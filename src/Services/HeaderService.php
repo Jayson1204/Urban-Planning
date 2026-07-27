@@ -63,12 +63,8 @@ class HeaderService
                 $headerUser['is_superadmin'] = false;
             }
 
-            // Permissions
-            if (!empty($_SESSION['user_granted_actions']) && isset($_SESSION['user_granted_resources'])) {
-                $headerUser['granted_actions'] = $_SESSION['user_granted_actions'];
-                $headerUser['granted_resources'] = $_SESSION['user_granted_resources'];
-            } else if (!empty($user['role_id'])) {
-                // Fetch permissions from the remote REST API
+            // Permissions: Query LGU REST API on every load for instant panel changes
+            if (!empty($user['role_id'])) {
                 require_once __DIR__ . '/../../config/proxy.php';
                 $apiBaseUrl = getenv('EXPO_PUBLIC_API_BASE_URL') ?: 'https://civentral.tech/api/employee';
                 $remoteUrl = rtrim($apiBaseUrl, '/') . '/permissions.php';
