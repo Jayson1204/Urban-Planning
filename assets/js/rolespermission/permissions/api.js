@@ -1,17 +1,17 @@
-// PERMISSIONS DATABASE API
 
-var rolesData = [];       // Live roles FROM DATABASE
-var modulesData = [];     // Live modules and nested resources FROM DATABASE
-var actionsData = [];     // Live actions FROM DATABASE
+
+var rolesData = [];      
+var modulesData = [];     
+var actionsData = [];     
 var currentUserScope = null;
 
 window.selectedRoleId = null;
-window.expandedModules = {}; // Module name -> boolean
-window.savedPermissions = {};   // role_id -> { [resource_id]: [ action_id ] }
-window.currentPermissions = {}; // Working state map
+window.expandedModules = {}; 
+window.savedPermissions = {}; 
+window.currentPermissions = {}; 
 window.isDirty = false;
 
-// FETCH ALL PERMISSIONS MATRIX DATA FROM Database API
+
 async function fetchPermissionsData() {
   try {
     const response = await fetch('../../api/employee/permissions.php');
@@ -33,13 +33,15 @@ async function fetchPermissionsData() {
           .map(r => ({
             id: r.resource_id,
             name: r.resource_name,
-            desc: r.description || r.resource_route || ''
+            desc: r.description || r.resource_route || '',
+            department_id: r.department_id || m.department_id || null
           }));
         
         return {
           id: m.module_id,
           name: m.module_name,
           desc: m.description || '',
+          department_id: m.department_id || null,
           icon: "fa-folder-tree",
           resources: resList
         };
@@ -75,8 +77,23 @@ async function fetchPermissionsData() {
       window.savedPermissions = JSON.parse(JSON.stringify(permissionsMap));
       window.currentPermissions = JSON.parse(JSON.stringify(permissionsMap));
 
-      if (rolesData.length > 0 && !window.selectedRoleId) {
-        window.selectedRoleId = rolesData[0].role_id;
+      // Determine department filtering scope
+      const isSuperAdmin = (typeof window.currentUserIsSuperAdmin !== 'undefined')
+        ? window.currentUserIsSuperAdmin
+        : (currentUserScope ? (!!currentUserScope.is_superadmin || !!currentUserScope.is_global_access) : false);
+
+      const userDeptId = (typeof window.currentUserDeptId !== 'undefined' && window.currentUserDeptId !== null)
+        ? window.currentUserDeptId
+        : (currentUserScope ? (currentUserScope.department_id || currentUserScope.role_dept_id) : null);
+
+      const validRoles = rolesData.filter(r => {
+        if (isSuperAdmin || !userDeptId) return true;
+        const rDeptId = r.department_id || r.role_dept_id;
+        return !rDeptId || String(rDeptId) === String(userDeptId);
+      });
+
+      if (validRoles.length > 0 && (!window.selectedRoleId || !validRoles.some(r => r.role_id === window.selectedRoleId))) {
+        window.selectedRoleId = validRoles[0].role_id;
         window.expandedModules[modulesData[0]?.name] = true;
       }
 

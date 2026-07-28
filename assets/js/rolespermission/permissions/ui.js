@@ -38,7 +38,26 @@ function renderRoleSelector(filterQuery = '') {
   roleListContainer.innerHTML = '';
   const query = filterQuery.toLowerCase().trim();
 
-  const filteredRoles = rolesData.filter(r => (r.role_name || '').toLowerCase().includes(query));
+  const isSuperAdmin = (typeof window.currentUserIsSuperAdmin !== 'undefined')
+    ? window.currentUserIsSuperAdmin
+    : (currentUserScope ? (!!currentUserScope.is_superadmin || !!currentUserScope.is_global_access) : false);
+
+  const userDeptId = (typeof window.currentUserDeptId !== 'undefined' && window.currentUserDeptId !== null)
+    ? window.currentUserDeptId
+    : (currentUserScope ? (currentUserScope.department_id || currentUserScope.role_dept_id) : null);
+
+  const filteredRoles = rolesData.filter(r => {
+    const nameMatches = (r.role_name || '').toLowerCase().includes(query);
+    if (!nameMatches) return false;
+    
+    if (isSuperAdmin || !userDeptId) return true;
+    
+    const roleDeptId = r.department_id || r.role_dept_id;
+    if (roleDeptId) {
+      return String(roleDeptId) === String(userDeptId);
+    }
+    return true;
+  });
 
   if (filteredRoles.length === 0) {
     roleListContainer.innerHTML = '<p class="text-[11px] text-slate-400 text-center py-2 font-semibold">No roles found</p>';
@@ -64,6 +83,45 @@ function renderRoleSelector(filterQuery = '') {
   });
 }
 
+function isModuleAllowedForDepartment(mod, userDeptId, userDeptName, isSuperAdmin) {
+  if (isSuperAdmin) return true;
+  
+  // 1. Check explicit DB department_id if present on module
+  if (mod.department_id && userDeptId) {
+    return String(mod.department_id) === String(userDeptId);
+  }
+
+  const deptNameLower = (userDeptName || '').toLowerCase();
+  const modNameLower = (mod.name || '').toLowerCase();
+  const modDescLower = (mod.desc || '').toLowerCase();
+  const resText = (mod.resources || []).map(r => (r.name || '') + ' ' + (r.desc || '')).join(' ').toLowerCase();
+  const fullModText = modNameLower + ' ' + modDescLower + ' ' + resText;
+
+  // Department-specific operational modules (restricted to their respective departments)
+  const domainRules = [
+    {
+      domainKeywords: ['scholarship', 'student registry', 'education monitoring'],
+      deptKeywords: ['scholarship', 'education', 'school', 'student']
+    },
+    {
+      domainKeywords: ['sanitation inspection', 'clinic management', 'medical records'],
+      deptKeywords: ['health', 'sanitation', 'medical', 'doctor', 'clinic', 'hospital']
+    }
+  ];
+
+  for (const rule of domainRules) {
+    const isDomainModule = rule.domainKeywords.some(kw => fullModText.includes(kw));
+    if (isDomainModule) {
+      const isUserInDomainDept = rule.deptKeywords.some(kw => deptNameLower.includes(kw));
+      if (!isUserInDomainDept) {
+        return false; // Hide operational module of other department
+      }
+    }
+  }
+
+  return true;
+}
+
 // RENDER COLLAPSIBLE MODULES AND NESTED RESOURCES
 function renderAccordions() {
   const accordionsContainer = document.getElementById('moduleAccordionList');
@@ -74,7 +132,18 @@ function renderAccordions() {
   const rolePermissions = (window.currentPermissions && window.currentPermissions[roleId]) ? window.currentPermissions[roleId] : {};
   const query = moduleSearchInput ? moduleSearchInput.value.toLowerCase().trim() : '';
 
-  const isSuperAdmin = currentUserScope ? !!currentUserScope.is_superadmin : false;
+  const isSuperAdmin = (typeof window.currentUserIsSuperAdmin !== 'undefined')
+    ? window.currentUserIsSuperAdmin
+    : (currentUserScope ? (!!currentUserScope.is_superadmin || !!currentUserScope.is_global_access) : false);
+
+  const userDeptId = (typeof window.currentUserDeptId !== 'undefined' && window.currentUserDeptId !== null)
+    ? window.currentUserDeptId
+    : (currentUserScope ? (currentUserScope.department_id || currentUserScope.role_dept_id) : null);
+
+  const userDeptName = (typeof window.currentUserDeptName !== 'undefined')
+    ? window.currentUserDeptName
+    : (currentUserScope ? (currentUserScope.department_name || '') : '');
+
   const grantedActions = currentUserScope ? (currentUserScope.granted_actions || []) : [];
   let canEditUser = isSuperAdmin || grantedActions.includes('EDIT') || grantedActions.includes('CREATE');
 
@@ -83,6 +152,11 @@ function renderAccordions() {
   }
 
   modulesData.forEach(mod => {
+    // Check if module is allowed for the user's department
+    if (!isModuleAllowedForDepartment(mod, userDeptId, userDeptName, isSuperAdmin)) {
+      return;
+    }
+
     const moduleMatches = mod.name.toLowerCase().includes(query) || mod.desc.toLowerCase().includes(query);
     const matchingResources = mod.resources.filter(res => 
       res.name.toLowerCase().includes(query) || res.desc.toLowerCase().includes(query)

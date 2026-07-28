@@ -5,6 +5,10 @@ include '../../includes/sidebar.php';
 ?>
 <script>
   window.currentUserRoleId = <?php echo json_encode($_SESSION['current_user_details']['role_id'] ?? null); ?>;
+  window.currentUserDeptId = <?php echo json_encode($headerUser['department_id'] ?? null); ?>;
+  window.currentUserDeptName = <?php echo json_encode($headerUser['department_name'] ?? ''); ?>;
+  window.currentUserDeptCode = <?php echo json_encode($headerUser['department_code'] ?? ''); ?>;
+  window.currentUserIsSuperAdmin = <?php echo json_encode(!empty($headerUser['is_superadmin']) || !empty($headerUser['is_global_access'])); ?>;
 </script>
 
 
