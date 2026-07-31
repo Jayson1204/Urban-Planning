@@ -1,47 +1,61 @@
 <?php
 $basePath = '../../';
+require_once __DIR__ . '/../../src/bootstrap.php';
+
+\App\Middleware\AuthMiddleware::handle($basePath);
+\App\Middleware\PermissionMiddleware::require('audit.user_activities', $basePath);
+
 include '../../includes/header.php';
 include '../../includes/sidebar.php';
 ?>
 
-
 <main class="flex-1 p-6 md:p-8 w-full space-y-6 overflow-y-auto bg-slate-50">
 
   <!-- Breadcrumb & Page Header -->
-  <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
+  <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200/80 dark:border-slate-700/80 pb-5">
     <div class="space-y-1.5">
-      <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+      <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
         <span>Audit Logs</span>
         <i class="fa-solid fa-chevron-right text-[8px] opacity-60"></i>
-        <span class="text-slate-900">User Activities Audit System</span>
+        <span class="text-slate-900 dark:text-slate-200">User Activities Audit System</span>
       </div>
-      <h1 class="text-2xl font-black text-slate-950 tracking-tight flex items-center gap-2 mt-4">
-        <i class="fa-solid fa-clock-rotate-left text-[#0f172a]"></i>
-        User Activities Audit System
+      <h1 class="text-2xl font-black text-slate-950 dark:text-white tracking-tight flex items-center gap-2.5 mt-4">
+        <i class="fa-solid fa-clock-rotate-left text-[#176B87] dark:text-[#86B6F6] shrink-0"></i>
+        <span>User Activities Audit System</span>
       </h1>
-      <p class="text-xs text-slate-500 max-w-3xl leading-relaxed font-medium">
-        Monitor and review decentralized operational actions, security mutations, and system transactions across all municipal divisions.
+      <p class="text-xs text-slate-500 dark:text-slate-400 max-w-3xl leading-relaxed font-medium">
+        Monitor and review operational actions, security mutations, and system transactions across all municipal divisions.
       </p>
     </div>
     
-    <!-- Action Buttons (Top Right) -->
-    <div class="flex items-center gap-3 shrink-0">
+    <!-- Action Controls (Top Right) -->
+    <div class="flex items-center gap-2.5 shrink-0 flex-wrap">
+      <button onclick="refreshLogs()" class="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 border border-[#B4D4FF] text-[#176B87] bg-[#EEF5FF] hover:bg-[#86B6F6]/20 font-bold rounded-xl text-xs tracking-wide transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#86B6F6]/40 shadow-sm dark:bg-slate-800 dark:border-slate-600 dark:text-[#86B6F6] dark:hover:bg-slate-700">
+        <i class="fa-solid fa-rotate text-[#86B6F6]"></i>
+        <span>Refresh Log</span>
+      </button>
+
+      <!-- Export Dropdown -->
       <div class="relative inline-block text-left" id="exportDropdownContainer">
-        <button id="exportDropdownBtn" onclick="toggleExportDropdown(event)" 
-          class="inline-flex items-center justify-center gap-2.5 px-4 py-2.5 border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 font-bold rounded-xl text-xs tracking-wide transition shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0f172a]/20">
-          <i class="fa-solid fa-download text-slate-400"></i>
-          <span>Export Log</span>
-          <i class="fa-solid fa-chevron-down text-[9px] text-slate-400"></i>
+        <button id="exportDropdownBtn" onclick="toggleExportDropdown(event)"
+          class="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-xs tracking-wide transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-400/50 shadow-sm">
+          <i class="fa-solid fa-file-export"></i>
+          <span>Export Logs</span>
+          <i class="fa-solid fa-chevron-down text-[9px] opacity-75"></i>
         </button>
         <!-- Dropdown Card -->
-        <div id="exportDropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-50 text-xs text-slate-600 transition-all transform scale-95 origin-top-right">
-          <a href="#" onclick="mockExport('CSV', event)" class="flex items-center gap-2.5 px-4 py-2.5 hover:bg-slate-50 text-slate-700 transition font-bold">
+        <div id="exportDropdownMenu" class="hidden absolute right-0 mt-2 w-52 bg-white border border-[#B4D4FF] rounded-xl shadow-xl py-1.5 z-50 text-xs text-slate-600 transition-all transform scale-95 origin-top-right dark:bg-slate-800 dark:border-slate-600">
+          <a href="#" onclick="exportLogs('PDF', event)" class="flex items-center gap-2.5 px-4 py-2.5 hover:bg-[#EEF5FF] text-slate-700 transition font-bold rounded-lg mx-1 dark:text-slate-200 dark:hover:bg-slate-700">
+            <i class="fa-solid fa-file-pdf text-red-500 text-sm"></i>
+            <span>Export to PDF</span>
+          </a>
+          <a href="#" onclick="exportLogs('Excel', event)" class="flex items-center gap-2.5 px-4 py-2.5 hover:bg-[#EEF5FF] text-slate-700 transition font-bold rounded-lg mx-1 dark:text-slate-200 dark:hover:bg-slate-700">
+            <i class="fa-solid fa-file-excel text-emerald-600 text-sm"></i>
+            <span>Export to Excel</span>
+          </a>
+          <a href="#" onclick="exportLogs('CSV', event)" class="flex items-center gap-2.5 px-4 py-2.5 hover:bg-[#EEF5FF] text-slate-700 transition font-bold rounded-lg mx-1 dark:text-slate-200 dark:hover:bg-slate-700">
             <i class="fa-solid fa-file-csv text-emerald-500 text-sm"></i>
             <span>Download CSV</span>
-          </a>
-          <a href="#" onclick="mockExport('Excel', event)" class="flex items-center gap-2.5 px-4 py-2.5 hover:bg-slate-50 text-slate-700 transition font-bold">
-            <i class="fa-solid fa-file-excel text-emerald-600 text-sm"></i>
-            <span>Download Excel</span>
           </a>
         </div>
       </div>
@@ -97,10 +111,6 @@ include '../../includes/sidebar.php';
           <select id="filterDepartment" onchange="applyFilters()"
             class="w-full bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl pl-10 pr-4 py-2.5 appearance-none focus:outline-none focus:border-[#0f172a] focus:ring-2 focus:ring-[#0f172a]/10 transition cursor-pointer">
             <option value="All">All Departments</option>
-            <option value="Education & Scholarship">Education & Scholarship</option>
-            <option value="Health & Sanitation">Health & Sanitation</option>
-            <option value="Citizen Management">Citizen Management</option>
-            <option value="Treasury">Revenue Collection & Treasury</option>
           </select>
           <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
             <i class="fa-solid fa-chevron-down text-[9px]"></i>
@@ -118,9 +128,6 @@ include '../../includes/sidebar.php';
           <select id="filterModule" onchange="applyFilters()"
             class="w-full bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl pl-10 pr-4 py-2.5 appearance-none focus:outline-none focus:border-[#0f172a] focus:ring-2 focus:ring-[#0f172a]/10 transition cursor-pointer">
             <option value="All">All Modules</option>
-            <option value="User Management">User Management</option>
-            <option value="Scholarship">Scholarship</option>
-            <option value="Citizen Management">Citizen Management</option>
           </select>
           <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
             <i class="fa-solid fa-chevron-down text-[9px]"></i>
@@ -150,18 +157,18 @@ include '../../includes/sidebar.php';
         </div>
       </div>
 
-      <!-- Status Switcher -->
+      <!-- Status Selector -->
       <div class="space-y-1.5">
-        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block" for="filterStatus">Status Switcher</label>
+        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block" for="filterStatus">Status Selector</label>
         <div class="relative">
           <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-            <i class="fa-solid fa-shield-halved text-xs"></i>
+            <i class="fa-solid fa-circle-check text-xs"></i>
           </span>
           <select id="filterStatus" onchange="applyFilters()"
             class="w-full bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl pl-10 pr-4 py-2.5 appearance-none focus:outline-none focus:border-[#0f172a] focus:ring-2 focus:ring-[#0f172a]/10 transition cursor-pointer">
             <option value="All">All Statuses</option>
             <option value="Success">Success</option>
-            <option value="Failed">Failed</option>
+            <option value="Failed">Failed / Blocked</option>
           </select>
           <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
             <i class="fa-solid fa-chevron-down text-[9px]"></i>
@@ -171,79 +178,102 @@ include '../../includes/sidebar.php';
     </div>
   </div>
 
-  <!-- System Audit Trail Datatable Card -->
-  <div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
-    <div class="overflow-x-auto w-full">
-      <table class="w-full text-left border-collapse min-w-[1000px]">
-        <thead>
-          <tr class="bg-slate-50 border-b border-slate-200">
-            <th class="py-3.5 px-5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Activity ID</th>
-            <th class="py-3.5 px-5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Date & Time</th>
-            <th class="py-3.5 px-5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Actor Identity</th>
-            <th class="py-3.5 px-5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Scope Location</th>
-            <th class="py-3.5 px-5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Action & Details</th>
-            <th class="py-3.5 px-5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Metadata Context</th>
-            <th class="py-3.5 px-5 text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Status</th>
+  <!-- Audit Table Container -->
+  <div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden flex flex-col">
+    <div class="overflow-x-auto overflow-y-auto max-h-[600px] w-full custom-scrollbar">
+      <table class="w-full text-left border-collapse min-w-[950px]">
+        <thead class="sticky top-0 bg-slate-50 z-10 border-b border-slate-200 shadow-xs">
+          <tr class="bg-slate-50 text-[10px] font-black uppercase tracking-wider text-slate-400">
+            <th class="py-4 px-5">Activity ID</th>
+            <th class="py-4 px-5">Date & Time (Asia/Manila)</th>
+            <th class="py-4 px-5">Actor & Role</th>
+            <th class="py-4 px-5">Department / Module</th>
+            <th class="py-4 px-5">Action & Description</th>
+            <th class="py-4 px-5">IP & Device Trace</th>
+            <th class="py-4 px-5 text-center">Status</th>
           </tr>
         </thead>
-        <tbody id="auditTableBody" class="divide-y divide-slate-100 text-xs">
-          <!-- Row 1 -->
-          <!-- Dynamic No Results Row -->
-          <tr id="noResultsRow" class="hidden">
-            <td colspan="7" class="py-12 text-center text-slate-400">
-              <div class="flex flex-col items-center justify-center space-y-2">
-                <i class="fa-solid fa-folder-open text-3xl text-slate-300"></i>
-                <p class="text-xs font-bold">No matching audit logs found</p>
-                <p class="text-[10px] font-semibold text-slate-400">Try adjusting your filters or resetting them to defaults.</p>
-              </div>
+        <tbody id="auditTableBody" class="divide-y divide-slate-100 text-xs text-slate-700">
+          <tr>
+            <td colspan="7" class="py-12 text-center text-slate-400 font-semibold">
+              <i class="fa-solid fa-spinner fa-spin text-2xl mb-3 block text-slate-900"></i>
+              Fetching real-time audit logs FROM DATABASE...
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <!-- Pagination Footer Container -->
+    <div id="paginationFooter" class="px-5 py-3.5 bg-[#EEF5FF]/60 border-t border-[#B4D4FF]/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-semibold select-none dark:bg-slate-800/60 dark:border-slate-700">
+      <div class="flex items-center gap-4 flex-wrap">
+        <div id="paginationInfo" class="text-xs text-slate-500 font-medium dark:text-slate-400">
+          Showing <span id="paginationStart" class="font-bold text-[#176B87] dark:text-[#86B6F6]">0</span> to <span id="paginationEnd" class="font-bold text-[#176B87] dark:text-[#86B6F6]">0</span> of <span id="paginationTotal" class="font-bold text-[#176B87] dark:text-[#86B6F6]">0</span> entries
+        </div>
+        <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+          <label for="pageSizeSelect" class="text-[11px] font-semibold">Rows per page:</label>
+          <select id="pageSizeSelect" onchange="changePageSize(this.value)" class="bg-white dark:bg-slate-800 border border-[#B4D4FF] dark:border-slate-600 rounded-lg px-2 py-1 text-xs font-bold text-[#176B87] dark:text-[#86B6F6] focus:outline-none cursor-pointer">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5" id="paginationControls">
+        <button id="prevPageBtn" onclick="changePage(-1)" class="px-3 py-1.5 border border-[#B4D4FF] rounded-xl bg-white hover:bg-[#EEF5FF] disabled:opacity-40 disabled:cursor-not-allowed text-[#176B87] font-bold transition flex items-center gap-1 text-xs cursor-pointer shadow-sm dark:bg-slate-800 dark:border-slate-600 dark:text-[#86B6F6] dark:hover:bg-slate-700">
+          <i class="fa-solid fa-chevron-left text-[10px]"></i> Previous
+        </button>
+        <div id="pageNumbers" class="flex items-center gap-1 font-bold text-xs">
+          <!-- Dynamic Page Numbers -->
+        </div>
+        <button id="nextPageBtn" onclick="changePage(1)" class="px-3 py-1.5 border border-[#B4D4FF] rounded-xl bg-white hover:bg-[#EEF5FF] disabled:opacity-40 disabled:cursor-not-allowed text-[#176B87] font-bold transition flex items-center gap-1 text-xs cursor-pointer shadow-sm dark:bg-slate-800 dark:border-slate-600 dark:text-[#86B6F6] dark:hover:bg-slate-700">
+          Next <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <!-- Detail Modal -->
-  <div id="logDetailsModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 transition-all duration-300">
-    <div id="modalCard" class="bg-white border border-slate-200 shadow-2xl rounded-2xl w-full max-w-xl overflow-hidden flex flex-col transform scale-95 opacity-0 transition-all duration-300">
+  <!-- Audit Entry Detailed Inspector Modal -->
+  <div id="logDetailsModal" class="hidden fixed inset-0 z-[99999] p-4 sm:p-6 pt-20 sm:pt-16 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-all duration-300 overflow-y-auto">
+    <div id="modalCard" class="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-200 flex flex-col max-h-[82vh] my-auto dark:bg-slate-900 dark:border-slate-800">
       
       <!-- Modal Header -->
-      <div class="px-6 py-4 border-b border-slate-200/80 bg-slate-50 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="h-9 w-9 rounded-xl bg-slate-905 flex items-center justify-center text-white bg-slate-900 text-sm shadow-sm">
-            <i class="fa-solid fa-receipt"></i>
+      <div class="px-6 py-4 border-b border-slate-200/80 flex items-center justify-between bg-slate-50/50 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="h-9 w-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-[#0f172a]">
+            <i class="fa-solid fa-clock-rotate-left text-base"></i>
           </div>
           <div>
-            <h3 class="text-sm font-black text-slate-900">Audit Log Details</h3>
-            <span id="modalActId" class="font-mono text-[10px] font-black text-slate-400 uppercase">#ACT-90812</span>
+            <h3 class="text-sm font-black text-slate-900">Activity Log Inspector</h3>
+            <p class="text-[10px] text-slate-400 font-semibold" id="modalActId">#ACT-0000</p>
           </div>
         </div>
-        <button onclick="closeLogDetailsModal()" class="h-8 w-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 flex items-center justify-center transition focus:outline-none cursor-pointer">
+        <button onclick="closeLogDetailsModal()" class="h-8 w-8 rounded-lg hover:bg-slate-200/70 text-slate-400 hover:text-slate-600 transition flex items-center justify-center cursor-pointer">
           <i class="fa-solid fa-xmark text-sm"></i>
         </button>
       </div>
 
-      <!-- Modal Content (Receipt layout) -->
-      <div class="p-6 space-y-5 overflow-y-auto max-h-[70vh] custom-scrollbar">
+      <!-- Modal Body -->
+      <div class="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1">
+        
         <!-- Status Indicator Banner -->
-        <div id="modalStatusBanner" class="p-4 rounded-xl flex items-center gap-3">
-          <div id="modalStatusIconContainer" class="h-8 w-8 rounded-lg flex items-center justify-center shrink-0">
-            <!-- Dynamic Icon -->
+        <div id="modalStatusBanner" class="p-4 rounded-xl flex items-center gap-3 bg-emerald-50 border border-emerald-100 text-emerald-800">
+          <div id="modalStatusIconContainer" class="h-8 w-8 rounded-lg flex items-center justify-center shrink-0 bg-emerald-100 text-emerald-700">
+            <i class="fa-solid fa-circle-check text-base"></i>
           </div>
-          <div>
+          <div class="space-y-0.5">
             <h4 id="modalStatusTitle" class="text-xs font-bold">Transaction Success</h4>
-            <p id="modalStatusMsg" class="text-[10px] leading-relaxed font-semibold">The action was verified and committed successfully in the municipal portal.</p>
+            <p id="modalStatusMsg" class="text-[10px] leading-relaxed font-semibold text-emerald-600">The operations were processed, audited, and committed successfully.</p>
           </div>
         </div>
 
-        <!-- Details Grid -->
-        <div class="grid grid-cols-2 gap-y-4 gap-x-6 border-b border-slate-100 pb-5 text-xs">
+        <!-- Detail Breakdown Grid -->
+        <div class="grid grid-cols-2 gap-4 text-xs">
           <div>
             <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block mb-1">Actor Identity</span>
             <div id="modalActorName" class="font-bold text-slate-900">Joshua Suruiz</div>
-            <div id="modalActorRole" class="mt-1">
-              <!-- Dynamic badge -->
-            </div>
+            <div id="modalActorRole" class="mt-1"></div>
           </div>
           
           <div>
@@ -296,11 +326,11 @@ include '../../includes/sidebar.php';
       </div>
 
       <!-- Modal Footer -->
-      <div class="px-6 py-4 border-t border-slate-200/80 bg-slate-50 flex items-center justify-end gap-3">
+      <div class="px-6 py-4 border-t border-slate-200/80 bg-slate-50 flex items-center justify-end gap-3 shrink-0">
         <button onclick="closeLogDetailsModal()" class="px-4 py-2 border border-slate-200 text-slate-700 hover:bg-slate-100 font-bold rounded-xl text-xs tracking-wide transition cursor-pointer focus:outline-none">
           Close Details
         </button>
-        <button onclick="window.print()" class="px-4 py-2 bg-[#0f172a] hover:bg-[#1e3a8a] text-white font-bold rounded-xl text-xs tracking-wide transition flex items-center gap-1.5 cursor-pointer focus:outline-none shadow-sm">
+        <button onclick="printData()" class="px-4 py-2 bg-[#0f172a] hover:bg-[#1e3a8a] text-white font-bold rounded-xl text-xs tracking-wide transition flex items-center gap-1.5 cursor-pointer focus:outline-none shadow-sm">
           <i class="fa-solid fa-print"></i>
           Print Log Entry
         </button>
@@ -313,6 +343,15 @@ include '../../includes/sidebar.php';
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
 
 </main>
-<script src="../../assets/js/audit/user-activities.js"></script>
+
+<script src="../../assets/js/audit/shared/utils.js"></script>
+<script src="../../assets/js/audit/shared/toast.js"></script>
+<script src="../../assets/js/audit/audit-export.js"></script>
+<script src="../../assets/js/audit/user-activities/api.js"></script>
+<script src="../../assets/js/audit/user-activities/ui.js"></script>
+<script src="../../assets/js/audit/user-activities/filters.js"></script>
+<script src="../../assets/js/audit/user-activities/modal.js"></script>
+<script src="../../assets/js/audit/user-activities/events.js"></script>
+<script src="../../assets/js/audit/user-activities/app.js"></script>
 
 <?php include '../../includes/footer.php'; ?>

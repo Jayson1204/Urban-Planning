@@ -1,5 +1,10 @@
 <?php
 $basePath = '../../';
+require_once __DIR__ . '/../../src/bootstrap.php';
+
+\App\Middleware\AuthMiddleware::handle($basePath);
+\App\Middleware\PermissionMiddleware::require('audit.data_changes', $basePath);
+
 include '../../includes/header.php';
 include '../../includes/sidebar.php';
 ?>
@@ -7,53 +12,48 @@ include '../../includes/sidebar.php';
 <main class="flex-1 p-6 md:p-8 w-full space-y-6 overflow-y-auto bg-slate-50">
 
   <!-- Breadcrumb & Page Header -->
-  <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
+  <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200/80 dark:border-slate-700/80 pb-5">
     <div class="space-y-1.5">
-      <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+      <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
         <span>Audit Logs</span>
         <i class="fa-solid fa-chevron-right text-[8px] opacity-60"></i>
-        <span class="text-slate-900">Data Mutation Logs</span>
+        <span class="text-slate-900 dark:text-slate-200">Data Mutation Logs</span>
       </div>
-      <h1 class="text-2xl font-black text-slate-950 tracking-tight flex items-center gap-2.5 mt-4">
-        <i class="fa-solid fa-database text-[#0f172a]"></i>
-        Data Mutation & Records Audit
+      <h1 class="text-2xl font-black text-slate-950 dark:text-white tracking-tight flex items-center gap-2.5 mt-4">
+        <i class="fa-solid fa-database text-[#176B87] dark:text-[#86B6F6] shrink-0"></i>
+        <span>Data Mutation & Records Audit</span>
       </h1>
-      <p class="text-xs text-slate-500 max-w-3xl leading-relaxed font-medium">
+      <p class="text-xs text-slate-500 dark:text-slate-400 max-w-3xl leading-relaxed font-medium">
         Track structural row edits, history changes, and delta record mutations to maximize data accountability.
       </p>
     </div>
 
     <!-- Non-Destructive Action Controls -->
-    <div class="flex items-center gap-3 shrink-0">
-      <button onclick="refreshLogs()" class="inline-flex items-center justify-center gap-2 px-3 py-2.5 border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 font-bold rounded-xl text-xs tracking-wide transition shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0f172a]/20">
-        <i class="fa-solid fa-rotate text-slate-400"></i>
+    <div class="flex items-center gap-2.5 shrink-0 flex-wrap">
+      <button onclick="refreshLogs()" class="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 border border-[#B4D4FF] text-[#176B87] bg-[#EEF5FF] hover:bg-[#86B6F6]/20 font-bold rounded-xl text-xs tracking-wide transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#86B6F6]/40 shadow-sm dark:bg-slate-800 dark:border-slate-600 dark:text-[#86B6F6] dark:hover:bg-slate-700">
+        <i class="fa-solid fa-rotate text-[#86B6F6] dark:text-[#86B6F6]"></i>
         <span>Refresh Log</span>
-      </button>
-
-      <button onclick="window.print()" class="inline-flex items-center justify-center gap-2 px-3 py-2.5 border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 font-bold rounded-xl text-xs tracking-wide transition shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0f172a]/20">
-        <i class="fa-solid fa-print text-slate-400"></i>
-        <span>Print Log</span>
       </button>
 
       <!-- Export Dropdown -->
       <div class="relative inline-block text-left" id="exportDropdownContainer">
-        <button id="exportDropdownBtn" onclick="toggleExportDropdown(event)" 
-          class="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 font-bold rounded-xl text-xs tracking-wide transition shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0f172a]/20">
-          <i class="fa-solid fa-file-export text-slate-400"></i>
+        <button id="exportDropdownBtn" onclick="toggleExportDropdown(event)"
+          class="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-xs tracking-wide transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-400/50 shadow-sm">
+          <i class="fa-solid fa-file-export"></i>
           <span>Export Logs</span>
-          <i class="fa-solid fa-chevron-down text-[9px] text-slate-400"></i>
+          <i class="fa-solid fa-chevron-down text-[9px] opacity-75"></i>
         </button>
         <!-- Dropdown Card -->
-        <div id="exportDropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-50 text-xs text-slate-600 transition-all transform scale-95 origin-top-right">
-          <a href="#" onclick="exportLogs('PDF', event)" class="flex items-center gap-2.5 px-4 py-2.5 hover:bg-slate-50 text-slate-700 transition font-bold">
+        <div id="exportDropdownMenu" class="hidden absolute right-0 mt-2 w-52 bg-white border border-[#B4D4FF] rounded-xl shadow-xl py-1.5 z-50 text-xs text-slate-600 transition-all transform scale-95 origin-top-right dark:bg-slate-800 dark:border-slate-600">
+          <a href="#" onclick="exportLogs('PDF', event)" class="flex items-center gap-2.5 px-4 py-2.5 hover:bg-[#EEF5FF] text-slate-700 transition font-bold rounded-lg mx-1 dark:text-slate-200 dark:hover:bg-slate-700">
             <i class="fa-solid fa-file-pdf text-red-500 text-sm"></i>
             <span>Export to PDF</span>
           </a>
-          <a href="#" onclick="exportLogs('Excel', event)" class="flex items-center gap-2.5 px-4 py-2.5 hover:bg-slate-50 text-slate-700 transition font-bold">
+          <a href="#" onclick="exportLogs('Excel', event)" class="flex items-center gap-2.5 px-4 py-2.5 hover:bg-[#EEF5FF] text-slate-700 transition font-bold rounded-lg mx-1 dark:text-slate-200 dark:hover:bg-slate-700">
             <i class="fa-solid fa-file-excel text-emerald-600 text-sm"></i>
             <span>Export to Excel</span>
           </a>
-          <a href="#" onclick="exportLogs('CSV', event)" class="flex items-center gap-2.5 px-4 py-2.5 hover:bg-slate-50 text-slate-700 transition font-bold">
+          <a href="#" onclick="exportLogs('CSV', event)" class="flex items-center gap-2.5 px-4 py-2.5 hover:bg-[#EEF5FF] text-slate-700 transition font-bold rounded-lg mx-1 dark:text-slate-200 dark:hover:bg-slate-700">
             <i class="fa-solid fa-file-csv text-emerald-500 text-sm"></i>
             <span>Download CSV</span>
           </a>
@@ -102,7 +102,7 @@ include '../../includes/sidebar.php';
         </div>
       </div>
 
-      <!-- Date Range Picker -->
+      <!-- Date Filter -->
       <div class="space-y-1.5">
         <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block" for="filterDate">Date Picker</label>
         <div class="relative">
@@ -114,9 +114,9 @@ include '../../includes/sidebar.php';
         </div>
       </div>
 
-      <!-- Affected Module Selector -->
+      <!-- Module / Target Table Filter -->
       <div class="space-y-1.5">
-        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block" for="filterModule">Affected Module</label>
+        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block" for="filterModule">Module / Target Area</label>
         <div class="relative">
           <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
             <i class="fa-solid fa-cubes text-xs"></i>
@@ -133,120 +133,183 @@ include '../../includes/sidebar.php';
     </div>
   </div>
 
-  <!-- Data Mutation Trail Table -->
-  <div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
-    <div class="overflow-x-auto w-full">
-      <table class="w-full text-left border-collapse min-w-[1200px]">
-        <thead>
-          <tr class="bg-slate-50 border-b border-slate-200">
-            <th class="py-3.5 px-5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Change ID</th>
-            <th class="py-3.5 px-5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Timestamp</th>
-            <th class="py-3.5 px-5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Actor</th>
-            <th class="py-3.5 px-5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Coordinates</th>
-            <th class="py-3.5 px-5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Action / Field</th>
-            <th class="py-3.5 px-5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Target Entity</th>
-            <th class="py-3.5 px-5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Result Status</th>
-            <th class="py-3.5 px-5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Description / Justification</th>
-            <th class="py-3.5 px-5 text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Action</th>
+  <!-- Data Mutation Audit Table Container -->
+  <div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden flex flex-col">
+    <div class="overflow-x-auto overflow-y-auto max-h-[600px] w-full custom-scrollbar">
+      <table class="w-full text-left border-collapse min-w-[950px]">
+        <thead class="sticky top-0 bg-slate-50 z-10 border-b border-slate-200 shadow-xs">
+          <tr class="bg-slate-50 text-[10px] font-black uppercase tracking-wider text-slate-400">
+            <th class="py-4 px-5">Change Ref</th>
+            <th class="py-4 px-5">Timestamp (Asia/Manila)</th>
+            <th class="py-4 px-5">Actor Name</th>
+            <th class="py-4 px-5">Module / Target</th>
+            <th class="py-4 px-5">Record Ref</th>
+            <th class="py-4 px-5">Action Type</th>
+            <th class="py-4 px-5">Pre-State (Old)</th>
+            <th class="py-4 px-5">Post-State (New)</th>
+            <th class="py-4 px-5 text-right">Details</th>
           </tr>
         </thead>
-        <tbody id="mutationTableBody" class="divide-y divide-slate-100 text-xs">
-          <!-- Dynamically populated from MySQL Database via assets/js/audit/data-changes.js -->
+        <tbody id="mutationTableBody" class="divide-y divide-slate-100 text-xs text-slate-700">
+          <tr id="loadingRow">
+            <td colspan="9" class="py-12 text-center text-slate-400 font-semibold">
+              <i class="fa-solid fa-spinner fa-spin text-2xl mb-3 block text-[#0f172a]"></i>
+              Loading real-time data mutation audit logs from database...
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
+
+    <!-- Pagination Footer Container -->
+    <div id="paginationFooter" class="px-5 py-3.5 bg-[#EEF5FF]/60 border-t border-[#B4D4FF]/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-semibold select-none dark:bg-slate-800/60 dark:border-slate-700">
+      <div class="flex items-center gap-4 flex-wrap">
+        <div id="paginationInfo" class="text-xs text-slate-500 font-medium dark:text-slate-400">
+          Showing <span id="paginationStart" class="font-bold text-[#176B87] dark:text-[#86B6F6]">0</span> to <span id="paginationEnd" class="font-bold text-[#176B87] dark:text-[#86B6F6]">0</span> of <span id="paginationTotal" class="font-bold text-[#176B87] dark:text-[#86B6F6]">0</span> entries
+        </div>
+        <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+          <label for="pageSizeSelect" class="text-[11px] font-semibold">Rows per page:</label>
+          <select id="pageSizeSelect" onchange="changePageSize(this.value)" class="bg-white dark:bg-slate-800 border border-[#B4D4FF] dark:border-slate-600 rounded-lg px-2 py-1 text-xs font-bold text-[#176B87] dark:text-[#86B6F6] focus:outline-none cursor-pointer">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5" id="paginationControls">
+        <button id="prevPageBtn" onclick="changePage(-1)" class="px-3 py-1.5 border border-[#B4D4FF] rounded-xl bg-white hover:bg-[#EEF5FF] disabled:opacity-40 disabled:cursor-not-allowed text-[#176B87] font-bold transition flex items-center gap-1 text-xs cursor-pointer shadow-sm dark:bg-slate-800 dark:border-slate-600 dark:text-[#86B6F6] dark:hover:bg-slate-700">
+          <i class="fa-solid fa-chevron-left text-[10px]"></i> Previous
+        </button>
+        <div id="pageNumbers" class="flex items-center gap-1 font-bold text-xs">
+          <!-- Dynamic Page Numbers -->
+        </div>
+        <button id="nextPageBtn" onclick="changePage(1)" class="px-3 py-1.5 border border-[#B4D4FF] rounded-xl bg-white hover:bg-[#EEF5FF] disabled:opacity-40 disabled:cursor-not-allowed text-[#176B87] font-bold transition flex items-center gap-1 text-xs cursor-pointer shadow-sm dark:bg-slate-800 dark:border-slate-600 dark:text-[#86B6F6] dark:hover:bg-slate-700">
+          Next <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <!-- Snapshot Inspection Modal -->
-  <div id="mutationDetailsModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 transition-all duration-300">
-    <div id="modalCard" class="bg-white border border-slate-200 shadow-2xl rounded-2xl w-full max-w-3xl overflow-hidden flex flex-col transform scale-95 opacity-0 transition-all duration-300">
+  <!-- Data Mutation Detail Inspector Modal -->
+  <div id="mutationDetailsModal" class="hidden fixed inset-0 z-[99999] p-4 sm:p-6 pt-20 sm:pt-16 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-all duration-300 overflow-y-auto">
+    <div id="modalCard" class="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden transform scale-95 opacity-0 transition-all duration-200 flex flex-col max-h-[82vh] my-auto dark:bg-slate-900 dark:border-slate-800">
       
       <!-- Modal Header -->
-      <div class="px-6 py-4 border-b border-slate-200/80 bg-slate-50 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="h-9 w-9 rounded-xl bg-slate-900 flex items-center justify-center text-white text-sm shadow-sm">
-            <i class="fa-solid fa-code-compare"></i>
+      <div class="px-6 py-4 border-b border-slate-200/80 flex items-center justify-between bg-slate-50/50 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="h-9 w-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-[#176B87]">
+            <i class="fa-solid fa-database text-base"></i>
           </div>
           <div>
-            <h3 class="text-sm font-black text-slate-900">Record Delta Visualizer</h3>
-            <span id="modalMutId" class="font-mono text-[10px] font-black text-slate-400 uppercase">#MUT-1001</span>
+            <h3 class="text-sm font-black text-slate-900">Data Mutation Delta Inspector</h3>
+            <p class="text-[10px] text-slate-400 font-semibold" id="modalMutId">#MUT-0000</p>
           </div>
         </div>
-        <button onclick="closeMutationModal()" class="h-8 w-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 flex items-center justify-center transition focus:outline-none cursor-pointer">
+        <button onclick="closeMutationModal()" class="h-8 w-8 rounded-lg hover:bg-slate-200/70 text-slate-400 hover:text-slate-600 transition flex items-center justify-center cursor-pointer">
           <i class="fa-solid fa-xmark text-sm"></i>
         </button>
       </div>
 
       <!-- Modal Body -->
-      <div class="p-6 space-y-5 overflow-y-auto max-h-[75vh] custom-scrollbar text-xs">
+      <div class="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1">
         
-        <!-- Summary Context Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-50 border border-slate-200/60 p-4 rounded-xl">
+        <!-- Summary Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs bg-slate-50 border border-slate-200/60 p-4 rounded-xl">
           <div>
-            <span class="text-[8px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">Audit Actor</span>
-            <span id="modalActor" class="font-bold text-slate-800">System User</span>
+            <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">Actor Identity</span>
+            <div id="modalActor" class="font-bold text-slate-900">System</div>
           </div>
           <div>
-            <span class="text-[8px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">Timestamp</span>
-            <span id="modalTime" class="font-bold text-slate-800 font-mono">Jul 26, 2026 / 01:00 AM</span>
+            <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">Timestamp (Asia/Manila)</span>
+            <div id="modalTime" class="font-bold text-slate-900">—</div>
           </div>
           <div>
-            <span class="text-[8px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">Affected Module</span>
-            <span id="modalModule" class="font-bold text-slate-800">System</span>
+            <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">Module / Target</span>
+            <div id="modalModule" class="font-bold text-slate-900">System</div>
           </div>
           <div>
-            <span class="text-[8px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">Record Identifier</span>
-            <span id="modalRecord" class="font-bold text-slate-800 font-mono">REC-CORE</span>
+            <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">Record Ref</span>
+            <div id="modalRecord" class="font-mono font-bold text-slate-900">—</div>
           </div>
         </div>
 
-        <!-- Delta comparison visualizer boxes -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Old Value block -->
-          <div class="bg-rose-50/50 border border-rose-200/60 rounded-xl p-4 space-y-1.5">
-            <span class="text-[8px] font-black uppercase tracking-wider text-rose-600 block">Original Parameter State</span>
-            <div class="flex items-baseline gap-2">
-              <span id="modalFieldOldLabel" class="text-[10px] font-bold text-slate-500">Action:</span>
-              <span id="modalOldValue" class="text-xs font-bold text-rose-700 line-through bg-rose-50 border border-rose-100 px-2 py-0.5 rounded">Previous State</span>
-            </div>
-          </div>
+        <!-- Delta State Comparison Panel -->
+        <div class="space-y-3">
+          <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-code-compare text-slate-400"></i>
+            <span>Delta State Comparison</span>
+          </h4>
           
-          <!-- New Value block -->
-          <div class="bg-emerald-50/50 border border-emerald-200 rounded-xl p-4 space-y-1.5">
-            <span class="text-[8px] font-black uppercase tracking-wider text-emerald-700 block">Committed Mutation State</span>
-            <div class="flex items-baseline gap-2">
-              <span id="modalFieldNewLabel" class="text-[10px] font-bold text-slate-500">Action:</span>
-              <span id="modalNewValue" class="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded">Success</span>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Old Value Box -->
+            <div class="space-y-1.5">
+              <span id="modalFieldOldLabel" class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Pre-Mutation State (Old):</span>
+              <div id="modalOldValue" class="p-3 bg-slate-100 border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-700 break-words leading-relaxed min-h-[48px]">
+                None (New Record)
+              </div>
+            </div>
+            
+            <!-- New Value Box -->
+            <div class="space-y-1.5">
+              <span id="modalFieldNewLabel" class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Post-Mutation State (New):</span>
+              <div id="modalNewValue" class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-mono font-bold text-emerald-800 break-words leading-relaxed min-h-[48px]">
+                Success
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Split Screen Code Comparison -->
+        <!-- Context Description -->
+        <div class="space-y-1.5">
+          <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block">System Description & Reason</span>
+          <p id="modalReason" class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-700 leading-relaxed">
+            Record mutation committed to audit log database.
+          </p>
+        </div>
+
+        <!-- Request Network Context -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 border border-slate-200/60 p-3.5 rounded-xl text-xs">
+          <div>
+            <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">IP Address</span>
+            <span id="modalIp" class="font-mono font-bold text-slate-700">127.0.0.1</span>
+          </div>
+          <div>
+            <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">HTTP Method</span>
+            <span id="modalMethod" class="font-mono font-bold text-slate-700">POST</span>
+          </div>
+          <div>
+            <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">Target Request URI</span>
+            <span id="modalUri" class="font-mono font-bold text-slate-700 truncate block">/api</span>
+          </div>
+          <div>
+            <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">Client User Agent</span>
+            <span id="modalBrowser" class="font-bold text-slate-700 truncate block">Browser</span>
+          </div>
+        </div>
+
+        <!-- Full Pre / Post JSON Payload comparison -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Left side: Original JSON -->
           <div class="space-y-1.5">
-            <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">Original Record Snapshot</span>
-            <pre class="bg-slate-900 text-slate-200 p-4 rounded-xl text-[10px] font-mono overflow-x-auto border border-slate-800 shadow-inner max-h-48 custom-scrollbar"><code id="modalOldJson">{}</code></pre>
+            <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Pre-Mutation JSON Payload</span>
+            <pre class="bg-slate-900 text-slate-200 p-3.5 rounded-xl text-[10px] font-mono overflow-x-auto leading-relaxed border border-slate-800 shadow-inner max-h-40 custom-scrollbar"><code id="modalOldJson">null</code></pre>
           </div>
-
-          <!-- Right side: Modified JSON -->
           <div class="space-y-1.5">
-            <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">Committed Audit Context Snapshot</span>
-            <pre class="bg-slate-900 text-slate-200 p-4 rounded-xl text-[10px] font-mono overflow-x-auto border border-slate-800 shadow-inner max-h-48 custom-scrollbar"><code id="modalNewJson">{}</code></pre>
+            <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Post-Mutation JSON Payload</span>
+            <pre class="bg-slate-900 text-slate-200 p-3.5 rounded-xl text-[10px] font-mono overflow-x-auto leading-relaxed border border-slate-800 shadow-inner max-h-40 custom-scrollbar"><code id="modalNewJson">{}</code></pre>
           </div>
         </div>
 
-        <!-- Justification Description -->
-        <div class="bg-slate-50 border border-slate-200/60 p-4 rounded-xl space-y-1">
-          <span class="text-[8px] font-black uppercase tracking-wider text-slate-400 block">Mutation Justification</span>
-          <p id="modalReason" class="text-[11px] font-bold text-slate-700 leading-relaxed">Description provided in audit log entry.</p>
-        </div>
       </div>
 
       <!-- Modal Footer -->
-      <div class="px-6 py-4 border-t border-slate-200/80 bg-slate-50 flex items-center justify-end gap-3">
+      <div class="px-6 py-4 border-t border-slate-200/80 bg-slate-50 flex items-center justify-end gap-3 shrink-0">
         <button onclick="closeMutationModal()" class="px-4 py-2 border border-slate-200 text-slate-700 hover:bg-slate-100 font-bold rounded-xl text-xs tracking-wide transition cursor-pointer focus:outline-none">
-          Close Details
+          Close Inspector
+        </button>
+        <button onclick="printData()" class="px-4 py-2 bg-[#0f172a] hover:bg-[#1e3a8a] text-white font-bold rounded-xl text-xs tracking-wide transition flex items-center gap-1.5 cursor-pointer focus:outline-none shadow-sm">
+          <i class="fa-solid fa-print"></i>
+          Print Audit Trail
         </button>
       </div>
 
@@ -258,6 +321,14 @@ include '../../includes/sidebar.php';
 
 </main>
 
-<script src="../../assets/js/audit/data-changes.js"></script>
+<script src="../../assets/js/audit/shared/utils.js"></script>
+<script src="../../assets/js/audit/shared/toast.js"></script>
+<script src="../../assets/js/audit/audit-export.js"></script>
+<script src="../../assets/js/audit/data-changes/api.js"></script>
+<script src="../../assets/js/audit/data-changes/ui.js"></script>
+<script src="../../assets/js/audit/data-changes/filters.js"></script>
+<script src="../../assets/js/audit/data-changes/modal.js"></script>
+<script src="../../assets/js/audit/data-changes/events.js"></script>
+<script src="../../assets/js/audit/data-changes/app.js"></script>
 
 <?php include '../../includes/footer.php'; ?>

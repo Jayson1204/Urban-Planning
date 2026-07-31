@@ -14,6 +14,10 @@ window.civAudit.dataChanges.modal = {
     const oldVal = row.getAttribute('data-old');
     const newVal = row.getAttribute('data-new');
     const reason = row.getAttribute('data-reason');
+    const ip = row.getAttribute('data-ip') || '127.0.0.1';
+    const method = row.getAttribute('data-method') || 'POST';
+    const uri = row.getAttribute('data-uri') || '/api';
+    const browser = row.getAttribute('data-browser') || 'Browser';
     const oldJson = row.getAttribute('data-old-json');
     const newJson = row.getAttribute('data-new-json');
 
@@ -27,6 +31,10 @@ window.civAudit.dataChanges.modal = {
     const elOldV = document.getElementById('modalOldValue');
     const elNewV = document.getElementById('modalNewValue');
     const elReason = document.getElementById('modalReason');
+    const elIp = document.getElementById('modalIp');
+    const elMethod = document.getElementById('modalMethod');
+    const elUri = document.getElementById('modalUri');
+    const elBrowser = document.getElementById('modalBrowser');
     const elOldJ = document.getElementById('modalOldJson');
     const elNewJ = document.getElementById('modalNewJson');
 
@@ -36,22 +44,49 @@ window.civAudit.dataChanges.modal = {
     if (elMod) elMod.innerText = mod;
     if (elRec) elRec.innerText = record;
 
-    if (elFldOld) elFldOld.innerText = `${field}:`;
-    if (elFldNew) elFldNew.innerText = `${field}:`;
+    if (elIp) elIp.innerText = ip;
+    if (elMethod) elMethod.innerText = method;
+    if (elUri) {
+      elUri.innerText = uri;
+      elUri.title = uri;
+    }
+    if (elBrowser) {
+      elBrowser.innerText = browser;
+      elBrowser.title = browser;
+    }
+
+    if (elFldOld) elFldOld.innerText = `${field} (Pre-Mutation State):`;
+    if (elFldNew) elFldNew.innerText = `${field} (Post-Mutation State):`;
 
     if (elOldV) elOldV.innerText = oldVal;
     if (elNewV) {
       elNewV.innerText = newVal;
-      if (newVal !== 'Success') {
-        elNewV.className = 'text-xs font-bold text-rose-800 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded';
+      if (newVal.toLowerCase().includes('failed') || newVal.toLowerCase().includes('archived') || newVal.toLowerCase().includes('deleted')) {
+        elNewV.className = 'p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-mono font-bold text-rose-800 break-words leading-relaxed min-h-[48px]';
       } else {
-        elNewV.className = 'text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded';
+        elNewV.className = 'p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-mono font-bold text-emerald-800 break-words leading-relaxed min-h-[48px]';
       }
     }
     
     if (elReason) elReason.innerText = reason;
-    if (elOldJ) elOldJ.textContent = oldJson;
-    if (elNewJ) elNewJ.textContent = newJson;
+
+    try {
+      if (elOldJ) {
+        const parsedOld = oldJson ? (typeof oldJson === 'string' ? JSON.parse(oldJson) : oldJson) : null;
+        elOldJ.textContent = parsedOld ? JSON.stringify(parsedOld, null, 2) : 'null';
+      }
+    } catch(e) {
+      if (elOldJ) elOldJ.textContent = oldJson || 'null';
+    }
+
+    try {
+      if (elNewJ) {
+        const parsedNew = newJson ? (typeof newJson === 'string' ? JSON.parse(newJson) : newJson) : null;
+        elNewJ.textContent = parsedNew ? JSON.stringify(parsedNew, null, 2) : '{}';
+      }
+    } catch(e) {
+      if (elNewJ) elNewJ.textContent = newJson || '{}';
+    }
 
     const modal = document.getElementById('mutationDetailsModal');
     const card = document.getElementById('modalCard');
@@ -74,5 +109,11 @@ window.civAudit.dataChanges.modal = {
         modal.classList.add('hidden');
       }, 150);
     }
+  }
+};
+
+window.closeMutationModal = function() {
+  if (window.civAudit && window.civAudit.dataChanges && window.civAudit.dataChanges.modal) {
+    window.civAudit.dataChanges.modal.closeMutationModal();
   }
 };

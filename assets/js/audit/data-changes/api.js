@@ -19,7 +19,8 @@ window.civAudit.dataChanges.api = {
     }
 
     try {
-      const response = await fetch('../../api/employee/audit-logs.php');
+      const basePath = (typeof window.civentralBasePath !== 'undefined') ? window.civentralBasePath : '../../';
+      const response = await fetch(basePath + 'api/employee/audit-logs.php');
       const result = await response.json();
 
       if (result.status === 'success' && Array.isArray(result.data)) {
@@ -28,6 +29,10 @@ window.civAudit.dataChanges.api = {
 
         if (window.civAudit.dataChanges.ui) {
           window.civAudit.dataChanges.ui.populateModuleDropdown();
+        }
+        if (window.civAudit.dataChanges.filters) {
+          window.civAudit.dataChanges.filters.applyFilters();
+        } else if (window.civAudit.dataChanges.ui) {
           window.civAudit.dataChanges.ui.renderMutationLogs(this.auditLogsData);
         }
       } else {

@@ -2,6 +2,7 @@ window.civAudit = window.civAudit || {};
 window.civAudit.dataChanges = window.civAudit.dataChanges || {};
 
 window.civAudit.dataChanges.events = {
+
   toggleExportDropdown(event) {
     if (event) event.stopPropagation();
     const menu = document.getElementById('exportDropdownMenu');
@@ -22,72 +23,76 @@ window.civAudit.dataChanges.events = {
     if (menu) {
       menu.classList.remove('scale-100', 'opacity-100');
       menu.classList.add('scale-95', 'opacity-0');
-      setTimeout(() => {
-        menu.classList.add('hidden');
-      }, 150);
+      setTimeout(() => menu.classList.add('hidden'), 150);
     }
+  },
+
+  _getRows() {
+    const ui  = window.civAudit.dataChanges.ui;
+    const api = window.civAudit.dataChanges.api;
+    const logs = (ui && Array.isArray(ui.currentFilteredLogs) && ui.currentFilteredLogs.length > 0)
+      ? ui.currentFilteredLogs
+      : (api ? api.auditLogsData : []);
+
+    return logs.map(log => {
+      const actor = log.users
+        ? (`${log.users.first_name || ''} ${log.users.last_name || ''}`.trim() || log.users.email || 'User')
+        : 'System';
+      const recordId = log.target_id || log.session_id || '—';
+      const modName  = (log.modules && log.modules.module_name) ? log.modules.module_name : (log.target_table || 'System');
+      const action   = log.action || 'Data Update';
+
+      let oldVal = '—', newVal = '—';
+      try {
+        const cd = log.context_json ? (typeof log.context_json === 'string' ? JSON.parse(log.context_json) : log.context_json) : null;
+        if (cd && cd.old_data) oldVal = typeof cd.old_data === 'object' ? JSON.stringify(cd.old_data) : cd.old_data;
+        if (cd && cd.new_data) newVal = typeof cd.new_data === 'object' ? JSON.stringify(cd.new_data) : cd.new_data;
+      } catch(e) {
+        oldVal = log.target_table || '—';
+        newVal = log.status || 'Success';
+      }
+
+      return [
+        `#MUT-${log.audit_id || log.id || ''}`,
+        log.created_at || '—',
+        actor,
+        modName,
+        recordId,
+        action,
+        oldVal,
+        newVal,
+        log.description || '—'
+      ];
+    });
   },
 
   exportLogs(type, event) {
     if (event) event.preventDefault();
     this.hideExportDropdown();
 
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Change ID,Date Time,Actor,Module,Record ID,Field/Action,Old Value,New Value,Description\r\n";
+    const headers = ['Change ID','Date Time','Actor','Module','Record ID','Action','Old Value','New Value','Description'];
+    const rows    = this._getRows();
+    const exp     = window.CivAuditExport;
+    if (!exp) { alert('Export utility not loaded.'); return; }
 
-    const filterSearch = document.getElementById('filterSearch');
-    const filterDate = document.getElementById('filterDate');
-    const filterModule = document.getElementById('filterModule');
-    const searchVal = filterSearch ? filterSearch.value.toLowerCase().trim() : '';
-    const dateVal = filterDate ? filterDate.value : '';
-    const moduleVal = filterModule ? filterModule.value : 'All';
-
-    const api = window.civAudit.dataChanges.api;
-    const filtered = api.auditLogsData.filter(log => {
-      let actorName = 'System';
-      if (log.users) actorName = `${log.users.first_name || ''} ${log.users.last_name || ''}`.trim() || log.users.email || 'User';
-      const recordId = log.target_id || log.session_id || '';
-      const action = log.action || '';
-      const desc = log.description || '';
-      const rawDate = log.created_at || '';
-      const isoDate = rawDate.split(' ')[0] || '';
-      const modName = (log.modules && log.modules.module_name) ? log.modules.module_name : (log.target_table || 'System');
-
-      const matchSearch = !searchVal || 
-                          actorName.toLowerCase().includes(searchVal) || 
-                          recordId.toString().toLowerCase().includes(searchVal) || 
-                          action.toLowerCase().includes(searchVal) || 
-                          desc.toLowerCase().includes(searchVal);
-      const matchDate = !dateVal || isoDate === dateVal;
-      const matchModule = moduleVal === 'All' || modName === moduleVal;
-
-      return matchSearch && matchDate && matchModule;
-    });
-
-    filtered.forEach(log => {
-      let actorName = 'System';
-      if (log.users) actorName = `${log.users.first_name || ''} ${log.users.last_name || ''}`.trim() || log.users.email || 'User';
-      const recordId = log.target_id || log.session_id || 'REC-CORE';
-      const modName = (log.modules && log.modules.module_name) ? log.modules.module_name : (log.target_table || 'System');
-      const action = log.action || 'Data Update';
-      const isSuccess = (log.status || 'Success') === 'Success';
-      const oldVal = isSuccess ? (log.target_table ? `${log.target_table}` : 'Active') : 'Attempted';
-      const newVal = log.status || 'Success';
-
-      const row = `"${log.audit_id}","${log.created_at || ''}","${actorName}","${modName}","${recordId}","${action}","${oldVal}","${newVal}","${(log.description || '').replace(/"/g, '""')}"`;
-      csvContent += row + "\r\n";
-    });
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `Civentral_Data_Mutations_${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (type === 'PDF') {
+      exp.printTable('Data Mutation & Records Audit', headers, rows);
+    } else if (type === 'Excel') {
+      exp.downloadExcel('Civentral_Data_Mutations', 'Data Mutation Logs', headers, rows);
+    } else {
+      exp.downloadCSV('Civentral_Data_Mutations', headers, rows);
+    }
 
     if (window.showToast) {
-      window.showToast(`Export Success`, `Exported ${filtered.length} mutation logs as ${type} file.`);
+      window.showToast('Export Success', `Exported ${rows.length} mutation logs as ${type}.`);
+    }
+  },
+
+  printData() {
+    const headers = ['Change ID','Date Time','Actor','Module','Record ID','Action','Old Value','New Value','Description'];
+    const rows    = this._getRows();
+    if (window.CivAuditExport) {
+      window.CivAuditExport.printTable('Data Mutation & Records Audit', headers, rows);
     }
   },
 
@@ -99,7 +104,7 @@ window.civAudit.dataChanges.events = {
       }
 
       const modal = document.getElementById('mutationDetailsModal');
-      const card = document.getElementById('modalCard');
+      const card  = document.getElementById('modalCard');
       if (modal && !modal.classList.contains('hidden') && card && !card.contains(event.target)) {
         const row = event.target.closest('#mutationTableBody tr');
         if (!row && window.civAudit.dataChanges.modal) {
@@ -108,13 +113,13 @@ window.civAudit.dataChanges.events = {
       }
     });
 
-    // Make functions globally available for inline HTML handlers
     window.toggleExportDropdown = (e) => this.toggleExportDropdown(e);
-    window.exportLogs = (type, e) => this.exportLogs(type, e);
-    window.openMutationModal = (row) => window.civAudit.dataChanges.modal.openMutationModal(row);
-    window.closeMutationModal = () => window.civAudit.dataChanges.modal.closeMutationModal();
-    window.applyFilters = () => window.civAudit.dataChanges.filters.applyFilters();
-    window.resetFilters = () => window.civAudit.dataChanges.filters.resetFilters();
-    window.refreshLogs = () => window.civAudit.dataChanges.api.fetchMutationLogs();
+    window.exportLogs            = (type, e) => this.exportLogs(type, e);
+    window.printData             = () => this.printData();
+    window.openMutationModal     = (row) => window.civAudit.dataChanges.modal.openMutationModal(row);
+    window.closeMutationModal    = () => window.civAudit.dataChanges.modal.closeMutationModal();
+    window.applyFilters          = () => window.civAudit.dataChanges.filters.applyFilters();
+    window.resetFilters          = () => window.civAudit.dataChanges.filters.resetFilters();
+    window.refreshLogs           = () => window.civAudit.dataChanges.api.fetchMutationLogs();
   }
 };

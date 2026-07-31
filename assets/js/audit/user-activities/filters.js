@@ -35,7 +35,7 @@ window.civAudit.userActivities.filters = {
     });
 
     if (window.civAudit.userActivities.ui) {
-      window.civAudit.userActivities.ui.renderTableRows(filtered);
+      window.civAudit.userActivities.ui.renderTableRows(filtered, 1);
     }
   },
 
@@ -59,5 +59,17 @@ window.civAudit.userActivities.filters = {
     if (window.showToast) {
       window.showToast("Filters Reset", "All filter inputs have been returned to their default values.");
     }
+  }
+};
+
+window.applyFilters = function() {
+  if (window.civAudit && window.civAudit.userActivities && window.civAudit.userActivities.filters) {
+    window.civAudit.userActivities.filters.applyFilters();
+  }
+};
+
+window.resetFilters = function() {
+  if (window.civAudit && window.civAudit.userActivities && window.civAudit.userActivities.filters) {
+    window.civAudit.userActivities.filters.resetFilters();
   }
 };

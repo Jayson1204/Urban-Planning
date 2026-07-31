@@ -26,6 +26,8 @@ require_once __DIR__ . '/Services/HeaderService.php';
 
 // Load Middleware
 require_once __DIR__ . '/Middleware/SessionTimeout.php';
+require_once __DIR__ . '/Middleware/AuthMiddleware.php';
+require_once __DIR__ . '/Middleware/PermissionMiddleware.php';
 
 // Initialize Core & Middleware
 $authService = new \App\Services\AuthService();

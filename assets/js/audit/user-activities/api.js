@@ -20,7 +20,8 @@ window.civAudit.userActivities.api = {
     }
 
     try {
-      const response = await fetch('../../api/employee/audit-logs.php');
+      const basePath = (typeof window.civentralBasePath !== 'undefined') ? window.civentralBasePath : '../../';
+      const response = await fetch(basePath + 'api/employee/audit-logs.php');
       const result = await response.json();
 
       if (result.status === 'success' && Array.isArray(result.data)) {
@@ -51,13 +52,21 @@ window.civAudit.userActivities.api = {
           const deptName = log.departments?.department_name || 'General Services';
           const moduleName = log.modules?.module_name || 'System Portal';
 
-          const rawDate = log.created_at || new Date().toISOString();
-          const dtObj = new Date(rawDate);
-          const dateISO = dtObj.toISOString().split('T')[0];
-          
-          const timePart = dtObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-          const datePart = dtObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-          const dateTimeStr = `${datePart} at ${timePart}`;
+          const rawDate = log.created_at || '';
+          let datePart = 'N/A', timePart = '', dateTimeStr = 'N/A', dateISO = '';
+          if (rawDate) {
+            dateISO = rawDate.split(' ')[0] || '';
+            const dtObj = new Date(rawDate.includes('T') ? rawDate : rawDate.replace(' ', 'T') + '+08:00');
+            if (!isNaN(dtObj.getTime())) {
+              datePart = dtObj.toLocaleDateString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' });
+              timePart = dtObj.toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', hour12: true });
+              dateTimeStr = `${datePart} at ${timePart}`;
+            } else {
+              datePart = rawDate.split(' ')[0] || '';
+              timePart = rawDate.split(' ')[1] || '';
+              dateTimeStr = rawDate;
+            }
+          }
 
           let payloadObj = log.context_json;
           if (typeof payloadObj === 'string') {
@@ -99,9 +108,9 @@ window.civAudit.userActivities.api = {
         if (tbody) {
           tbody.innerHTML = `
             <tr>
-              <td colspan="7" class="py-12 text-center text-rose-500 font-semibold">
-                <i class="fa-solid fa-triangle-exclamation text-3xl mb-3 block"></i>
-                Failed to load audit logs.
+              <td colspan="7" class="py-12 text-center text-slate-400">
+                <i class="fa-solid fa-folder-open text-3xl mb-2"></i>
+                <p class="text-xs font-bold">No audit log records available</p>
               </td>
             </tr>
           `;
@@ -112,9 +121,8 @@ window.civAudit.userActivities.api = {
       if (tbody) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="7" class="py-12 text-center text-rose-500 font-semibold">
-              <i class="fa-solid fa-wifi text-3xl mb-3 block"></i>
-              Connection error connecting to audit log server.
+            <td colspan="7" class="py-12 text-center text-rose-500 font-bold text-xs">
+              Failed to connect to audit logs endpoint.
             </td>
           </tr>
         `;

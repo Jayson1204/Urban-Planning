@@ -205,12 +205,7 @@ class NotificationService
         return "{$actionName} — {$object}";
     }
 
-    /**
-     * Determine recipient user IDs based on business rules:
-     * (1) Super Administrator receives notifications for administrative actions.
-     * (2) Affected target user receives notification when action directly affects their account or record.
-     * (3) Active users assigned to a role when role permissions matrix is updated.
-     */
+    
     private static function resolveRecipients(
         int $actorUserId, 
         ?int $departmentId, 
@@ -221,7 +216,6 @@ class NotificationService
         global $db;
         $recipients = [];
 
-        // Rule (1): Super Administrators receive notifications for administrative oversight
         try {
             $superAdmins = $db->query("
                 SELECT u.user_id 
@@ -242,7 +236,6 @@ class NotificationService
             $recipients[] = (int)$sa['user_id'];
         }
 
-        // Rule (2): Affected target user receives notification when action directly affects account
         if (in_array(strtolower($targetTable ?? ''), ['users', 'citizen_users', 'user_accounts']) && !empty($targetId)) {
             $targetUserId = (int)$targetId;
             if ($targetUserId > 0) {
@@ -250,7 +243,6 @@ class NotificationService
             }
         }
 
-        // Rule (3): Notify all active users assigned to role when role permissions matrix updated
         if (in_array(strtolower($targetTable ?? ''), ['roles', 'role_permissions', 'permissions']) && !empty($targetId)) {
             $targetRoleId = (int)$targetId;
             if ($targetRoleId > 0) {
@@ -261,7 +253,7 @@ class NotificationService
             }
         }
 
-        // De-duplicate recipients
+        
         $recipients = array_unique($recipients);
 
         return array_values($recipients);
