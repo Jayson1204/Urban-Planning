@@ -66,10 +66,32 @@ require_once __DIR__ . '/../src/bootstrap.php';
         <i id="themeToggleIcon" class="fa-solid fa-moon text-lg"></i>
       </button>
 
-      <button class="header-action-btn p-2 text-slate-400 hover:text-brand-dark dark:hover:text-brand-medium cursor-pointer relative">
-        <i class="fa-solid fa-bell text-lg"></i>
-        <span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-900"></span>
-      </button>
+      <!-- Notification Dropdown -->
+      <div class="relative" id="notifDropdownContainer">
+        <button id="notifDropdownBtn" onclick="window.civNotif.toggle(event)" class="header-action-btn p-2 text-slate-400 hover:text-brand-dark dark:hover:text-brand-medium cursor-pointer relative" title="System Notifications">
+          <i class="fa-solid fa-bell text-lg"></i>
+          <span id="notifBadge" class="hidden absolute top-1 right-1 px-1.5 py-0.5 text-[9px] font-black leading-none text-white bg-rose-500 rounded-full ring-2 ring-white dark:ring-slate-900">0</span>
+        </button>
+        
+        <!-- Notifications Dropdown Menu Card -->
+        <div id="notifDropdownMenu" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-[100] transition-all transform scale-95 origin-top-right overflow-hidden flex flex-col">
+          <!-- Card Header -->
+          <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/40 shrink-0">
+            <span class="font-black text-slate-800 dark:text-white uppercase tracking-wider text-xs">Notifications</span>
+            <button onclick="window.civNotif.markAllRead(event)" class="text-[10px] text-brand-medium hover:text-[#176B87] font-bold transition cursor-pointer">
+              Mark all read
+            </button>
+          </div>
+
+          <!-- Notification Items (Scrollable List) -->
+          <div id="notifItemsContainer" class="max-h-[360px] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800 custom-scrollbar">
+            <div class="py-12 text-center text-slate-400 dark:text-slate-500">
+              <i class="fa-solid fa-rotate-notch fa-spin text-xl mb-1.5 text-brand-medium"></i>
+              <p class="text-xs font-bold">Syncing notifications...</p>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <div class="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
  

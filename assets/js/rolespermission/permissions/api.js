@@ -47,7 +47,6 @@ async function fetchPermissionsData() {
         };
       });
 
-      // Build permission lookup: permission_id -> { resource_id, action_id }
       const permIdMap = {};
       dbPermissions.forEach(p => {
         permIdMap[p.permission_id] = {
@@ -56,7 +55,6 @@ async function fetchPermissionsData() {
         };
       });
 
-      // Build permissionsMap: role_id -> { resource_id -> [ action_id ] }
       const permissionsMap = {};
       rolesData.forEach(r => {
         permissionsMap[r.role_id] = {};

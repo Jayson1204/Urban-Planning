@@ -4,6 +4,7 @@ window.loadCiventralScript('assets/js/header/theme.js');
 window.loadCiventralScript('assets/js/header/dropdown.js');
 window.loadCiventralScript('assets/js/header/logout-modal.js');
 window.loadCiventralScript('assets/js/header/inactivity.js');
+window.loadCiventralScript('assets/js/header/notifications.js');
 window.loadCiventralScript('assets/js/header/sidebar.js', () => {
     // Initialization executes after all header scripts have loaded
     updateHeaderClock();
