@@ -55,12 +55,54 @@ $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
 $employeeIdOrEmail = trim($input['employeeId'] ?? $input['email'] ?? $input['username'] ?? '');
 $password = trim($input['password'] ?? '');
+$recaptchaToken = trim($input['g-recaptcha-response'] ?? $input['recaptchaResponse'] ?? '');
+$recaptchaSecret = getenv('RECAPTCHA_SECRET_KEY') ?: '';
 
 if (empty($employeeIdOrEmail) || empty($password)) {
     respond([
         'status' => 'error',
         'message' => 'Please provide both Employee ID / Email and Password.'
     ], 400);
+}
+
+if (empty($recaptchaToken)) {
+    respond([
+        'status' => 'error',
+        'message' => 'reCAPTCHA verification is required. Please check the robot checkbox.'
+    ], 400);
+}
+
+// Verify token with Google API if secret key is present
+if (!empty($recaptchaSecret)) {
+    $verifyUrl = 'https://www.google.com/recaptcha/api/siteverify';
+    $postData = http_build_query([
+        'secret'   => $recaptchaSecret,
+        'response' => $recaptchaToken,
+        'remoteip' => $_SERVER['REMOTE_ADDR'] ?? ''
+    ]);
+
+    $verifyOptions = [
+        'http' => [
+            'method'  => 'POST',
+            'header'  => "Content-Type: application/x-www-form-urlencoded\r\n" .
+                         "Content-Length: " . strlen($postData) . "\r\n",
+            'content' => $postData,
+            'timeout' => 5
+        ]
+    ];
+
+    $context = stream_context_create($verifyOptions);
+    $verifyResponse = @file_get_contents($verifyUrl, false, $context);
+
+    if ($verifyResponse !== false) {
+        $responseData = json_decode($verifyResponse, true);
+        if (empty($responseData['success'])) {
+            respond([
+                'status' => 'error',
+                'message' => 'reCAPTCHA verification failed. Please try again.'
+            ], 400);
+        }
+    }
 }
 
 // System Maintenance Check
@@ -78,7 +120,9 @@ $remoteUrl = rtrim($apiBaseUrl, '/') . '/login.php';
 
 $result = proxyRequest($remoteUrl, 'POST', [
     'employeeId' => $employeeIdOrEmail,
-    'password' => $password
+    'password' => $password,
+    'g-recaptcha-response' => $recaptchaToken,
+    'recaptchaResponse' => $recaptchaToken
 ]);
 
 respond($result['body'], $result['code']);

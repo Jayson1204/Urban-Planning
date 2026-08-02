@@ -1,3 +1,7 @@
+<?php
+require_once __DIR__ . '/config/database.php';
+$recaptchaSiteKey = getenv('RECAPTCHA_SITE_KEY') ?: '';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +10,7 @@
   <title>Civentral</title>
   <link rel="icon" type="image/png" href="assets/images/logo.png">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   <style type="text/tailwindcss">
   @theme {
     --color-brand-light: #EEF5FF;
@@ -103,6 +108,10 @@
             <span class="text-xs text-gray-500">Keep me signed in</span>
           </label>
           <a href="#" class="text-xs font-semibold text-brand-medium hover:underline">Forgot password?</a>
+        </div>
+
+        <div class="flex justify-center my-3">
+          <div class="g-recaptcha" data-sitekey="<?php echo htmlspecialchars($recaptchaSiteKey); ?>"></div>
         </div>
 
         <button 

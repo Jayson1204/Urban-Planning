@@ -48,6 +48,12 @@ function togglePasswordVisibility() {
         showStatusAlert('error', 'Please fill in both Employee ID / Email and Password.');
         return;
       }
+
+      const recaptchaResponse = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
+      if (typeof grecaptcha !== 'undefined' && !recaptchaResponse) {
+        showStatusAlert('error', 'Please check the "I\'m not a robot" box to verify you are not a robot.');
+        return;
+      }
       
       if (id.toLowerCase() === 'maintenance') {
         showStatusAlert('maintenance');
@@ -65,7 +71,12 @@ function togglePasswordVisibility() {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ employeeId: id, password: pass })
+          body: JSON.stringify({
+            employeeId: id,
+            password: pass,
+            recaptchaResponse: recaptchaResponse,
+            'g-recaptcha-response': recaptchaResponse
+          })
         });
 
         const data = await response.json();
@@ -86,12 +97,14 @@ function togglePasswordVisibility() {
           }, 1200);
         } else if (data.status === 'maintenance') {
           showStatusAlert('maintenance', data.message);
+          if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
           if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalBtnHtml;
           }
         } else {
           showStatusAlert('error', data.message || 'Login failed. Please check your credentials.');
+          if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
           if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalBtnHtml;
@@ -110,6 +123,7 @@ function togglePasswordVisibility() {
           }, 1200);
         } else {
           showStatusAlert('error', 'Login failed. Invalid credentials or network error.');
+          if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
           if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalBtnHtml;
