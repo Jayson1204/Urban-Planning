@@ -14,27 +14,68 @@ function togglePasswordVisibility() {
     }
 
       // FOR THE FUCKING MODALS 
+    let statusAlertTimer = null;
+
+    function hideStatusAlert() {
+      const modal = document.getElementById('statusModal');
+      if (!modal) return;
+      if (statusAlertTimer) {
+        clearTimeout(statusAlertTimer);
+        statusAlertTimer = null;
+      }
+      modal.classList.add('opacity-0', '-translate-y-2');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 250);
+    }
+
     function showStatusAlert(type, customMessage = "") {
       const modal = document.getElementById('statusModal');
       const icon = document.getElementById('modalIcon');
+      const title = document.getElementById('modalTitle');
       const msgText = document.getElementById('modalMessage');
 
-      modal.classList.remove('hidden');
-      modal.className = "mt-4 border rounded-lg p-4 flex items-start space-x-3 transition-all duration-300";
+      if (!modal) return;
+
+      if (statusAlertTimer) {
+        clearTimeout(statusAlertTimer);
+        statusAlertTimer = null;
+      }
+
+      modal.classList.remove('hidden', 'opacity-0', '-translate-y-2', 'border-rose-200', 'bg-rose-50/95', 'text-rose-900', 'border-emerald-200', 'bg-emerald-50/95', 'text-emerald-900', 'border-amber-200', 'bg-amber-50/95', 'text-amber-900');
+      modal.className = "transform transition-all duration-300 ease-out border rounded-xl p-4 flex items-start space-x-3 shadow-lg relative my-2";
 
       if (type === 'success') {
-        modal.classList.add('border-green-200', 'bg-green-50', 'text-green-700');
-        icon.innerHTML = '<img src="assets/images/spinner.svg" class="h-6 w-6 shrink-0" alt="Loading...">';
-        msgText.textContent = customMessage || "Login successful. Redirecting...";
+        modal.classList.add('border-emerald-200', 'bg-emerald-50/95', 'text-emerald-900');
+        if (icon) icon.innerHTML = '<div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-xs"><i class="fa-solid fa-circle-check text-base"></i></div>';
+        if (title) title.textContent = "Success";
+        msgText.textContent = customMessage || "Login successful. Entering dashboard...";
       } else if (type === 'error') {
-        modal.classList.add('border-red-200', 'bg-red-50', 'text-red-700');
-        icon.innerHTML = '<i class="fa-solid fa-circle-exclamation text-xl"></i>';
+        modal.classList.add('border-rose-200', 'bg-rose-50/95', 'text-rose-900');
+        if (icon) icon.innerHTML = '<div class="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 shadow-xs animate-pulse"><i class="fa-solid fa-triangle-exclamation text-base"></i></div>';
+        if (title) title.textContent = "Notice";
         msgText.textContent = customMessage || "Login failed. Please check your credentials.";
       } else if (type === 'maintenance') {
-        modal.classList.add('border-brand-border', 'bg-brand-light', 'text-brand-dark');
-        icon.innerHTML = '<i class="fa-solid fa-circle-info text-xl"></i>';
+        modal.classList.add('border-amber-200', 'bg-amber-50/95', 'text-amber-900');
+        if (icon) icon.innerHTML = '<div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shadow-xs"><i class="fa-solid fa-screwdriver-wrench text-base"></i></div>';
+        if (title) title.textContent = "System Maintenance";
         msgText.textContent = customMessage || "System maintenance is scheduled for Sunday, 11:00 PM–1:00 AM. Save drafts before then.";
       }
+
+      statusAlertTimer = setTimeout(() => {
+        hideStatusAlert();
+      }, 7000);
+    }
+
+    function showDashboardLoadingOverlay(message = 'Entering Dashboard...') {
+      const overlay = document.getElementById('dashboardLoadingOverlay');
+      const msgEl = document.getElementById('loadingOverlayMessage');
+      if (msgEl) msgEl.textContent = message;
+      if (!overlay) return;
+      overlay.classList.remove('hidden');
+      setTimeout(() => {
+        overlay.classList.remove('opacity-0');
+      }, 10);
     }
 
     async function handleLogin(event) {
@@ -89,12 +130,10 @@ function togglePasswordVisibility() {
           openOtpModal(data.email || '');
         } else if (data.status === 'success') {
           showStatusAlert('success', data.message || 'Login successful! Redirecting to dashboard...');
-          if (submitBtn) {
-            submitBtn.innerHTML = '<span class="inline-flex items-center justify-center gap-2"><img src="assets/images/spinner.svg" class="h-4 w-4 inline" alt="loading"> Entering Dashboard...</span>';
-          }
+          showDashboardLoadingOverlay('Entering Dashboard...');
           setTimeout(() => {
             window.location.href = 'pages/dashboard.php';
-          }, 1200);
+          }, 1400);
         } else if (data.status === 'maintenance') {
           showStatusAlert('maintenance', data.message);
           if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
@@ -115,12 +154,10 @@ function togglePasswordVisibility() {
         const validIds = ['SADM-2026-001', 'EMP-1111-ADMIN-2026', 'ADMIN', 'SUPERADMIN@CIVENTRAL.GOV.PH'];
         if (validIds.includes(id.toUpperCase()) && pass === '1234') {
           showStatusAlert('success', 'Login successful! Redirecting to dashboard...');
-          if (submitBtn) {
-            submitBtn.innerHTML = '<span class="inline-flex items-center justify-center gap-2"><img src="assets/images/spinner.svg" class="h-4 w-4 inline" alt="loading"> Entering Dashboard...</span>';
-          }
+          showDashboardLoadingOverlay('Entering Dashboard...');
           setTimeout(() => {
             window.location.href = 'pages/dashboard.php';
-          }, 1200);
+          }, 1400);
         } else {
           showStatusAlert('error', 'Login failed. Invalid credentials or network error.');
           if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
@@ -184,31 +221,43 @@ function togglePasswordVisibility() {
       alertEl.textContent = message;
     }
 
-    // Auto-advance & paste handler for 6 OTP boxes
+    // Auto-advance & paste handler for 6 OTP boxes (NUMBERS ONLY STRICTLY ENFORCED)
     document.addEventListener('DOMContentLoaded', () => {
       const otpInputs = document.querySelectorAll('.otp-input');
       otpInputs.forEach((input, index) => {
+        // Strictly prevent non-numeric keys on keydown
+        input.addEventListener('keydown', (e) => {
+          const allowedControlKeys = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+          if (allowedControlKeys.includes(e.key) || e.ctrlKey || e.metaKey) {
+            if (e.key === 'Backspace' && !e.target.value && index > 0) {
+              otpInputs[index - 1].focus();
+            }
+            return;
+          }
+          if (!/^[0-9]$/.test(e.key)) {
+            e.preventDefault();
+          }
+        });
+
+        // Strip non-digit characters on input
         input.addEventListener('input', (e) => {
-          const val = e.target.value;
-          if (val && index < otpInputs.length - 1) {
+          const cleanVal = e.target.value.replace(/[^0-9]/g, '');
+          e.target.value = cleanVal;
+          if (cleanVal && index < otpInputs.length - 1) {
             otpInputs[index + 1].focus();
           }
         });
 
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Backspace' && !e.target.value && index > 0) {
-            otpInputs[index - 1].focus();
-          }
-        });
-
+        // Handle numeric paste
         input.addEventListener('paste', (e) => {
           e.preventDefault();
-          const pastedData = (e.clipboardData || window.clipboardData).getData('text').trim();
-          if (/^\d{6}$/.test(pastedData)) {
-            pastedData.split('').forEach((char, i) => {
+          const pastedData = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '').trim();
+          if (pastedData) {
+            pastedData.split('').slice(0, 6).forEach((char, i) => {
               if (otpInputs[i]) otpInputs[i].value = char;
             });
-            otpInputs[5].focus();
+            const focusIndex = Math.min(pastedData.length, 5);
+            if (otpInputs[focusIndex]) otpInputs[focusIndex].focus();
           }
         });
       });
@@ -242,12 +291,11 @@ function togglePasswordVisibility() {
 
         if (data.status === 'success') {
           showOtpAlert('OTP verified! Entering Dashboard...', false);
-          if (verifyBtn) {
-            verifyBtn.innerHTML = '<span class="inline-flex items-center gap-2"><img src="assets/images/spinner.svg" class="h-4 w-4 inline" alt="loading"> Entering Dashboard...</span>';
-          }
+          closeOtpModal();
+          showDashboardLoadingOverlay('Entering Dashboard...');
           setTimeout(() => {
             window.location.href = 'pages/dashboard.php';
-          }, 1000);
+          }, 1400);
         } else {
           showOtpAlert(data.message || 'Verification failed.');
           if (verifyBtn) {
