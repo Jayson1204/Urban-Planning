@@ -23,4 +23,5 @@
     window.loadCiventralScript('assets/js/header/app.js');
     window.loadCiventralScript('assets/js/department/app.js');
     window.loadCiventralScript('assets/js/profile/app.js');
+    window.loadCiventralScript('assets/js/resident/app.js');
 })();

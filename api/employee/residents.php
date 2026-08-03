@@ -1,0 +1,83 @@
+<?php
+$basePath = '../../';
+require_once __DIR__ . '/../../src/bootstrap.php';
+
+header('Content-Type: application/json; charset=utf-8');
+
+function respond(array $payload, int $statusCode = 200): void {
+    http_response_code($statusCode);
+    echo json_encode($payload);
+    exit;
+}
+
+if (!$authService->isLoggedIn()) {
+    respond(['status' => 'error', 'message' => 'Authentication required.'], 401);
+}
+
+\App\Middleware\PermissionMiddleware::requireResource('resident management', $basePath);
+
+$method = $_SERVER['REQUEST_METHOD'];
+
+if ($method === 'GET') {
+    if (($_GET['action'] ?? '') === 'stats') {
+        respond(['status' => 'success', 'data' => $residentRepo->stats()]);
+    }
+
+    if (!empty($_GET['id'])) {
+        $resident = $residentRepo->find((int)$_GET['id']);
+        if (!$resident) {
+            respond(['status' => 'error', 'message' => 'Resident not found.'], 404);
+        }
+        $resident['documents'] = $residentDocumentRepo->forResident($resident['resident_id']);
+        $resident['household_members'] = $resident['household_id']
+            ? $residentService->getHouseholdMembers($resident['household_id'])
+            : [];
+        respond(['status' => 'success', 'data' => $resident]);
+    }
+
+    $filters = [
+        'search' => trim($_GET['search'] ?? ''),
+        'barangay' => trim($_GET['barangay'] ?? ''),
+        'status' => trim($_GET['status'] ?? ''),
+    ];
+    $page = (int)($_GET['page'] ?? 1);
+    $perPage = (int)($_GET['per_page'] ?? 10);
+
+    respond(['status' => 'success'] + $residentRepo->paginate($filters, $page, $perPage));
+}
+
+$input = json_decode(file_get_contents('php://input'), true) ?? [];
+
+if ($method === 'POST') {
+    $errors = $residentService->validateResidentInput($input, false);
+    if ($errors) {
+        respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
+    }
+    $newId = $residentService->createResident($input);
+    respond(['status' => 'success', 'message' => 'Resident added successfully.', 'resident_id' => $newId], 201);
+}
+
+if ($method === 'PUT') {
+    $residentId = (int)($input['resident_id'] ?? 0);
+    if (!$residentId) {
+        respond(['status' => 'error', 'message' => 'resident_id is required.'], 422);
+    }
+    $errors = $residentService->validateResidentInput($input, true);
+    if ($errors) {
+        respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
+    }
+    $residentService->updateResident($residentId, $input);
+    respond(['status' => 'success', 'message' => 'Resident updated successfully.']);
+}
+
+if ($method === 'DELETE') {
+    $residentId = (int)($_GET['id'] ?? $input['resident_id'] ?? 0);
+    if (!$residentId) {
+        respond(['status' => 'error', 'message' => 'resident_id is required.'], 422);
+    }
+    $newStatus = ($_GET['status'] ?? $input['status'] ?? 'Archived') === 'Active' ? 'Active' : 'Archived';
+    $residentRepo->setStatus($residentId, $newStatus);
+    respond(['status' => 'success', 'message' => "Resident marked as {$newStatus}."]);
+}
+
+respond(['status' => 'error', 'message' => 'Method Not Allowed.'], 405);

@@ -25,13 +25,16 @@
         'citizen-directory.php',
         'citizen-account.php'
       ];
-      $scholarshipPages = [
-        'scholarship-types.php'
-      ];
       $auditPages = [
         'user-activities.php',
         'login-history.php',
         'data-changes.php'
+      ];
+      $urbanPlanningPages = [
+        'urban-planning-overview.php'
+      ];
+      $residentPages = [
+        'resident-directory.php'
       ];
 
       $isSuperAdmin = !empty($headerUser['is_superadmin']) || !empty($headerUser['is_global_access']);
@@ -51,28 +54,80 @@
           return false;
       };
     ?>
-    
+
     <aside id="sidebar" class="bg-brand-light text-slate-600 w-72 min-h-[calc(100vh-5rem)] flex flex-col justify-between transition-all duration-300 border-r border-brand-border/60 sticky top-20 h-[calc(100vh-5rem)] z-30 shrink-0 shadow-sm">
-      
+
       <div class="flex flex-col h-full overflow-hidden">
         <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto custom-scrollbar">
-          
+
           <div class="sidebar-divider px-1 pb-3 mb-2 border-b">
             <button onclick="toggleSidebar()" class="sidebar-collapse-btn w-full py-2 rounded-xl border flex items-center justify-center focus:outline-none transition cursor-pointer shadow-xs" title="Collapse Menu Panel">
               <i id="toggleArrow" class="fa-solid fa-chevron-left text-xs"></i>
             </button>
           </div>
 
-          <span class="sidebar-text text-[9px] font-bold tracking-widest text-slate-400 uppercase block px-3 mb-2">Main Controls</span>
-          
-          <a href="<?php echo $basePath ?? '../'; ?>pages/dashboard.php" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs tracking-wide transition cursor-pointer <?php echo $currentPage == 'dashboard.php' ? 'bg-white text-brand-dark border border-brand-border font-bold shadow-xs' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-dark dark:hover:text-[#86B6F6] border border-transparent font-semibold'; ?>">
-            <i class="fa-solid fa-table-columns text-sm <?php echo $currentPage == 'dashboard.php' ? 'text-brand-medium' : 'text-slate-400'; ?>"></i>
-            <span class="sidebar-text truncate">Dashboard Overview</span>
-          </a>
+          <span class="sidebar-text text-[9px] font-bold tracking-widest text-slate-400 uppercase block px-3 mb-2">Urban Planning</span>
 
-          <?php 
+          <?php
+          // Gated by the local, per-role capstone_module_permissions table (production's
+          // shared permission system has no knowledge of this module).
+          $canAccessResidentMgmt = $isSuperAdmin || (isset($capstoneModulePermRepo) && $capstoneModulePermRepo->roleHasModule($headerUser['role_id'] ?? null, 'resident_management'));
+          if ($canAccessResidentMgmt):
+          ?>
+          <div class="space-y-1">
+           <button
+                  onclick="toggleDropdown('residentDropdown', 'residentChevron')"
+                  class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs tracking-wide transition group cursor-pointer <?php echo in_array($currentPage, $residentPages) ? 'bg-white text-brand-dark border border-brand-border font-bold shadow-xs' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-dark dark:hover:text-[#86B6F6] border border-transparent font-semibold'; ?>">
+
+                  <div class="flex items-center space-x-3">
+                      <i class="fa-solid fa-people-roof text-sm <?php echo in_array($currentPage, $residentPages) ? 'text-brand-medium' : 'text-slate-400'; ?> group-hover:text-brand-medium transition"></i>
+                      <span class="sidebar-text truncate">Resident Management</span>
+              </div>
+
+              <div class="dropdown-right">
+                  <i id="residentChevron"
+                    class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200 <?php echo in_array($currentPage, $residentPages) ? 'rotate-180' : ''; ?>"></i>
+              </div>
+            </button>
+
+            <div id="residentDropdown" class="<?php echo in_array($currentPage, $residentPages) ? '' : 'hidden'; ?> pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
+              <a href="<?php echo $basePath ?? '../'; ?>pages/resident/resident-directory.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'resident-directory.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-address-card text-[10px] <?php echo $currentPage == 'resident-directory.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Resident Directory</span></a>
+            </div>
+          </div>
+          <?php endif; ?>
+
+          <?php
+          // Same reasoning as Resident Management above.
+          $canAccessUrbanPlanning = $isSuperAdmin || (isset($capstoneModulePermRepo) && $capstoneModulePermRepo->roleHasModule($headerUser['role_id'] ?? null, 'urban_planning'));
+          if ($canAccessUrbanPlanning):
+          ?>
+          <div class="space-y-1">
+           <button
+                  onclick="toggleDropdown('urbanPlanningDropdown', 'urbanPlanningChevron')"
+                  class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs tracking-wide transition group cursor-pointer <?php echo in_array($currentPage, $urbanPlanningPages) ? 'bg-white text-brand-dark border border-brand-border font-bold shadow-xs' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-dark dark:hover:text-[#86B6F6] border border-transparent font-semibold'; ?>">
+
+                  <div class="flex items-center space-x-3">
+                      <i class="fa-solid fa-map-location-dot text-sm <?php echo in_array($currentPage, $urbanPlanningPages) ? 'text-brand-medium' : 'text-slate-400'; ?> group-hover:text-brand-medium transition"></i>
+                      <span class="sidebar-text truncate">Urban Planning</span>
+              </div>
+
+              <div class="dropdown-right">
+                  <i id="urbanPlanningChevron"
+                    class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200 <?php echo in_array($currentPage, $urbanPlanningPages) ? 'rotate-180' : ''; ?>"></i>
+              </div>
+            </button>
+
+            <div id="urbanPlanningDropdown" class="<?php echo in_array($currentPage, $urbanPlanningPages) ? '' : 'hidden'; ?> pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
+              <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/urban-planning-overview.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'urban-planning-overview.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-compass-drafting text-[10px] <?php echo $currentPage == 'urban-planning-overview.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Overview</span></a>
+            </div>
+          </div>
+          <?php endif; ?>
+
+          <span class="sidebar-text text-[9px] font-bold tracking-widest text-slate-400 uppercase block px-3 mb-2 mt-4">Main Controls</span>
+
+          <?php
           $canAccessUserMgmt = $isSuperAdmin || $hasResourceAccess(['user directory', 'user account', 'users account', 'account status', 'user', 'account', 'employee']);
-          if ($canAccessUserMgmt): 
+          if ($canAccessUserMgmt):
           ?>
           <div class="space-y-1">
            <button onclick="toggleDropdown('userDropdown', 'userChevron')" class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs tracking-wide transition group cursor-pointer <?php echo in_array($currentPage, $usermanagementPages) ? 'bg-white text-brand-dark border border-brand-border font-bold shadow-xs' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-dark dark:hover:text-[#86B6F6] border border-transparent font-semibold'; ?>">
@@ -99,9 +154,9 @@
           </div>
           <?php endif; ?>
 
-          <?php 
+          <?php
           $canAccessRoleMgmt = $isSuperAdmin || $hasResourceAccess(['role', 'permission', 'module', 'resource', 'access control']);
-          if ($canAccessRoleMgmt): 
+          if ($canAccessRoleMgmt):
           ?>
           <div class="space-y-1">
             <button onclick="toggleDropdown('roleDropdown', 'roleChevron')" class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs tracking-wide transition group cursor-pointer <?php echo in_array($currentPage, $rolesmanagementPages) ? 'bg-white text-brand-dark border border-brand-border font-bold shadow-xs' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-dark dark:hover:text-[#86B6F6] border border-transparent font-semibold'; ?>">
@@ -142,9 +197,9 @@
           </div>
           <?php endif; ?>
 
-          <?php 
+          <?php
           $canAccessDeptMgmt = $hasResourceAccess(['department', 'position', 'sitemap', 'department management']);
-          if ($canAccessDeptMgmt): 
+          if ($canAccessDeptMgmt):
           ?>
           <div class="space-y-1">
             <button onclick="toggleDropdown('deptDropdown', 'deptChevron')" class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs tracking-wide transition group cursor-pointer <?php echo in_array($currentPage, $departmentmanagementPages) ? 'bg-white text-brand-dark border border-brand-border font-bold shadow-xs' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-dark dark:hover:text-[#86B6F6] border border-transparent font-semibold'; ?>">
@@ -164,9 +219,9 @@
           </div>
           <?php endif; ?>
 
-          <?php 
+          <?php
           $canAccessCitizenMgmt = $hasResourceAccess(['citizen', 'kyc', 'verification']);
-          if ($canAccessCitizenMgmt): 
+          if ($canAccessCitizenMgmt):
           ?>
           <div class="space-y-1">
             <button onclick="toggleDropdown('citizenDropdown', 'citizenChevron')" class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs tracking-wide transition group cursor-pointer <?php echo in_array($currentPage, $citizenPages) ? 'bg-white text-brand-dark border border-brand-border font-bold shadow-xs' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-dark dark:hover:text-[#86B6F6] border border-transparent font-semibold'; ?>">
@@ -193,30 +248,8 @@
           <?php endif; ?>
 
           <?php
-            $canAccessScholarshipModule = $hasResourceAccess(['scholarship', 'education', 'student']);
-            if ($canAccessScholarshipModule):
-          ?>
-          <div class="space-y-1">
-            <button onclick="toggleDropdown('scholarshipDropdown', 'scholarshipChevron')" class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs tracking-wide transition group cursor-pointer <?php echo in_array($currentPage, $scholarshipPages) ? 'bg-white text-brand-dark border border-brand-border font-bold shadow-xs' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-dark dark:hover:text-[#86B6F6] border border-transparent font-semibold'; ?>">
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid fa-graduation-cap text-sm <?php echo in_array($currentPage, $scholarshipPages) ? 'text-brand-medium' : 'text-slate-400'; ?> group-hover:text-brand-medium transition"></i>
-                    <span class="sidebar-text truncate">Education & Scholarship</span>
-              </div>
-                <div class="dropdown-right">
-                    <i id="scholarshipChevron"
-                       class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200 <?php echo in_array($currentPage, $scholarshipPages) ? 'rotate-180' : ''; ?>"></i>
-                </div>
-            </button>
-
-            <div id="scholarshipDropdown" class="<?php echo in_array($currentPage, $scholarshipPages) ? '' : 'hidden'; ?> pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
-              <a href="<?php echo $basePath ?? '../'; ?>pages/education-scholarship/scholarship-program/scholarship-types.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'scholarship-types.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-graduation-cap text-[10px] <?php echo $currentPage == 'scholarship-types.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Scholarship Types</span></a>
-            </div>
-          </div>
-          <?php endif; ?>
-
-          <?php 
           $canAccessAuditLogs = $hasResourceAccess(['audit', 'activity', 'log', 'change', 'history']);
-          if ($canAccessAuditLogs): 
+          if ($canAccessAuditLogs):
           ?>
           <div class="space-y-1">
            <button
@@ -242,7 +275,7 @@
           </div>
           <?php endif; ?>
         </nav>
-        
+
         <div class="p-4 border-t shrink-0 sidebar-footer">
           <a href="#" onclick="openLogoutModal(event)" class="sidebar-logout-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-bold tracking-wide transition group cursor-pointer">
             <i class="fa-solid fa-arrow-right-from-bracket text-sm"></i>

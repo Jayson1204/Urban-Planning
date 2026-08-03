@@ -15,8 +15,8 @@
       const chevron = document.getElementById(chevronId);
       if (!dropdown) return;
       
-      const dropdowns = ['userDropdown', 'roleDropdown', 'deptDropdown', 'citizenDropdown', 'scholarshipDropdown', 'auditDropdown'];
-      const chevrons = ['userChevron', 'roleChevron', 'deptChevron', 'citizenChevron', 'scholarshipChevron', 'auditChevron'];
+      const dropdowns = ['userDropdown', 'roleDropdown', 'deptDropdown', 'citizenDropdown', 'auditDropdown', 'residentDropdown', 'urbanPlanningDropdown'];
+      const chevrons = ['userChevron', 'roleChevron', 'deptChevron', 'citizenChevron', 'auditChevron', 'residentChevron', 'urbanPlanningChevron'];
       
       dropdowns.forEach((d, i) => {
         if (d !== id) {
@@ -53,7 +53,9 @@ function toggleSidebar() {
         'roleDropdown',
         'deptDropdown',
         'citizenDropdown',
-        'auditDropdown'
+        'auditDropdown',
+        'residentDropdown',
+        'urbanPlanningDropdown'
     ];
 
     isCollapsed = !isCollapsed;

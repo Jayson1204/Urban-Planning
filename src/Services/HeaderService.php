@@ -52,6 +52,7 @@ class HeaderService
 
             $headerUser['role'] = $user['role_name'] ?? 'Staff';
             $headerUser['role_prefix'] = $user['role_prefix'] ?? 'STF';
+            $headerUser['role_id'] = $user['role_id'] ?? null;
             $headerUser['is_global_access'] = filter_var($user['is_global_access'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
             $roleNameLower = strtolower($headerUser['role']);

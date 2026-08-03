@@ -3,8 +3,8 @@ function toggleDropdown(id, chevronId) {
   const chevron = document.getElementById(chevronId);
   if (!dropdown) return;
 
-  const allDropdowns = ['userDropdown', 'roleDropdown', 'deptDropdown', 'citizenDropdown', 'scholarshipDropdown', 'auditDropdown'];
-  const allChevrons = ['userChevron', 'roleChevron', 'deptChevron', 'citizenChevron', 'scholarshipChevron', 'auditChevron'];
+  const allDropdowns = ['userDropdown', 'roleDropdown', 'deptDropdown', 'citizenDropdown', 'auditDropdown', 'residentDropdown', 'urbanPlanningDropdown'];
+  const allChevrons = ['userChevron', 'roleChevron', 'deptChevron', 'citizenChevron', 'auditChevron', 'residentChevron', 'urbanPlanningChevron'];
 
   allDropdowns.forEach((d, i) => {
     if (d !== id) {

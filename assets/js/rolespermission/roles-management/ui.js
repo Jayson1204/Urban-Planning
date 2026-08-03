@@ -99,6 +99,10 @@ function renderRoles(dataToRender = systemRoles) {
           <!-- Edit button -->
           <button type="button" onclick="if(typeof openEditModal === 'function') openEditModal(${role.role_id})" class="text-slate-400 hover:text-[#0f172a] hover:bg-slate-100 p-1.5 rounded-lg border border-slate-200 transition cursor-pointer" title="Edit Role Parameters">
             <i class="fa-solid fa-pen-to-square text-xs"></i>
+          </button>
+          <!-- Capstone Module Access button (local-only system) -->
+          <button type="button" onclick="if(typeof openModuleAccessModal === 'function') openModuleAccessModal(${role.role_id}, '${(role.role_name || '').replace(/'/g, "\\'")}')" class="text-slate-400 hover:text-[#0f172a] hover:bg-slate-100 p-1.5 rounded-lg border border-slate-200 transition cursor-pointer" title="Capstone Module Access (local)">
+            <i class="fa-solid fa-cubes text-xs"></i>
           </button>` : `<span class="text-[10px] text-slate-400 font-bold italic">Read-only</span>`}
         </div>
       </td>

@@ -11,3 +11,7 @@
 # OS files
 .DS_Store
 Thumbs.db
+
+# Uploaded resident documents (contain PII, must not be committed)
+/uploads/residents/*
+!/uploads/residents/.gitkeep
