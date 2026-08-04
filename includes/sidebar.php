@@ -35,6 +35,9 @@
       $residentPages = [
         'resident-directory.php'
       ];
+      $housingPages = [
+        'housing-units.php'
+      ];
 
       $isSuperAdmin = !empty($headerUser['is_superadmin']) || !empty($headerUser['is_global_access']);
       $userGrantedRes = $headerUser['granted_resources'] ?? [];
@@ -91,6 +94,33 @@
 
             <div id="residentDropdown" class="<?php echo in_array($currentPage, $residentPages) ? '' : 'hidden'; ?> pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
               <a href="<?php echo $basePath ?? '../'; ?>pages/resident/resident-directory.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'resident-directory.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-address-card text-[10px] <?php echo $currentPage == 'resident-directory.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Resident Directory</span></a>
+            </div>
+          </div>
+          <?php endif; ?>
+
+          <?php
+          // Same reasoning as Resident Management above.
+          $canAccessHousingMgmt = $isSuperAdmin || (isset($capstoneModulePermRepo) && $capstoneModulePermRepo->roleHasModule($headerUser['role_id'] ?? null, 'housing_management'));
+          if ($canAccessHousingMgmt):
+          ?>
+          <div class="space-y-1">
+           <button
+                  onclick="toggleDropdown('housingDropdown', 'housingChevron')"
+                  class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs tracking-wide transition group cursor-pointer <?php echo in_array($currentPage, $housingPages) ? 'bg-white text-brand-dark border border-brand-border font-bold shadow-xs' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-dark dark:hover:text-[#86B6F6] border border-transparent font-semibold'; ?>">
+
+                  <div class="flex items-center space-x-3">
+                      <i class="fa-solid fa-house-chimney text-sm <?php echo in_array($currentPage, $housingPages) ? 'text-brand-medium' : 'text-slate-400'; ?> group-hover:text-brand-medium transition"></i>
+                      <span class="sidebar-text truncate">Housing Management</span>
+              </div>
+
+              <div class="dropdown-right">
+                  <i id="housingChevron"
+                    class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200 <?php echo in_array($currentPage, $housingPages) ? 'rotate-180' : ''; ?>"></i>
+              </div>
+            </button>
+
+            <div id="housingDropdown" class="<?php echo in_array($currentPage, $housingPages) ? '' : 'hidden'; ?> pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
+              <a href="<?php echo $basePath ?? '../'; ?>pages/housing/housing-units.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'housing-units.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-house text-[10px] <?php echo $currentPage == 'housing-units.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Housing Units</span></a>
             </div>
           </div>
           <?php endif; ?>

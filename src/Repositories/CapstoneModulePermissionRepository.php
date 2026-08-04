@@ -14,6 +14,7 @@ class CapstoneModulePermissionRepository
     {
         return [
             'resident_management' => ['label' => 'Resident Management', 'icon' => 'fa-people-roof'],
+            'housing_management' => ['label' => 'Housing Management', 'icon' => 'fa-house-chimney'],
             'urban_planning' => ['label' => 'Urban Planning', 'icon' => 'fa-map-location-dot'],
         ];
     }

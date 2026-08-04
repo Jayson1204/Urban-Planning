@@ -20,6 +20,7 @@ require_once __DIR__ . '/Repositories/PermissionRepository.php';
 require_once __DIR__ . '/Repositories/ResidentRepository.php';
 require_once __DIR__ . '/Repositories/HouseholdRepository.php';
 require_once __DIR__ . '/Repositories/ResidentDocumentRepository.php';
+require_once __DIR__ . '/Repositories/HousingUnitRepository.php';
 require_once __DIR__ . '/Repositories/CapstoneModulePermissionRepository.php';
 
 // Load Services
@@ -28,6 +29,7 @@ require_once __DIR__ . '/Services/UserService.php';
 require_once __DIR__ . '/Services/PermissionService.php';
 require_once __DIR__ . '/Services/HeaderService.php';
 require_once __DIR__ . '/Services/ResidentService.php';
+require_once __DIR__ . '/Services/HousingService.php';
 
 // Load Middleware
 require_once __DIR__ . '/Middleware/SessionTimeout.php';
@@ -49,12 +51,14 @@ $permRepo = new \App\Repositories\PermissionRepository($db ?? null);
 $residentRepo = new \App\Repositories\ResidentRepository($db ?? null);
 $householdRepo = new \App\Repositories\HouseholdRepository($db ?? null);
 $residentDocumentRepo = new \App\Repositories\ResidentDocumentRepository($db ?? null);
+$housingUnitRepo = new \App\Repositories\HousingUnitRepository($db ?? null);
 $capstoneModulePermRepo = new \App\Repositories\CapstoneModulePermissionRepository($db ?? null);
 
 // Initialize Services
 $userService = new \App\Services\UserService($userRepo);
 $permService = new \App\Services\PermissionService($permRepo);
 $residentService = new \App\Services\ResidentService($residentRepo, $householdRepo, $residentDocumentRepo);
+$housingService = new \App\Services\HousingService($housingUnitRepo);
 
 // Initialize Header Service (and build user)
 $headerService = new \App\Services\HeaderService($userService, $permService, $authService);
