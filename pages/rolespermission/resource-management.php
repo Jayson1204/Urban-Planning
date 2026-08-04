@@ -29,7 +29,7 @@ include '../../includes/sidebar.php';
       <button 
         type="button"
         onclick="openCreateResourceModal()" 
-        class="bg-[#0F172A] hover:bg-slate-800 text-white font-bold px-4.5 py-2.5 rounded-xl text-xs transition duration-200 shadow-xs flex items-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-900/20"
+        class="bg-[#86B6F6] hover:bg-[#6fa5f5] text-slate-900 font-extrabold px-4.5 py-2.5 rounded-xl text-xs transition duration-200 shadow-xs flex items-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-medium/30 border border-[#72a6eb]"
       >
         <i class="fa-solid fa-plus text-xs"></i>
         <span>Add New Resource</span>
@@ -38,125 +38,193 @@ include '../../includes/sidebar.php';
     <?php endif; ?>
   </div>
 
-  <!-- Resource Overview Metric Cards (3 columns) -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-    <!-- Total Registered Resources -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between">
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Total Registered</span>
-        <h3 id="metricTotalResources" class="text-2xl font-black text-slate-900 tracking-tight">12</h3>
-        <p class="text-[11px] text-slate-500 font-medium">System Resources Mapped</p>
+  <!-- FULL CONTENT SKELETON LOADER -->
+  <div id="resourceSkeleton" class="space-y-6 transition-all duration-500 opacity-100 pointer-events-auto">
+    <!-- Cards Skeleton -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <?php for($i=0; $i<3; $i++): ?>
+      <div class="glass-panel rounded-2xl p-5 flex items-center justify-between dark:bg-slate-900/85 dark:border-slate-800/80">
+        <div class="space-y-2.5 w-full">
+          <div class="skeleton-loader h-3 w-28 rounded-md"></div>
+          <div class="skeleton-loader h-7 w-20 rounded-lg"></div>
+          <div class="skeleton-loader h-2.5 w-36 rounded-md"></div>
+        </div>
+        <div class="skeleton-loader h-11 w-11 rounded-xl shrink-0 ml-3"></div>
       </div>
-      <div class="h-12 w-12 rounded-2xl bg-brand-light border border-brand-border/60 flex items-center justify-center text-brand-dark shrink-0">
-        <i class="fa-solid fa-folder-tree text-lg"></i>
-      </div>
+      <?php endfor; ?>
     </div>
 
-    <!-- Active Resources -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between">
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Active Resources</span>
-        <h3 id="metricActiveResources" class="text-2xl font-black text-emerald-600 tracking-tight">11</h3>
-        <p class="text-[11px] text-slate-500 font-medium">Active Endpoints & Features</p>
+    <!-- Table Skeleton -->
+    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+      <div class="p-4 border-b border-slate-100 flex items-center justify-between gap-4">
+        <div class="skeleton-loader h-10 w-80 rounded-xl"></div>
+        <div class="skeleton-loader h-10 w-48 rounded-xl"></div>
       </div>
-      <div class="h-12 w-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
-        <i class="fa-solid fa-circle-check text-lg"></i>
-      </div>
-    </div>
-
-    <!-- Inactive & Archived Resources -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between">
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Inactive / Archived</span>
-        <h3 id="metricInactiveResources" class="text-2xl font-black text-amber-600 tracking-tight">1</h3>
-        <p class="text-[11px] text-slate-500 font-medium">Disabled or Archived Resources</p>
-      </div>
-      <div class="h-12 w-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
-        <i class="fa-solid fa-box-archive text-lg"></i>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-100">
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-24 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-28 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-36 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-20 rounded-md"></div></th>
+              <th class="px-6 py-4 text-right"><div class="skeleton-loader h-3 w-20 rounded-md ml-auto"></div></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <?php for($k=0; $k<5; $k++): ?>
+            <tr class="animate-pulse">
+              <td class="px-6 py-4"><div class="skeleton-loader h-3.5 w-24 rounded-md"></div></td>
+              <td class="px-6 py-4"><div class="skeleton-loader h-3.5 w-28 rounded-md"></div></td>
+              <td class="px-6 py-4"><div class="skeleton-loader h-3.5 w-36 rounded-md"></div></td>
+              <td class="px-6 py-4"><div class="skeleton-loader h-5 w-20 rounded-full"></div></td>
+              <td class="px-6 py-4 text-right"><div class="skeleton-loader h-7 w-20 rounded-lg ml-auto"></div></td>
+            </tr>
+            <?php endfor; ?>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 
-  <!-- Resource Directory Datatable Workspace -->
-  <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden space-y-4">
-    
-    <!-- Control Panel & Filters -->
-    <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
-      <!-- Search Input -->
-      <div class="relative flex-1 max-w-md">
-        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-        <input 
-          type="text" 
-          id="resourceSearchInput" 
-          oninput="filterResources()" 
-          placeholder="Search resources by Name, Route, or Description..." 
-          class="pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs w-full bg-white focus:outline-none focus:border-brand-medium focus:ring-2 focus:ring-brand-medium/10 transition"
-        >
+  <!-- REAL PAGE CONTENT -->
+  <div id="resourceRealContent" class="space-y-6 hidden opacity-0 transition-all duration-700 ease-out transform translate-y-2">
+
+    <!-- Resource Overview Metric Cards (3 columns) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <!-- Total Registered Resources -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between">
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Total Registered</span>
+          <h3 id="metricTotalResources" class="text-2xl font-black text-slate-900 tracking-tight">0</h3>
+          <p class="text-[11px] text-slate-500 font-medium">System Resources Mapped</p>
+        </div>
+        <div class="h-12 w-12 rounded-2xl bg-brand-light border border-brand-border/60 flex items-center justify-center text-brand-dark shrink-0">
+          <i class="fa-solid fa-folder-tree text-lg"></i>
+        </div>
       </div>
 
-      <!-- Filters Group -->
-      <div class="flex items-center gap-3">
-        <!-- Parent Module Filter Dropdown -->
-        <select 
-          id="parentModuleFilter" 
-          onchange="filterResources()" 
-          class="px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white text-slate-700 focus:outline-none focus:border-brand-medium transition cursor-pointer"
-        >
-          <option value="ALL">All Parent Modules</option>
-          <option value="User Management">User Management</option>
-          <option value="Citizen Management">Citizen Management</option>
-          <option value="Education & Scholarship">Education & Scholarship</option>
-          <option value="Health Services">Health Services</option>
-          <option value="BPLO Licensing & Permits">BPLO Licensing & Permits</option>
-          <option value="DRRM Dispatch & Emergency">DRRM Dispatch & Emergency</option>
-          <option value="Reports & Analytics">Reports & Analytics</option>
-          <option value="System Settings">System Settings</option>
-          <option value="Legacy Cashiering">Legacy Cashiering</option>
-          <option value="Archived Portal Gateway">Archived Portal Gateway</option>
-        </select>
+      <!-- Active Resources -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between">
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Active Resources</span>
+          <h3 id="metricActiveResources" class="text-2xl font-black text-emerald-600 tracking-tight">0</h3>
+          <p class="text-[11px] text-slate-500 font-medium">Active Endpoints & Features</p>
+        </div>
+        <div class="h-12 w-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+          <i class="fa-solid fa-circle-check text-lg"></i>
+        </div>
+      </div>
 
-        <!-- Status Filter Dropdown -->
-        <select 
-          id="statusFilterSelect" 
-          onchange="filterResources()" 
-          class="px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white text-slate-700 focus:outline-none focus:border-brand-medium transition cursor-pointer"
-        >
-          <option value="ALL">All Statuses</option>
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-          <option value="Archived">Archived</option>
-        </select>
+      <!-- Inactive & Archived Resources -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between">
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Inactive / Archived</span>
+          <h3 id="metricInactiveResources" class="text-2xl font-black text-amber-600 tracking-tight">0</h3>
+          <p class="text-[11px] text-slate-500 font-medium">Disabled or Archived Resources</p>
+        </div>
+        <div class="h-12 w-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+          <i class="fa-solid fa-box-archive text-lg"></i>
+        </div>
       </div>
     </div>
 
-    <!-- Structured Resource Datatable -->
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="bg-slate-50/80 border-b border-slate-200/80 text-[10px] font-black uppercase tracking-wider text-slate-400">
-            <th class="px-6 py-3.5">Resource Name</th>
-            <th class="px-6 py-3.5">Parent Module</th>
-            <th class="px-6 py-3.5">Description</th>
-            <th class="px-6 py-3.5 text-center">Status</th>
-            <th class="px-6 py-3.5">Created At</th>
-            <th class="px-6 py-3.5">Updated At</th>
-            <th class="px-6 py-3.5 text-right">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="resourceTableBody" class="divide-y divide-slate-100 text-xs font-medium">
-          <!-- Dynamically populated by JS -->
-        </tbody>
-      </table>
+    <!-- Resource Directory Datatable Workspace -->
+    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+      
+      <!-- Status Tabs Header -->
+      <div class="px-5 pt-3.5 pb-0 border-b border-slate-200/80 bg-slate-50/50 flex items-center justify-between flex-wrap gap-2">
+        <div class="flex items-center space-x-1" id="statusTabsContainer">
+          <button type="button" onclick="switchStatusTab('Active')" data-status-tab="Active" class="status-tab-btn px-4 py-2.5 rounded-t-xl text-xs font-black transition-all cursor-pointer bg-white text-[#176B87] border-t-2 border-[#86B6F6] border-x border-slate-200/80 shadow-2xs">
+            <i class="fa-solid fa-circle-check text-emerald-500 mr-1.5 text-[10px]"></i>
+            Active <span id="tabCountActive" class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 font-extrabold">0</span>
+          </button>
+
+          <button type="button" onclick="switchStatusTab('Inactive')" data-status-tab="Inactive" class="status-tab-btn px-4 py-2.5 rounded-t-xl text-xs font-bold transition-all cursor-pointer text-slate-500 hover:text-slate-800 hover:bg-slate-100/60">
+            <i class="fa-solid fa-circle-minus text-slate-400 mr-1.5 text-[10px]"></i>
+            Inactive <span id="tabCountInactive" class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-slate-100 text-slate-600 font-bold">0</span>
+          </button>
+
+          <button type="button" onclick="switchStatusTab('Archived')" data-status-tab="Archived" class="status-tab-btn px-4 py-2.5 rounded-t-xl text-xs font-bold transition-all cursor-pointer text-slate-500 hover:text-slate-800 hover:bg-slate-100/60">
+            <i class="fa-solid fa-box-archive text-amber-500 mr-1.5 text-[10px]"></i>
+            Archived <span id="tabCountArchived" class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-800 font-bold">0</span>
+          </button>
+
+          <button type="button" onclick="switchStatusTab('ALL')" data-status-tab="ALL" class="status-tab-btn px-4 py-2.5 rounded-t-xl text-xs font-bold transition-all cursor-pointer text-slate-500 hover:text-slate-800 hover:bg-slate-100/60">
+            <i class="fa-solid fa-layer-group text-blue-500 mr-1.5 text-[10px]"></i>
+            All <span id="tabCountAll" class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-blue-100 text-blue-800 font-bold">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Control Panel & Filters -->
+      <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/30">
+        <!-- Search Input -->
+        <div class="relative flex-1 max-w-md">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input 
+            type="text" 
+            id="resourceSearchInput" 
+            oninput="filterResources()" 
+            placeholder="Search resources by Name, Route, or Description..." 
+            class="pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs w-full bg-white focus:outline-none focus:border-brand-medium focus:ring-2 focus:ring-brand-medium/10 transition"
+          >
+        </div>
+
+        <!-- Filters Group -->
+        <div class="flex items-center gap-3">
+          <!-- Parent Module Filter Dropdown -->
+          <select 
+            id="parentModuleFilter" 
+            onchange="filterResources()" 
+            class="px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white text-slate-700 focus:outline-none focus:border-brand-medium transition cursor-pointer"
+          >
+            <option value="ALL">All Parent Modules</option>
+            <option value="User Management">User Management</option>
+            <option value="Citizen Management">Citizen Management</option>
+            <option value="Education & Scholarship">Education & Scholarship</option>
+            <option value="Health Services">Health Services</option>
+            <option value="BPLO Licensing & Permits">BPLO Licensing & Permits</option>
+            <option value="DRRM Dispatch & Emergency">DRRM Dispatch & Emergency</option>
+            <option value="Reports & Analytics">Reports & Analytics</option>
+            <option value="System Settings">System Settings</option>
+            <option value="Legacy Cashiering">Legacy Cashiering</option>
+            <option value="Archived Portal Gateway">Archived Portal Gateway</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Datatable Container -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+              <th class="px-6 py-4">Resource Name</th>
+              <th class="px-6 py-4">Parent Module</th>
+              <th class="px-6 py-4">Route Path / URI</th>
+              <th class="px-6 py-4">Status</th>
+              <th class="px-6 py-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="resourceTableBody" class="divide-y divide-slate-100 text-xs text-slate-700">
+            <!-- Populated dynamically by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Footer / Pagination -->
+      <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-400">
+        <div id="paginationText">
+          Showing 0 to 0 of 0 resources
+        </div>
+        <div class="flex items-center space-x-1" id="paginationControls">
+          <!-- Page buttons rendered by JS -->
+        </div>
+      </div>
+
     </div>
 
-    <!-- Empty State -->
-    <div id="emptyTableState" class="hidden p-10 text-center space-y-2">
-      <i class="fa-solid fa-folder-open text-slate-300 text-3xl block"></i>
-      <p class="text-xs font-bold text-slate-700">No resources match your search filter</p>
-      <p class="text-[10px] text-slate-400">Try adjusting your search keyword or module dropdown filter.</p>
-    </div>
-
-  </div>
+  </div> <!-- End #resourceRealContent -->
 
 </main>
 
@@ -229,6 +297,7 @@ include '../../includes/sidebar.php';
           >
             <option value="Active">Active</option>
             <option value="Inactive">Inactive</option>
+            <option value="Archived">Archived</option>
           </select>
         </div>
 
@@ -280,7 +349,7 @@ include '../../includes/sidebar.php';
         </button>
         <button 
           type="submit" 
-          class="px-5 py-2 bg-[#0F172A] hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition shadow-xs cursor-pointer flex items-center gap-1.5"
+          class="px-5 py-2 bg-[#86B6F6] hover:bg-[#6fa5f5] text-slate-900 font-extrabold rounded-xl text-xs transition shadow-xs cursor-pointer flex items-center gap-1.5 border border-[#72a6eb]"
         >
           <i class="fa-solid fa-floppy-disk text-xs"></i>
           <span>Save Resource</span>

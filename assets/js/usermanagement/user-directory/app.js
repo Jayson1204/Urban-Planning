@@ -7,6 +7,9 @@ window.loadCiventralScript('assets/js/usermanagement/user-directory/filters.js')
 window.loadCiventralScript('assets/js/usermanagement/user-directory/modal.js', () => {
 
     function initUserDirectoryModule() {
+        if (typeof renderSkeletonTable === 'function') {
+            renderSkeletonTable();
+        }
         if (typeof fetchUsersData === 'function') {
             fetchUsersData();
         }

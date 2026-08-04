@@ -208,6 +208,31 @@ document.addEventListener("DOMContentLoaded", () => {
     renderDemoChart();
     renderRadarChart();
 
+    // Smooth Skeleton Loader Transition
+    function handleSkeletonTransition() {
+        const skeleton = document.getElementById('dashboardSkeleton');
+        const realContent = document.getElementById('dashboardRealContent');
+
+        if (!skeleton || !realContent) return;
+
+        // Show real content in DOM
+        realContent.classList.remove('hidden');
+
+        // Allow browser frame to calculate layout before fading
+        requestAnimationFrame(() => {
+            skeleton.classList.add('opacity-0', 'pointer-events-none');
+            realContent.classList.remove('opacity-0', 'translate-y-2');
+            realContent.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                skeleton.classList.add('hidden');
+            }, 500);
+        });
+    }
+
+    // Trigger skeleton hide and real content reveal after a smooth loading window
+    setTimeout(handleSkeletonTransition, 600);
+
     // Listen for Theme Toggle to dynamically redraw charts
     const themeToggleBtn = document.getElementById('themeToggleBtn');
     if (themeToggleBtn) {

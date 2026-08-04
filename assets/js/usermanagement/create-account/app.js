@@ -7,6 +7,9 @@ window.loadCiventralScript('assets/js/usermanagement/create-account/form.js');
 window.loadCiventralScript('assets/js/usermanagement/create-account/modal.js', () => {
 
     function initCreateAccountModule() {
+        if (typeof renderSkeletonOptions === 'function') {
+            renderSkeletonOptions();
+        }
         if (typeof fetchFormData === 'function') {
             fetchFormData();
         }

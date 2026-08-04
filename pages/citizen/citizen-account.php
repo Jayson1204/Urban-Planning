@@ -38,126 +38,191 @@ if (!empty($headerUser['is_superadmin']) || !empty($headerUser['is_global_access
     </div>
   </div>
 
-  <!-- ACTIVE -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
-      <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Active Status</span>
-        <h3 id="statActiveCount" class="text-2xl font-black text-slate-900 tracking-tight">0 Accounts</h3>
+  <!-- FULL CONTENT SKELETON LOADER -->
+  <div id="citizenAccountSkeleton" class="space-y-6 transition-all duration-500 opacity-100 pointer-events-auto">
+    <!-- Metric Cards Skeleton -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <?php for($k=0; $k<4; $k++): ?>
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between">
+        <div class="space-y-2 w-full">
+          <div class="skeleton-loader h-3 w-28 rounded-md"></div>
+          <div class="skeleton-loader h-7 w-20 rounded-lg"></div>
+        </div>
+        <div class="skeleton-loader h-10 w-10 rounded-lg shrink-0 ml-3"></div>
       </div>
-      <div class="h-10 w-10 rounded-lg bg-emerald-50/40 border border-emerald-100 flex items-center justify-center text-emerald-600 transition">
-        <i class="fa-solid fa-circle-check text-sm animate-pulse"></i>
+      <?php endfor; ?>
+    </div>
+
+    <!-- Filter Skeleton -->
+    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="skeleton-loader h-4 w-40 rounded-md"></div>
+        <div class="skeleton-loader h-4 w-24 rounded-md"></div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="skeleton-loader h-9 w-full rounded-xl"></div>
+        <div class="skeleton-loader h-9 w-full rounded-xl"></div>
+        <div class="skeleton-loader h-9 w-full rounded-xl"></div>
       </div>
     </div>
 
-    <!-- INACTIVE -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
-      <div class="absolute top-0 left-0 w-1.5 h-full bg-slate-400"></div>
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Inactive Status</span>
-        <h3 id="statInactiveCount" class="text-2xl font-black text-slate-900 tracking-tight">0 Accounts</h3>
-      </div>
-      <div class="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 transition">
-        <i class="fa-solid fa-circle-minus text-sm"></i>
-      </div>
-    </div>
-
-    <!-- LOCKED -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
-      <div class="absolute top-0 left-0 w-1.5 h-full bg-rose-500"></div>
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Locked Status</span>
-        <h3 id="statLockedCount" class="text-2xl font-black text-slate-900 tracking-tight">0 Accounts</h3>
-      </div>
-      <div class="h-10 w-10 rounded-lg bg-rose-50/40 border border-rose-100 flex items-center justify-center text-rose-500 transition">
-        <i class="fa-solid fa-user-lock text-sm"></i>
-      </div>
-    </div>
-
-    <!-- SUSPENDED -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
-      <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Suspended Status</span>
-        <h3 id="statSuspendedCount" class="text-2xl font-black text-slate-900 tracking-tight">0 Accounts</h3>
-      </div>
-      <div class="h-10 w-10 rounded-lg bg-amber-50/40 border border-amber-100 flex items-center justify-center text-amber-600 transition">
-        <i class="fa-solid fa-triangle-exclamation text-sm"></i>
+    <!-- Table Skeleton -->
+    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-100">
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-20 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-36 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-28 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-40 rounded-md"></div></th>
+              <th class="px-6 py-4 text-right"><div class="skeleton-loader h-3 w-24 rounded-md ml-auto"></div></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100/80">
+            <?php for($i=0; $i<5; $i++): ?>
+            <tr class="animate-pulse">
+              <td class="px-6 py-4"><div class="skeleton-loader h-3.5 w-24 rounded-md"></div></td>
+              <td class="px-6 py-4">
+                <div class="space-y-1">
+                  <div class="skeleton-loader h-3.5 w-36 rounded-md"></div>
+                  <div class="skeleton-loader h-2.5 w-24 rounded-md"></div>
+                </div>
+              </td>
+              <td class="px-6 py-4"><div class="skeleton-loader h-5 w-20 rounded-full"></div></td>
+              <td class="px-6 py-4"><div class="skeleton-loader h-3.5 w-40 rounded-md"></div></td>
+              <td class="px-6 py-4 text-right"><div class="skeleton-loader h-7 w-24 rounded-lg ml-auto"></div></td>
+            </tr>
+            <?php endfor; ?>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 
-  <!-- CONTROL-->
-  <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
-    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-      <div class="flex items-center space-x-2">
-        <i class="fa-solid fa-sliders text-brand-dark text-xs"></i>
-        <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">Security Control Filters</h3>
-      </div>
-      <button onclick="resetControlFilters()" class="text-slate-400 hover:text-rose-600 text-xs font-bold transition flex items-center gap-1 cursor-pointer">
-        <i class="fa-solid fa-trash-can text-[10px]"></i>
-        <span>Clear Filters</span>
-      </button>
-    </div>
+  <!-- REAL PAGE CONTENT -->
+  <div id="citizenAccountRealContent" class="space-y-6 hidden opacity-0 transition-all duration-700 ease-out transform translate-y-2">
 
-    <div class="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1 max-w-4xl">
-        <div class="relative">
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-          <input type="text" id="ctrlSearchInput" oninput="filterControlTable()" placeholder="Search ID, name, or email..." class="pl-8 pr-3 py-2 border border-slate-200 rounded-xl text-xs w-full bg-slate-50/50 focus:bg-white focus:outline-none focus:border-brand-medium transition">
+    <!-- ACTIVE -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Active Status</span>
+          <h3 id="statActiveCount" class="text-2xl font-black text-slate-900 tracking-tight">0 Accounts</h3>
         </div>
-
-        <!-- FILTER -->
-        <select id="ctrlStatusFilter" onchange="filterControlTable()" class="border border-slate-200 rounded-xl px-3 py-2 text-xs w-full bg-slate-50/50 focus:bg-white focus:outline-none focus:border-brand-medium transition cursor-pointer font-semibold text-slate-650">
-          <option value="All">All Statuses</option>
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-          <option value="Locked">Locked</option>
-          <option value="Suspended">Suspended</option>
-        </select>
-
-        <!-- FLAG -->
-        <div class="flex items-center space-x-2.5 pl-2 select-none">
-          <input type="checkbox" id="flaggedFilter" onchange="filterControlTable()" class="rounded border-slate-300 text-brand-medium focus:ring-brand-medium/20 h-4 w-4 cursor-pointer">
-          <label for="flaggedFilter" class="text-xs font-bold text-slate-650 cursor-pointer flex items-center gap-1.5">
-            <i class="fa-solid fa-flag text-rose-500 animate-pulse text-[10px]"></i>
-            <span>Show Flagged Warnings Only</span>
-          </label>
+        <div class="h-10 w-10 rounded-lg bg-emerald-50/40 border border-emerald-100 flex items-center justify-center text-emerald-600 transition">
+          <i class="fa-solid fa-circle-check text-sm animate-pulse"></i>
         </div>
       </div>
-      
-      <!-- EXCEL -->
-      <button onclick="exportControlCsv()" class="border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2 cursor-pointer transition shadow-xs">
-        <i class="fa-solid fa-download"></i>
-        <span>Export Log</span>
-      </button>
-    </div>
-  </div>
 
-  <!-- STATUS CONTROL -->
-  <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-wider">
-            <th class="px-6 py-4">Citizen ID</th>
-            <th class="px-6 py-4">Citizen User</th>
-            <th class="px-6 py-4">Current Security Status</th>
-            <th class="px-6 py-4">Access Violations / Security Log</th>
-            <?php if ($canEdit): ?>
-              <th class="px-6 py-4 text-right">State Controller Actions</th>
-            <?php else: ?>
-              <th class="px-6 py-4 text-right">Audit Logs</th>
-            <?php endif; ?>
-          </tr>
-        </thead>
-        <tbody id="controlTableBody" class="divide-y divide-slate-100/80 text-xs">
-        </tbody>
-      </table>
+      <!-- INACTIVE -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-slate-400"></div>
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Inactive Status</span>
+          <h3 id="statInactiveCount" class="text-2xl font-black text-slate-900 tracking-tight">0 Accounts</h3>
+        </div>
+        <div class="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 transition">
+          <i class="fa-solid fa-circle-minus text-sm"></i>
+        </div>
+      </div>
+
+      <!-- LOCKED -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-rose-500"></div>
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Locked Status</span>
+          <h3 id="statLockedCount" class="text-2xl font-black text-slate-900 tracking-tight">0 Accounts</h3>
+        </div>
+        <div class="h-10 w-10 rounded-lg bg-rose-50/40 border border-rose-100 flex items-center justify-center text-rose-500 transition">
+          <i class="fa-solid fa-user-lock text-sm"></i>
+        </div>
+      </div>
+
+      <!-- SUSPENDED -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Suspended Status</span>
+          <h3 id="statSuspendedCount" class="text-2xl font-black text-slate-900 tracking-tight">0 Accounts</h3>
+        </div>
+        <div class="h-10 w-10 rounded-lg bg-amber-50/40 border border-amber-100 flex items-center justify-center text-amber-600 transition">
+          <i class="fa-solid fa-triangle-exclamation text-sm"></i>
+        </div>
+      </div>
     </div>
 
-    <!-- PAGINATION -->
+    <!-- CONTROL-->
+    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-sliders text-brand-dark text-xs"></i>
+          <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">Security Control Filters</h3>
+        </div>
+        <button onclick="resetControlFilters()" class="text-slate-400 hover:text-rose-600 text-xs font-bold transition flex items-center gap-1 cursor-pointer">
+          <i class="fa-solid fa-trash-can text-[10px]"></i>
+          <span>Clear Filters</span>
+        </button>
+      </div>
+
+      <div class="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1 max-w-4xl">
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="ctrlSearchInput" oninput="filterControlTable()" placeholder="Search ID, name, or email..." class="pl-8 pr-3 py-2 border border-slate-200 rounded-xl text-xs w-full bg-slate-50/50 focus:bg-white focus:outline-none focus:border-brand-medium transition">
+          </div>
+
+          <!-- FILTER -->
+          <select id="ctrlStatusFilter" onchange="filterControlTable()" class="border border-slate-200 rounded-xl px-3 py-2 text-xs w-full bg-slate-50/50 focus:bg-white focus:outline-none focus:border-brand-medium transition cursor-pointer font-semibold text-slate-650">
+            <option value="All">All Statuses</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+            <option value="Locked">Locked</option>
+            <option value="Suspended">Suspended</option>
+          </select>
+
+          <!-- FLAG -->
+          <div class="flex items-center space-x-2.5 pl-2 select-none">
+            <input type="checkbox" id="flaggedFilter" onchange="filterControlTable()" class="rounded border-slate-300 text-brand-medium focus:ring-brand-medium/20 h-4 w-4 cursor-pointer">
+            <label for="flaggedFilter" class="text-xs font-bold text-slate-650 cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-flag text-rose-500 animate-pulse text-[10px]"></i>
+              <span>Show Flagged Warnings Only</span>
+            </label>
+          </div>
+        </div>
+        
+        <!-- EXCEL -->
+        <button onclick="exportControlCsv()" class="border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2 cursor-pointer transition shadow-xs">
+          <i class="fa-solid fa-download"></i>
+          <span>Export Log</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STATUS CONTROL -->
+    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+              <th class="px-6 py-4">Citizen ID</th>
+              <th class="px-6 py-4">Citizen User</th>
+              <th class="px-6 py-4">Current Security Status</th>
+              <th class="px-6 py-4">Access Violations / Security Log</th>
+              <?php if ($canEdit): ?>
+                <th class="px-6 py-4 text-right">State Controller Actions</th>
+              <?php else: ?>
+                <th class="px-6 py-4 text-right">Audit Logs</th>
+              <?php endif; ?>
+            </tr>
+          </thead>
+          <tbody id="controlTableBody" class="divide-y divide-slate-100/80 text-xs">
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAGINATION -->
     <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-400">
       <div id="ctrlPaginationText">
       </div>
@@ -171,7 +236,7 @@ if (!empty($headerUser['is_superadmin']) || !empty($headerUser['is_global_access
         </button>
       </div>
     </div>
-  </div>
+  </div> <!-- End #citizenAccountRealContent -->
 
 </main>
 

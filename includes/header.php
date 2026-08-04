@@ -18,6 +18,22 @@ require_once __DIR__ . '/../src/bootstrap.php';
       --color-brand-dark: #176B87;
     }
   </style>
+  <style>
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .skeleton-loader {
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 37%, #e2e8f0 63%);
+      background-size: 400% 100%;
+      animation: shimmer 1.4s ease infinite;
+    }
+    html.dark .skeleton-loader {
+      background: linear-gradient(90deg, #1e293b 25%, #334155 37%, #1e293b 63%);
+      background-size: 400% 100%;
+      animation: shimmer 1.4s ease infinite;
+    }
+  </style>
   <link rel="stylesheet" href="<?php echo $basePath ?? '../'; ?>assets/css/header.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script>

@@ -119,12 +119,30 @@ function toggleModuleMaster(masterChk) {
     window.currentPermissions[roleId] = {};
   }
 
-  const allActionIds = actionsData.map(a => a.action_id);
+  const isSuperAdmin = (typeof window.currentUserIsSuperAdmin !== 'undefined')
+    ? window.currentUserIsSuperAdmin
+    : (currentUserScope ? (!!currentUserScope.is_superadmin || !!currentUserScope.is_global_access) : false);
+
+  const userGrantedRes = (typeof window.currentUserGrantedResources !== 'undefined' && Array.isArray(window.currentUserGrantedResources))
+    ? window.currentUserGrantedResources
+    : (currentUserScope ? (currentUserScope.granted_resources || []) : []);
+
+  const userGrantedActions = (typeof window.currentUserGrantedActions !== 'undefined' && Array.isArray(window.currentUserGrantedActions))
+    ? window.currentUserGrantedActions
+    : (currentUserScope ? (currentUserScope.granted_actions || []) : []);
 
   modObj.resources.forEach(res => {
+    if (!isSuperAdmin && typeof isResourceGrantedToCurrentUser === 'function' && !isResourceGrantedToCurrentUser(res, isSuperAdmin, userGrantedRes)) {
+      return; // Skip resources not granted to logged-in user
+    }
+
     if (masterChk.checked) {
       const supportedActionIds = actionsData
-        .filter(a => (typeof isActionSupportedForResource === 'function' ? isActionSupportedForResource(res, a) : true))
+        .filter(a => {
+          const isSupported = (typeof isActionSupportedForResource === 'function') ? isActionSupportedForResource(res, a) : true;
+          const isGranted = (typeof isActionGrantedToCurrentUser === 'function') ? isActionGrantedToCurrentUser(a, isSuperAdmin, userGrantedActions) : true;
+          return isSupported && isGranted;
+        })
         .map(a => a.action_id);
       window.currentPermissions[roleId][res.id] = supportedActionIds;
     } else {

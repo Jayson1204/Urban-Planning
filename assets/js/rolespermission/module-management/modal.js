@@ -28,9 +28,10 @@ function hideModalOverlay(modalId, cardId) {
 }
 
 function openCreateModuleModal() {
-  const isSuperAdmin = currentUserScope ? !!currentUserScope.is_superadmin : false;
+  const isSuperAdmin = currentUserScope ? (!!currentUserScope.is_superadmin || !!currentUserScope.is_global_access) : false;
   const grantedActions = currentUserScope ? (currentUserScope.granted_actions || []) : [];
-  const canCreate = isSuperAdmin || grantedActions.includes('CREATE');
+  const hasActionList = Array.isArray(grantedActions) && grantedActions.length > 0;
+  const canCreate = isSuperAdmin || !hasActionList || grantedActions.includes('CREATE');
 
   if (!canCreate) {
     if (typeof showToast === 'function') showToast('Forbidden. View-only access level cannot create system modules.');
@@ -57,9 +58,10 @@ function openCreateModuleModal() {
 }
 
 function openEditModal(id) {
-  const isSuperAdmin = currentUserScope ? !!currentUserScope.is_superadmin : false;
+  const isSuperAdmin = currentUserScope ? (!!currentUserScope.is_superadmin || !!currentUserScope.is_global_access) : false;
   const grantedActions = currentUserScope ? (currentUserScope.granted_actions || []) : [];
-  const canEdit = isSuperAdmin || grantedActions.includes('EDIT');
+  const hasActionList = Array.isArray(grantedActions) && grantedActions.length > 0;
+  const canEdit = isSuperAdmin || !hasActionList || grantedActions.includes('EDIT');
 
   if (!canEdit) {
     if (typeof showToast === 'function') showToast('Forbidden. View-only access level cannot modify system modules.');

@@ -1,7 +1,22 @@
+function isSelfUser(user) {
+  if (!user) return false;
+  return (
+    (window.currentUserId && (user.db_id == window.currentUserId || user.id == window.currentUserId)) ||
+    (window.currentEmployeeId && user.id == window.currentEmployeeId) ||
+    (window.currentUserEmail && user.email && user.email.toLowerCase() === window.currentUserEmail.toLowerCase())
+  );
+}
+
 // TOGGLE DEACTIVATE
 async function handleStatusToggle(userId, toggleInput) {
-  const user = accountUsers.find(u => u.id === userId);
+  const user = accountUsers.find(u => u.id === userId || u.db_id === userId);
   if (!user) return;
+
+  if (isSelfUser(user)) {
+    toggleInput.checked = true;
+    if (typeof showToast === 'function') showToast("Operation denied: You cannot deactivate your own account.", true);
+    return;
+  }
 
   if (toggleInput.checked) {
     if (typeof updateUserStatusAPI === 'function') {
@@ -22,8 +37,14 @@ async function handleStatusToggle(userId, toggleInput) {
 }
 
 async function executeDeactivate() {
-  const user = accountUsers.find(u => u.id === window.pendingActionUser);
+  const user = accountUsers.find(u => u.id === window.pendingActionUser || u.db_id === window.pendingActionUser);
   if (user) {
+    if (isSelfUser(user)) {
+      if (typeof showToast === 'function') showToast("Operation denied: You cannot deactivate your own account.", true);
+      if (typeof closeModal === 'function') closeModal('deactivateModal');
+      return;
+    }
+
     if (typeof updateUserStatusAPI === 'function') {
         const ok = await updateUserStatusAPI(window.pendingActionUser, 'Deactivated');
         if (ok && typeof showToast === 'function') {
@@ -36,8 +57,13 @@ async function executeDeactivate() {
 
 // LOCK/UNLOCK MODAL TRIGGERS
 function triggerLockToggle(userId) {
-  const user = accountUsers.find(u => u.id === userId);
+  const user = accountUsers.find(u => u.id === userId || u.db_id === userId);
   if (!user) return;
+
+  if (isSelfUser(user)) {
+    if (typeof showToast === 'function') showToast("Operation denied: You cannot lock or suspend your own account.", true);
+    return;
+  }
 
   if (user.status === 'Archived') {
     if (typeof showToast === 'function') showToast(`Cannot lock/unlock archived staff profile. Please restore profile first.`, true);
@@ -99,8 +125,13 @@ async function executeLockToggle() {
 
 // ARCHIVE/RESTORE MODAL TRIGGERS
 function triggerArchiveToggle(userId) {
-  const user = accountUsers.find(u => u.id === userId);
+  const user = accountUsers.find(u => u.id === userId || u.db_id === userId);
   if (!user) return;
+
+  if (isSelfUser(user)) {
+    if (typeof showToast === 'function') showToast("Operation denied: You cannot archive your own account.", true);
+    return;
+  }
 
   window.pendingActionUser = userId;
   const mTitle = document.getElementById('archiveModalTitle');

@@ -62,133 +62,198 @@ include '../../includes/sidebar.php';
     </div>
   </div>
 
-  <!-- Policy Information Banner -->
-  <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3.5 text-xs text-blue-900 leading-relaxed font-semibold">
-    <div class="h-6 w-6 rounded-lg bg-blue-100 flex items-center justify-center shrink-0 text-blue-700">
-      <i class="fa-solid fa-circle-info"></i>
+  <!-- FULL CONTENT SKELETON LOADER -->
+  <div id="dataChangesSkeleton" class="space-y-6 transition-all duration-500 opacity-100 pointer-events-auto">
+    <!-- Policy Banner Skeleton -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between">
+      <div class="skeleton-loader h-4 w-72 rounded-md"></div>
+      <div class="skeleton-loader h-4 w-36 rounded-md"></div>
     </div>
-    <div>
-      <h4 class="font-bold text-blue-950">Read-Only Immutable Mutation Trail</h4>
-      <p class="text-[10px] text-blue-800 mt-0.5">
-        To maintain absolute municipal portal compliance and trust parameters, the log record database is permanently protected against administrative deletes, structural updates, or edits.
-      </p>
+    <!-- Search Controls Skeleton -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-5 md:p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="skeleton-loader h-4 w-48 rounded-md"></div>
+        <div class="skeleton-loader h-4 w-24 rounded-md"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="skeleton-loader h-10 w-full rounded-xl"></div>
+        <div class="skeleton-loader h-10 w-full rounded-xl"></div>
+        <div class="skeleton-loader h-10 w-full rounded-xl"></div>
+      </div>
     </div>
-  </div>
-
-  <!-- Search & Filter Controls -->
-  <div class="bg-white border border-slate-200 rounded-2xl shadow-xs p-5 md:p-6 space-y-4">
-    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-      <div class="flex items-center gap-2 text-slate-900">
-        <i class="fa-solid fa-sliders text-xs text-slate-400"></i>
-        <h3 class="text-xs font-bold uppercase tracking-wider">Search & Filter Controls</h3>
+    <!-- Table Skeleton -->
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden flex flex-col">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse min-w-[950px]">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200">
+              <th class="py-4 px-5"><div class="skeleton-loader h-3 w-20 rounded-md"></div></th>
+              <th class="py-4 px-5"><div class="skeleton-loader h-3 w-32 rounded-md"></div></th>
+              <th class="py-4 px-5"><div class="skeleton-loader h-3 w-28 rounded-md"></div></th>
+              <th class="py-4 px-5"><div class="skeleton-loader h-3 w-24 rounded-md"></div></th>
+              <th class="py-4 px-5"><div class="skeleton-loader h-3 w-24 rounded-md"></div></th>
+              <th class="py-4 px-5"><div class="skeleton-loader h-3 w-20 rounded-md"></div></th>
+              <th class="py-4 px-5"><div class="skeleton-loader h-3 w-36 rounded-md"></div></th>
+              <th class="py-4 px-5"><div class="skeleton-loader h-3 w-20 rounded-md"></div></th>
+              <th class="py-4 px-5 text-right"><div class="skeleton-loader h-3 w-16 rounded-md ml-auto"></div></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
+            <?php for($i = 0; $i < 5; $i++): ?>
+            <tr class="animate-pulse">
+              <td class="py-4 px-5"><div class="skeleton-loader h-3.5 w-20 rounded-md"></div></td>
+              <td class="py-4 px-5"><div class="skeleton-loader h-3.5 w-32 rounded-md"></div></td>
+              <td class="py-4 px-5">
+                <div class="space-y-1">
+                  <div class="skeleton-loader h-3.5 w-28 rounded-md"></div>
+                  <div class="skeleton-loader h-2.5 w-20 rounded-md"></div>
+                </div>
+              </td>
+              <td class="py-4 px-5"><div class="skeleton-loader h-3.5 w-24 rounded-md"></div></td>
+              <td class="py-4 px-5"><div class="skeleton-loader h-3.5 w-24 rounded-md"></div></td>
+              <td class="py-4 px-5"><div class="skeleton-loader h-5 w-16 rounded-full"></div></td>
+              <td class="py-4 px-5"><div class="skeleton-loader h-3.5 w-36 rounded-md"></div></td>
+              <td class="py-4 px-5"><div class="skeleton-loader h-3.5 w-20 rounded-md"></div></td>
+              <td class="py-4 px-5 text-right"><div class="skeleton-loader h-7 w-16 rounded-lg ml-auto"></div></td>
+            </tr>
+            <?php endfor; ?>
+          </tbody>
+        </table>
       </div>
-      <button onclick="resetFilters()" class="text-xs font-bold text-[#0f172a] hover:text-[#1e3a8a] transition flex items-center gap-1.5 focus:outline-none cursor-pointer">
-        <i class="fa-solid fa-rotate-right text-[10px]"></i>
-        Reset Filters
-      </button>
-    </div>
-
-    <!-- Filters Fields Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <!-- Search Query -->
-      <div class="space-y-1.5">
-        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block" for="filterSearch">Search Query</label>
-        <div class="relative">
-          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-            <i class="fa-solid fa-magnifying-glass text-xs"></i>
-          </span>
-          <input type="text" id="filterSearch" oninput="applyFilters()" placeholder="e.g. Record ID, User, Action, Description..."
-            class="w-full bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-[#0f172a] focus:ring-2 focus:ring-[#0f172a]/10 transition placeholder-slate-400">
-        </div>
-      </div>
-
-      <!-- Date Filter -->
-      <div class="space-y-1.5">
-        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block" for="filterDate">Date Picker</label>
-        <div class="relative">
-          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-            <i class="fa-solid fa-calendar text-xs"></i>
-          </span>
-          <input type="date" id="filterDate" onchange="applyFilters()"
-            class="w-full bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-[#0f172a] focus:ring-2 focus:ring-[#0f172a]/10 transition">
-        </div>
-      </div>
-
-      <!-- Module / Target Table Filter -->
-      <div class="space-y-1.5">
-        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block" for="filterModule">Module / Target Area</label>
-        <div class="relative">
-          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-            <i class="fa-solid fa-cubes text-xs"></i>
-          </span>
-          <select id="filterModule" onchange="applyFilters()"
-            class="w-full bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl pl-10 pr-4 py-2.5 appearance-none focus:outline-none focus:border-[#0f172a] focus:ring-2 focus:ring-[#0f172a]/10 transition cursor-pointer">
-            <option value="All">All Modules</option>
-          </select>
-          <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
-            <i class="fa-solid fa-chevron-down text-[9px]"></i>
-          </span>
-        </div>
+      <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <div class="skeleton-loader h-4 w-48 rounded-md"></div>
+        <div class="skeleton-loader h-8 w-40 rounded-xl"></div>
       </div>
     </div>
   </div>
 
-  <!-- Data Mutation Audit Table Container -->
-  <div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden flex flex-col">
-    <div class="overflow-x-auto overflow-y-auto max-h-[600px] w-full custom-scrollbar">
-      <table class="w-full text-left border-collapse min-w-[950px]">
-        <thead class="sticky top-0 bg-slate-50 z-10 border-b border-slate-200 shadow-xs">
-          <tr class="bg-slate-50 text-[10px] font-black uppercase tracking-wider text-slate-400">
-            <th class="py-4 px-5">Change Ref</th>
-            <th class="py-4 px-5">Timestamp (Asia/Manila)</th>
-            <th class="py-4 px-5">Actor Name</th>
-            <th class="py-4 px-5">Module / Target</th>
-            <th class="py-4 px-5">Record Ref</th>
-            <th class="py-4 px-5">Action Type</th>
-            <th class="py-4 px-5">Pre-State (Old)</th>
-            <th class="py-4 px-5">Post-State (New)</th>
-            <th class="py-4 px-5 text-right">Details</th>
-          </tr>
-        </thead>
-        <tbody id="mutationTableBody" class="divide-y divide-slate-100 text-xs text-slate-700">
-          <tr id="loadingRow">
-            <td colspan="9" class="py-12 text-center text-slate-400 font-semibold">
-              <i class="fa-solid fa-spinner fa-spin text-2xl mb-3 block text-[#0f172a]"></i>
-              Loading real-time data mutation audit logs from database...
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- REAL PAGE CONTENT -->
+  <div id="dataChangesRealContent" class="space-y-6 hidden opacity-0 transition-all duration-700 ease-out transform translate-y-2">
+
+    <!-- Policy Information Banner -->
+    <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3.5 text-xs text-blue-900 leading-relaxed font-semibold">
+      <div class="h-6 w-6 rounded-lg bg-blue-100 flex items-center justify-center shrink-0 text-blue-700">
+        <i class="fa-solid fa-circle-info"></i>
+      </div>
+      <div>
+        <h4 class="font-bold text-blue-950">Read-Only Immutable Mutation Trail</h4>
+        <p class="text-[10px] text-blue-800 mt-0.5">
+          To maintain absolute municipal portal compliance and trust parameters, the log record database is permanently protected against administrative deletes, structural updates, or edits.
+        </p>
+      </div>
     </div>
 
-    <!-- Pagination Footer Container -->
-    <div id="paginationFooter" class="px-5 py-3.5 bg-[#EEF5FF]/60 border-t border-[#B4D4FF]/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-semibold select-none dark:bg-slate-800/60 dark:border-slate-700">
-      <div class="flex items-center gap-4 flex-wrap">
-        <div id="paginationInfo" class="text-xs text-slate-500 font-medium dark:text-slate-400">
-          Showing <span id="paginationStart" class="font-bold text-[#176B87] dark:text-[#86B6F6]">0</span> to <span id="paginationEnd" class="font-bold text-[#176B87] dark:text-[#86B6F6]">0</span> of <span id="paginationTotal" class="font-bold text-[#176B87] dark:text-[#86B6F6]">0</span> entries
+    <!-- Search & Filter Controls -->
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-xs p-5 md:p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2 text-slate-900">
+          <i class="fa-solid fa-sliders text-xs text-slate-400"></i>
+          <h3 class="text-xs font-bold uppercase tracking-wider">Search & Filter Controls</h3>
         </div>
-        <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-          <label for="pageSizeSelect" class="text-[11px] font-semibold">Rows per page:</label>
-          <select id="pageSizeSelect" onchange="changePageSize(this.value)" class="bg-white dark:bg-slate-800 border border-[#B4D4FF] dark:border-slate-600 rounded-lg px-2 py-1 text-xs font-bold text-[#176B87] dark:text-[#86B6F6] focus:outline-none cursor-pointer">
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50" selected>50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
+        <button onclick="resetFilters()" class="text-xs font-bold text-[#0f172a] hover:text-[#1e3a8a] transition flex items-center gap-1.5 focus:outline-none cursor-pointer">
+          <i class="fa-solid fa-rotate-right text-[10px]"></i>
+          Reset Filters
+        </button>
       </div>
-      <div class="flex items-center gap-1.5" id="paginationControls">
-        <button id="prevPageBtn" onclick="changePage(-1)" class="px-3 py-1.5 border border-[#B4D4FF] rounded-xl bg-white hover:bg-[#EEF5FF] disabled:opacity-40 disabled:cursor-not-allowed text-[#176B87] font-bold transition flex items-center gap-1 text-xs cursor-pointer shadow-sm dark:bg-slate-800 dark:border-slate-600 dark:text-[#86B6F6] dark:hover:bg-slate-700">
-          <i class="fa-solid fa-chevron-left text-[10px]"></i> Previous
-        </button>
-        <div id="pageNumbers" class="flex items-center gap-1 font-bold text-xs">
-          <!-- Dynamic Page Numbers -->
+
+      <!-- Filters Fields Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Search Query -->
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block" for="filterSearch">Search Query</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-magnifying-glass text-xs"></i>
+            </span>
+            <input type="text" id="filterSearch" oninput="applyFilters()" placeholder="e.g. Record ID, User, Action, Description..."
+              class="w-full bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-[#0f172a] focus:ring-2 focus:ring-[#0f172a]/10 transition placeholder-slate-400">
+          </div>
         </div>
-        <button id="nextPageBtn" onclick="changePage(1)" class="px-3 py-1.5 border border-[#B4D4FF] rounded-xl bg-white hover:bg-[#EEF5FF] disabled:opacity-40 disabled:cursor-not-allowed text-[#176B87] font-bold transition flex items-center gap-1 text-xs cursor-pointer shadow-sm dark:bg-slate-800 dark:border-slate-600 dark:text-[#86B6F6] dark:hover:bg-slate-700">
-          Next <i class="fa-solid fa-chevron-right text-[10px]"></i>
-        </button>
+
+        <!-- Date Filter -->
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block" for="filterDate">Date Picker</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-calendar text-xs"></i>
+            </span>
+            <input type="date" id="filterDate" onchange="applyFilters()"
+              class="w-full bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-[#0f172a] focus:ring-2 focus:ring-[#0f172a]/10 transition">
+          </div>
+        </div>
+
+        <!-- Module / Target Table Filter -->
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block" for="filterModule">Module / Target Area</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-cubes text-xs"></i>
+            </span>
+            <select id="filterModule" onchange="applyFilters()"
+              class="w-full bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl pl-10 pr-4 py-2.5 appearance-none focus:outline-none focus:border-[#0f172a] focus:ring-2 focus:ring-[#0f172a]/10 transition cursor-pointer">
+              <option value="All">All Modules</option>
+            </select>
+            <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-chevron-down text-[9px]"></i>
+            </span>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Data Mutation Audit Table Container -->
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden flex flex-col">
+      <div class="overflow-x-auto overflow-y-auto max-h-[600px] w-full custom-scrollbar">
+        <table class="w-full text-left border-collapse min-w-[950px]">
+          <thead class="sticky top-0 bg-slate-50 z-10 border-b border-slate-200 shadow-xs">
+            <tr class="bg-slate-50 text-[10px] font-black uppercase tracking-wider text-slate-400">
+              <th class="py-4 px-5">Change Ref</th>
+              <th class="py-4 px-5">Timestamp (Asia/Manila)</th>
+              <th class="py-4 px-5">Actor Name</th>
+              <th class="py-4 px-5">Module / Target</th>
+              <th class="py-4 px-5">Record Ref</th>
+              <th class="py-4 px-5">Action Type</th>
+              <th class="py-4 px-5">Pre-State (Old)</th>
+              <th class="py-4 px-5">Post-State (New)</th>
+              <th class="py-4 px-5 text-right">Details</th>
+            </tr>
+          </thead>
+          <tbody id="mutationTableBody" class="divide-y divide-slate-100 text-xs text-slate-700">
+            <!-- Populated dynamically by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Footer Container -->
+      <div id="paginationFooter" class="px-5 py-3.5 bg-[#EEF5FF]/60 border-t border-[#B4D4FF]/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-semibold select-none dark:bg-slate-800/60 dark:border-slate-700">
+        <div class="flex items-center gap-4 flex-wrap">
+          <div id="paginationInfo" class="text-xs text-slate-500 font-medium dark:text-slate-400">
+            Showing <span id="paginationStart" class="font-bold text-[#176B87] dark:text-[#86B6F6]">0</span> to <span id="paginationEnd" class="font-bold text-[#176B87] dark:text-[#86B6F6]">0</span> of <span id="paginationTotal" class="font-bold text-[#176B87] dark:text-[#86B6F6]">0</span> entries
+          </div>
+          <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+            <label for="pageSizeSelect" class="text-[11px] font-semibold">Rows per page:</label>
+            <select id="pageSizeSelect" onchange="changePageSize(this.value)" class="bg-white dark:bg-slate-800 border border-[#B4D4FF] dark:border-slate-600 rounded-lg px-2 py-1 text-xs font-bold text-[#176B87] dark:text-[#86B6F6] focus:outline-none cursor-pointer">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50" selected>50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5" id="paginationControls">
+          <button id="prevPageBtn" onclick="changePage(-1)" class="px-3 py-1.5 border border-[#B4D4FF] rounded-xl bg-white hover:bg-[#EEF5FF] disabled:opacity-40 disabled:cursor-not-allowed text-[#176B87] font-bold transition flex items-center gap-1 text-xs cursor-pointer shadow-sm dark:bg-slate-800 dark:border-slate-600 dark:text-[#86B6F6] dark:hover:bg-slate-700">
+            <i class="fa-solid fa-chevron-left text-[10px]"></i> Previous
+          </button>
+          <div id="pageNumbers" class="flex items-center gap-1 font-bold text-xs">
+            <!-- Dynamic Page Numbers -->
+          </div>
+          <button id="nextPageBtn" onclick="changePage(1)" class="px-3 py-1.5 border border-[#B4D4FF] rounded-xl bg-white hover:bg-[#EEF5FF] disabled:opacity-40 disabled:cursor-not-allowed text-[#176B87] font-bold transition flex items-center gap-1 text-xs cursor-pointer shadow-sm dark:bg-slate-800 dark:border-slate-600 dark:text-[#86B6F6] dark:hover:bg-slate-700">
+            Next <i class="fa-solid fa-chevron-right text-[10px]"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Data Mutation Detail Inspector Modal -->

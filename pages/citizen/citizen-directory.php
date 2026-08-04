@@ -46,136 +46,208 @@ if (!empty($headerUser['is_superadmin']) || !empty($headerUser['is_global_access
     </div>
   </div>
 
-  <!-- Metric Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
-      <div class="absolute top-0 left-0 w-1.5 h-full bg-[#0f172a]"></div>
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Total Citizens</span>
-        <h3 class="text-2xl font-black text-slate-900 tracking-tight" id="metricTotal">0</h3>
+  <!-- FULL CONTENT SKELETON LOADER -->
+  <div id="citizenSkeleton" class="space-y-6 transition-all duration-500 opacity-100 pointer-events-auto">
+    <!-- Metric Cards Skeleton -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <?php for($k=0; $k<4; $k++): ?>
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between">
+        <div class="space-y-2 w-full">
+          <div class="skeleton-loader h-3 w-28 rounded-md"></div>
+          <div class="skeleton-loader h-7 w-20 rounded-lg"></div>
+        </div>
+        <div class="skeleton-loader h-10 w-10 rounded-lg shrink-0 ml-3"></div>
       </div>
-      <div class="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-450 group-hover:bg-slate-100 transition">
-        <i class="fa-solid fa-users text-sm"></i>
-      </div>
-    </div>
-    
-    <!-- Active  -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
-      <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Active Accounts</span>
-        <h3 class="text-2xl font-black text-slate-900 tracking-tight" id="metricActive">0</h3>
-      </div>
-      <div class="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-50 transition">
-        <i class="fa-solid fa-circle-user text-sm"></i>
-      </div>
+      <?php endfor; ?>
     </div>
 
-    <!-- Inactive -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
-      <div class="absolute top-0 left-0 w-1.5 h-full bg-slate-400"></div>
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Inactive Accounts</span>
-        <h3 class="text-2xl font-black text-slate-900 tracking-tight" id="metricInactive">0</h3>
+    <!-- Filter Control Skeleton -->
+    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="skeleton-loader h-4 w-40 rounded-md"></div>
+        <div class="skeleton-loader h-4 w-24 rounded-md"></div>
       </div>
-      <div class="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-slate-100 transition">
-        <i class="fa-solid fa-user-slash text-sm"></i>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="skeleton-loader h-9 w-full rounded-xl"></div>
+        <div class="skeleton-loader h-9 w-full rounded-xl"></div>
+        <div class="skeleton-loader h-9 w-full rounded-xl"></div>
+        <div class="skeleton-loader h-9 w-full rounded-xl"></div>
       </div>
     </div>
 
-    <!-- Locked -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
-      <div class="absolute top-0 left-0 w-1.5 h-full bg-rose-500"></div>
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Locked Accounts</span>
-        <h3 class="text-2xl font-black text-slate-900 tracking-tight" id="metricLocked">0</h3>
+    <!-- Datatable Skeleton -->
+    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-100">
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-20 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-36 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-28 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-24 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-24 rounded-md"></div></th>
+              <th class="px-6 py-4 text-right"><div class="skeleton-loader h-3 w-16 rounded-md ml-auto"></div></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100/80">
+            <?php for($i=0; $i<5; $i++): ?>
+            <tr class="animate-pulse">
+              <td class="px-6 py-4"><div class="skeleton-loader h-3.5 w-24 rounded-md"></div></td>
+              <td class="px-6 py-4">
+                <div class="space-y-1">
+                  <div class="skeleton-loader h-3.5 w-36 rounded-md"></div>
+                  <div class="skeleton-loader h-2.5 w-24 rounded-md"></div>
+                </div>
+              </td>
+              <td class="px-6 py-4"><div class="skeleton-loader h-3.5 w-28 rounded-md"></div></td>
+              <td class="px-6 py-4"><div class="skeleton-loader h-5 w-20 rounded-full"></div></td>
+              <td class="px-6 py-4"><div class="skeleton-loader h-3.5 w-24 rounded-md"></div></td>
+              <td class="px-6 py-4 text-right"><div class="skeleton-loader h-7 w-20 rounded-lg ml-auto"></div></td>
+            </tr>
+            <?php endfor; ?>
+          </tbody>
+        </table>
       </div>
-      <div class="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-rose-500 group-hover:bg-rose-50 transition">
-        <i class="fa-solid fa-user-lock text-sm"></i>
-      </div>
-    </div>
-  </div>
-
-  <!-- Advanced Control  -->
-  <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
-    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-      <div class="flex items-center space-x-2">
-        <i class="fa-solid fa-sliders text-brand-dark text-xs"></i>
-        <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">Advanced Filter Controls</h3>
-      </div>
-      <button onclick="resetFilters()" class="text-slate-400 hover:text-rose-600 text-xs font-bold transition flex items-center gap-1 cursor-pointer">
-        <i class="fa-solid fa-trash-can text-[10px]"></i>
-        <span>Reset Filters</span>
-      </button>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="relative">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-        <input type="text" id="citizenSearch" oninput="filterCitizenTable()" placeholder="Search ID, name, email..." class="pl-8 pr-3 py-2 border border-slate-200 rounded-xl text-xs w-full bg-slate-50/50 focus:bg-white focus:outline-none focus:border-brand-medium transition">
-      </div>
-
-      <!-- Dropdown -->
-      <select id="statusFilter" onchange="filterCitizenTable()" class="border border-slate-200 rounded-xl px-3 py-2 text-xs w-full bg-slate-50/50 focus:bg-white focus:outline-none focus:border-brand-medium transition cursor-pointer font-semibold text-slate-650">
-        <option value="All">All Statuses</option>
-        <option value="Active">Active</option>
-        <option value="Inactive">Inactive</option>
-        <option value="Locked">Locked</option>
-      </select>
-
-      <!-- Barangay Dropdown -->
-      <select id="barangayFilter" onchange="filterCitizenTable()" class="border border-slate-200 rounded-xl px-3 py-2 text-xs w-full bg-slate-50/50 focus:bg-white focus:outline-none focus:border-brand-medium transition cursor-pointer font-semibold text-slate-650">
-        <option value="All">All Barangays</option>
-        <option value="Barangay 171 (Bagumbong)">Barangay 171 (Bagumbong)</option>
-        <option value="Barangay 178 (Camarin)">Barangay 178 (Camarin)</option>
-        <option value="Barangay 8 (Tondo Border Area)">Barangay 8 (Tondo Border Area)</option>
-      </select>
-
-      <!-- Registration Date -->
-      <input type="date" id="dateFilter" onchange="filterCitizenTable()" class="border border-slate-200 rounded-xl px-3 py-2 text-xs w-full bg-slate-50/50 focus:bg-white focus:outline-none focus:border-brand-medium transition cursor-pointer font-semibold text-slate-650">
     </div>
   </div>
 
-  <!-- Citizen Roster -->
-  <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-wider">
-            <th class="px-6 py-4">Citizen ID</th>
-            <th class="px-6 py-4">Full Name & Contact</th>
-            <th class="px-6 py-4">Barangay</th>
-            <th class="px-6 py-4">Account Status</th>
-            <th class="px-6 py-4">Activity Logs</th>
-            <?php if ($canEdit): ?>
-              <th class="px-6 py-4 text-right">Actions</th>
-            <?php else: ?>
-              <th class="px-6 py-4 text-right">View Details</th>
-            <?php endif; ?>
-          </tr>
-        </thead>
-        <tbody id="citizenTableBody" class="divide-y divide-slate-100/80 text-xs">
-        
-        </tbody>
-      </table>
+  <!-- REAL PAGE CONTENT -->
+  <div id="citizenRealContent" class="space-y-6 hidden opacity-0 transition-all duration-700 ease-out transform translate-y-2">
+
+    <!-- Metric Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-[#0f172a]"></div>
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Total Citizens</span>
+          <h3 class="text-2xl font-black text-slate-900 tracking-tight" id="metricTotal">0</h3>
+        </div>
+        <div class="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-450 group-hover:bg-slate-100 transition">
+          <i class="fa-solid fa-users text-sm"></i>
+        </div>
+      </div>
+      
+      <!-- Active  -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Active Accounts</span>
+          <h3 class="text-2xl font-black text-slate-900 tracking-tight" id="metricActive">0</h3>
+        </div>
+        <div class="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-50 transition">
+          <i class="fa-solid fa-circle-user text-sm"></i>
+        </div>
+      </div>
+
+      <!-- Inactive -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-slate-400"></div>
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Inactive Accounts</span>
+          <h3 class="text-2xl font-black text-slate-900 tracking-tight" id="metricInactive">0</h3>
+        </div>
+        <div class="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-slate-100 transition">
+          <i class="fa-solid fa-user-slash text-sm"></i>
+        </div>
+      </div>
+
+      <!-- Locked -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-rose-500"></div>
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Locked Accounts</span>
+          <h3 class="text-2xl font-black text-slate-900 tracking-tight" id="metricLocked">0</h3>
+        </div>
+        <div class="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-rose-500 group-hover:bg-rose-50 transition">
+          <i class="fa-solid fa-user-lock text-sm"></i>
+        </div>
+      </div>
     </div>
 
-    <!-- Pagination -->
-    <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-400">
-      <div id="citizenPaginationText">
-        Showing 0 to 0 of 0 accounts
-      </div>
-      <div class="flex items-center space-x-1">
-        <button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 cursor-not-allowed transition" disabled>
-          <i class="fa-solid fa-chevron-left text-[9px]"></i>
+    <!-- Advanced Control  -->
+    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-sliders text-brand-dark text-xs"></i>
+          <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">Advanced Filter Controls</h3>
+        </div>
+        <button onclick="resetFilters()" class="text-slate-400 hover:text-rose-600 text-xs font-bold transition flex items-center gap-1 cursor-pointer">
+          <i class="fa-solid fa-trash-can text-[10px]"></i>
+          <span>Reset Filters</span>
         </button>
-        <button class="px-3 py-1.5 rounded-lg bg-brand-light border border-brand-border text-brand-dark font-extrabold">1</button>
-        <button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 cursor-not-allowed transition" disabled>
-          <i class="fa-solid fa-chevron-right text-[9px]"></i>
-        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input type="text" id="citizenSearch" oninput="filterCitizenTable()" placeholder="Search ID, name, email..." class="pl-8 pr-3 py-2 border border-slate-200 rounded-xl text-xs w-full bg-slate-50/50 focus:bg-white focus:outline-none focus:border-brand-medium transition">
+        </div>
+
+        <!-- Dropdown -->
+        <select id="statusFilter" onchange="filterCitizenTable()" class="border border-slate-200 rounded-xl px-3 py-2 text-xs w-full bg-slate-50/50 focus:bg-white focus:outline-none focus:border-brand-medium transition cursor-pointer font-semibold text-slate-650">
+          <option value="All">All Statuses</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+          <option value="Locked">Locked</option>
+        </select>
+
+        <!-- Barangay Dropdown -->
+        <select id="barangayFilter" onchange="filterCitizenTable()" class="border border-slate-200 rounded-xl px-3 py-2 text-xs w-full bg-slate-50/50 focus:bg-white focus:outline-none focus:border-brand-medium transition cursor-pointer font-semibold text-slate-650">
+          <option value="All">All Barangays</option>
+          <option value="Barangay 171 (Bagumbong)">Barangay 171 (Bagumbong)</option>
+          <option value="Barangay 178 (Camarin)">Barangay 178 (Camarin)</option>
+          <option value="Barangay 8 (Tondo Border Area)">Barangay 8 (Tondo Border Area)</option>
+        </select>
+
+        <!-- Registration Date -->
+        <input type="date" id="dateFilter" onchange="filterCitizenTable()" class="border border-slate-200 rounded-xl px-3 py-2 text-xs w-full bg-slate-50/50 focus:bg-white focus:outline-none focus:border-brand-medium transition cursor-pointer font-semibold text-slate-650">
       </div>
     </div>
-  </div>
+
+    <!-- Citizen Roster -->
+    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+              <th class="px-6 py-4">Citizen ID</th>
+              <th class="px-6 py-4">Full Name & Contact</th>
+              <th class="px-6 py-4">Barangay</th>
+              <th class="px-6 py-4">Account Status</th>
+              <th class="px-6 py-4">Activity Logs</th>
+              <?php if ($canEdit): ?>
+                <th class="px-6 py-4 text-right">Actions</th>
+              <?php else: ?>
+                <th class="px-6 py-4 text-right">View Details</th>
+              <?php endif; ?>
+            </tr>
+          </thead>
+          <tbody id="citizenTableBody" class="divide-y divide-slate-100/80 text-xs">
+          
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-400">
+        <div id="citizenPaginationText">
+          Showing 0 to 0 of 0 accounts
+        </div>
+        <div class="flex items-center space-x-1">
+          <button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 cursor-not-allowed transition" disabled>
+            <i class="fa-solid fa-chevron-left text-[9px]"></i>
+          </button>
+          <button class="px-3 py-1.5 rounded-lg bg-brand-light border border-brand-border text-brand-dark font-extrabold">1</button>
+          <button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 cursor-not-allowed transition" disabled>
+            <i class="fa-solid fa-chevron-right text-[9px]"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div> <!-- End #citizenRealContent -->
+
+</main>
 
 </main>
 

@@ -37,6 +37,13 @@ function openCreateModal() {
   document.getElementById('roleForm').reset();
   document.getElementById('roleIdRef').value = '';
   document.getElementById('rolePrefix').dataset.manual = 'false';
+
+  const statusEl = document.getElementById('roleStatus');
+  if (statusEl) {
+    statusEl.disabled = false;
+    statusEl.title = '';
+  }
+
   document.getElementById('roleModalTitle').innerText = "Create System Role";
   document.getElementById('roleModalIcon').className = "fa-solid fa-user-shield text-brand-medium";
   
@@ -53,7 +60,7 @@ function openEditModal(roleId) {
     return;
   }
 
-  const role = systemRoles.find(r => r.role_id === roleId);
+  const role = systemRoles.find(r => r.role_id === roleId || r.id === roleId);
   if (!role) return;
 
   document.getElementById('roleIdRef').value = role.role_id;
@@ -67,7 +74,24 @@ function openEditModal(roleId) {
   }
 
   document.getElementById('roleDesc').value = role.description || '';
-  document.getElementById('roleStatus').value = role.status || 'Active';
+
+  const isOwnRole = (
+    (window.currentUserRoleId && (role.role_id == window.currentUserRoleId || role.id == window.currentUserRoleId)) ||
+    (window.currentUserRoleName && role.role_name && role.role_name.toLowerCase() === window.currentUserRoleName.toLowerCase()) ||
+    (currentUserScope && currentUserScope.role_id && (role.role_id == currentUserScope.role_id || role.id == currentUserScope.role_id))
+  );
+
+  const statusEl = document.getElementById('roleStatus');
+  if (statusEl) {
+    statusEl.value = role.status || 'Active';
+    if (isOwnRole || role.is_system_role) {
+      statusEl.disabled = true;
+      statusEl.title = isOwnRole ? "You cannot change the status of your own role." : "System roles status cannot be changed.";
+    } else {
+      statusEl.disabled = false;
+      statusEl.title = "";
+    }
+  }
 
   document.getElementById('roleModalTitle').innerText = `Edit Role: ${role.role_name}`;
   document.getElementById('roleModalIcon').className = "fa-solid fa-pen-to-square text-brand-medium";

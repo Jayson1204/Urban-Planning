@@ -6,8 +6,18 @@ function renderResourcesTable(dataToRender = systemResources) {
 
   tableBody.innerHTML = '';
 
-  if (dataToRender.length === 0) {
+  const totalFiltered = dataToRender.length;
+  const totalPages = Math.ceil(totalFiltered / pageSize) || 1;
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalFiltered);
+  const pageData = dataToRender.slice(startIndex, endIndex);
+
+  if (totalFiltered === 0) {
     if (emptyState) emptyState.classList.remove('hidden');
+    renderPaginationUI(0, 0, 0, 1);
     updateResourceMetrics();
     return;
   } else {
@@ -32,21 +42,22 @@ function renderResourcesTable(dataToRender = systemResources) {
   const grantedActions = currentUserScope ? (currentUserScope.granted_actions || []) : [];
   const canEdit = isSuperAdmin || grantedActions.includes('EDIT');
 
-  dataToRender.forEach(res => {
+  pageData.forEach(res => {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-slate-50/60 transition group';
 
     const badgeStyle = moduleBadgeMap[res.module] || 'bg-slate-100 text-slate-700 border-slate-200';
 
     let statusBadgeHtml = '';
-    if (res.status === 'Active') {
+    const rStatus = res.status || 'Active';
+    if (rStatus === 'Active') {
       statusBadgeHtml = `
         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
           <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
           Active
         </span>
       `;
-    } else if (res.status === 'Inactive') {
+    } else if (rStatus === 'Inactive') {
       statusBadgeHtml = `
         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-slate-100 text-slate-600 border border-slate-200">
           <span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>
@@ -62,8 +73,8 @@ function renderResourcesTable(dataToRender = systemResources) {
       `;
     }
 
-    const isChecked = res.status === 'Active';
-    const isArchived = res.status === 'Archived';
+    const isChecked = rStatus === 'Active';
+    const isArchived = rStatus === 'Archived';
 
     tr.innerHTML = `
       <td class="px-6 py-4">
@@ -136,20 +147,98 @@ function renderResourcesTable(dataToRender = systemResources) {
     tableBody.appendChild(tr);
   });
 
+  renderPaginationUI(startIndex, endIndex, totalFiltered, totalPages);
   updateResourceMetrics();
 }
 
-// UPDATE METRIC CARDS
+function renderPaginationUI(startIndex, endIndex, totalFiltered, totalPages) {
+  const paginationEl = document.getElementById('paginationText');
+  const controlsEl = document.getElementById('paginationControls');
+
+  if (paginationEl) {
+    if (totalFiltered === 0) {
+      paginationEl.innerText = "Showing 0 to 0 of 0 resources";
+    } else {
+      paginationEl.innerText = `Showing ${startIndex + 1} to ${endIndex} of ${totalFiltered} resources`;
+    }
+  }
+
+  if (!controlsEl) return;
+  controlsEl.innerHTML = '';
+
+  if (totalPages <= 1) return;
+
+  // Prev Button
+  const prevBtn = document.createElement('button');
+  prevBtn.className = `px-3 py-1.5 rounded-lg border text-xs font-bold transition flex items-center justify-center ${currentPage === 1 ? 'border-slate-200 bg-white text-slate-300 cursor-not-allowed' : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600 cursor-pointer'}`;
+  prevBtn.disabled = currentPage === 1;
+  prevBtn.innerHTML = '<i class="fa-solid fa-chevron-left text-[9px]"></i>';
+  prevBtn.onclick = () => { if (currentPage > 1) { currentPage--; filterResources(); } };
+  controlsEl.appendChild(prevBtn);
+
+  // Page Numbers
+  for (let i = 1; i <= totalPages; i++) {
+    const pBtn = document.createElement('button');
+    if (i === currentPage) {
+      pBtn.className = "px-3 py-1.5 rounded-lg bg-[#86B6F6] border border-[#72a6eb] text-slate-900 font-black shadow-2xs text-xs";
+    } else {
+      pBtn.className = "px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold transition text-xs cursor-pointer";
+    }
+    pBtn.innerText = i;
+    pBtn.onclick = () => { currentPage = i; filterResources(); };
+    controlsEl.appendChild(pBtn);
+  }
+
+  // Next Button
+  const nextBtn = document.createElement('button');
+  nextBtn.className = `px-3 py-1.5 rounded-lg border text-xs font-bold transition flex items-center justify-center ${currentPage === totalPages ? 'border-slate-200 bg-white text-slate-300 cursor-not-allowed' : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600 cursor-pointer'}`;
+  nextBtn.disabled = currentPage === totalPages;
+  nextBtn.innerHTML = '<i class="fa-solid fa-chevron-right text-[9px]"></i>';
+  nextBtn.onclick = () => { if (currentPage < totalPages) { currentPage++; filterResources(); } };
+  controlsEl.appendChild(nextBtn);
+}
+
+// UPDATE METRIC CARDS AND TAB COUNTS
 function updateResourceMetrics() {
+  const total = systemResources.length;
+  const activeCount = systemResources.filter(r => (r.status || 'Active') === 'Active').length;
+  const inactiveCount = systemResources.filter(r => (r.status || '').toLowerCase() === 'inactive').length;
+  const archivedCount = systemResources.filter(r => (r.status || '').toLowerCase() === 'archived').length;
+
   const totalEl = document.getElementById('metricTotalResources');
   const activeEl = document.getElementById('metricActiveResources');
   const inactiveEl = document.getElementById('metricInactiveResources');
 
-  if (totalEl) totalEl.textContent = systemResources.length;
-  
-  const activeCount = systemResources.filter(r => r.status === 'Active').length;
+  if (totalEl) totalEl.textContent = total;
   if (activeEl) activeEl.textContent = activeCount;
+  if (inactiveEl) inactiveEl.textContent = inactiveCount + archivedCount;
 
-  const inactiveCount = systemResources.filter(r => r.status !== 'Active').length;
-  if (inactiveEl) inactiveEl.textContent = inactiveCount;
+  // Update tab counts
+  const tabActive = document.getElementById('tabCountActive');
+  const tabInactive = document.getElementById('tabCountInactive');
+  const tabArchived = document.getElementById('tabCountArchived');
+  const tabAll = document.getElementById('tabCountAll');
+
+  if (tabActive) tabActive.innerText = activeCount;
+  if (tabInactive) tabInactive.innerText = inactiveCount;
+  if (tabArchived) tabArchived.innerText = archivedCount;
+  if (tabAll) tabAll.innerText = total;
+
+  hideResourceSkeleton();
+}
+
+function hideResourceSkeleton() {
+  const skel = document.getElementById('resourceSkeleton');
+  const real = document.getElementById('resourceRealContent');
+  if (!skel || !real) return;
+
+  real.classList.remove('hidden');
+  requestAnimationFrame(() => {
+    skel.classList.add('opacity-0', 'pointer-events-none');
+    real.classList.remove('opacity-0', 'translate-y-2');
+    real.classList.add('opacity-100', 'translate-y-0');
+    setTimeout(() => {
+      skel.classList.add('hidden');
+    }, 500);
+  });
 }

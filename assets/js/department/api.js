@@ -23,6 +23,10 @@ async function fetchDepartments() {
   } catch (err) {
     console.error('Error fetching departments:', err);
     showToast('Network error connecting TO DATABASE.');
+  } finally {
+    if (typeof hideDeptSkeleton === 'function') {
+      hideDeptSkeleton();
+    }
   }
 }
 

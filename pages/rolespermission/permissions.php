@@ -9,8 +9,9 @@ include '../../includes/sidebar.php';
   window.currentUserDeptName = <?php echo json_encode($headerUser['department_name'] ?? ''); ?>;
   window.currentUserDeptCode = <?php echo json_encode($headerUser['department_code'] ?? ''); ?>;
   window.currentUserIsSuperAdmin = <?php echo json_encode(!empty($headerUser['is_superadmin']) || !empty($headerUser['is_global_access'])); ?>;
+  window.currentUserGrantedResources = <?php echo json_encode($headerUser['granted_resources'] ?? []); ?>;
+  window.currentUserGrantedActions = <?php echo json_encode($headerUser['granted_actions'] ?? []); ?>;
 </script>
-
 
 <main class="flex-1 p-6 md:p-8 w-full space-y-6 overflow-y-auto relative pb-24">
 
@@ -96,25 +97,16 @@ include '../../includes/sidebar.php';
           <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">Security Clearance Constraints</h3>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Allowed Scopes -->
-          <div class="space-y-3">
-            <h4 class="text-[10px] font-black text-emerald-600 uppercase tracking-wider flex items-center gap-1.5">
-              <i class="fa-solid fa-circle-check text-xs"></i>
-              Explicitly Allowed Operations
-            </h4>
-            <ul id="allowedRestrictionsList" class="space-y-2.5 text-xs text-slate-650">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-3.5 rounded-xl border border-slate-100 bg-slate-50/50 space-y-2">
+            <span class="text-[10px] font-black uppercase text-slate-400">Department Scope Enforcement</span>
+            <ul id="deptRestrictionsList" class="space-y-2 text-xs">
               <!-- JS Populated -->
             </ul>
           </div>
-
-          <!-- Forbidden Scopes -->
-          <div class="space-y-3">
-            <h4 class="text-[10px] font-black text-rose-600 uppercase tracking-wider flex items-center gap-1.5">
-              <i class="fa-solid fa-circle-xmark text-xs"></i>
-              Strictly Forbidden Operations
-            </h4>
-            <ul id="forbiddenRestrictionsList" class="space-y-2.5 text-xs text-slate-650">
+          <div class="p-3.5 rounded-xl border border-slate-100 bg-slate-50/50 space-y-2">
+            <span class="text-[10px] font-black uppercase text-slate-400">Global System Overrides</span>
+            <ul id="globalRestrictionsList" class="space-y-2 text-xs">
               <!-- JS Populated -->
             </ul>
           </div>
