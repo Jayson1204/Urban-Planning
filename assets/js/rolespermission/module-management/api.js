@@ -11,12 +11,12 @@ async function fetchModules() {
     const result = await response.json();
     if (result.status === 'success' && Array.isArray(result.data)) {
       systemModules = result.data.map(m => ({
-        id: m.module_id,
-        name: m.module_name,
+        id: m.module_id || m.id,
+        name: m.module_name || m.name || 'Unassigned Module',
         desc: m.description || '',
         status: m.status || 'Active',
-        created_at: m.created_at ? m.created_at.replace('T', ' ').substring(0, 19) : '',
-        updated_at: m.updated_at ? m.updated_at.replace('T', ' ').substring(0, 19) : ''
+        created_at: m.created_at ? String(m.created_at).replace('T', ' ').substring(0, 19) : '',
+        updated_at: m.updated_at ? String(m.updated_at).replace('T', ' ').substring(0, 19) : ''
       }));
       currentUserScope = result.current_user || null;
       if (typeof filterModules === 'function') filterModules();
@@ -26,6 +26,10 @@ async function fetchModules() {
   } catch (err) {
     console.error('Error fetching modules FROM DATABASE:', err);
     if (typeof showToast === 'function') showToast('Network error connecting to Database.');
+  } finally {
+    if (typeof hideModuleSkeleton === 'function') {
+      hideModuleSkeleton();
+    }
   }
 }
 
@@ -41,6 +45,7 @@ async function updateModuleStatusInDb(moduleId, newStatus) {
     if (result.status === 'success') {
       if (typeof showToast === 'function') showToast(`Module status updated to ${newStatus}.`);
       await fetchModules();
+      if (typeof switchStatusTab === 'function') switchStatusTab(newStatus);
     } else {
       if (typeof showToast === 'function') showToast(result.message || 'Failed to update module status.');
     }

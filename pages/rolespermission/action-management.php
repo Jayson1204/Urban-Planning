@@ -29,7 +29,7 @@ include '../../includes/sidebar.php';
       <button 
         type="button"
         onclick="openCreateActionModal()" 
-        class="bg-[#0F172A] hover:bg-slate-800 text-white font-bold px-4.5 py-2.5 rounded-xl text-xs transition duration-200 shadow-xs flex items-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-900/20"
+        class="bg-[#86B6F6] hover:bg-[#6fa5f5] text-slate-900 font-extrabold px-4.5 py-2.5 rounded-xl text-xs transition duration-200 shadow-xs flex items-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-medium/30 border border-[#72a6eb]"
       >
         <i class="fa-solid fa-plus text-xs"></i>
         <span>Create New Action</span>
@@ -38,105 +38,169 @@ include '../../includes/sidebar.php';
     <?php endif; ?>
   </div>
 
-  <!-- Action Overview Metric Cards (3 columns) -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-    <!-- Total Registered Actions -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between">
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Total Registered</span>
-        <h3 id="metricTotalActions" class="text-2xl font-black text-slate-900 tracking-tight">9</h3>
-        <p class="text-[11px] text-slate-500 font-medium">System Action Verbs</p>
+  <!-- FULL CONTENT SKELETON LOADER -->
+  <div id="actionSkeleton" class="space-y-6 transition-all duration-500 opacity-100 pointer-events-auto">
+    <!-- Cards Skeleton -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <?php for($i=0; $i<3; $i++): ?>
+      <div class="glass-panel rounded-2xl p-5 flex items-center justify-between dark:bg-slate-900/85 dark:border-slate-800/80">
+        <div class="space-y-2.5 w-full">
+          <div class="skeleton-loader h-3 w-28 rounded-md"></div>
+          <div class="skeleton-loader h-7 w-20 rounded-lg"></div>
+          <div class="skeleton-loader h-2.5 w-36 rounded-md"></div>
+        </div>
+        <div class="skeleton-loader h-11 w-11 rounded-xl shrink-0 ml-3"></div>
       </div>
-      <div class="h-12 w-12 rounded-2xl bg-brand-light border border-brand-border/60 flex items-center justify-center text-brand-dark shrink-0">
-        <i class="fa-solid fa-bolt text-lg"></i>
-      </div>
+      <?php endfor; ?>
     </div>
 
-    <!-- Active Actions -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between">
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Active Verbs</span>
-        <h3 id="metricActiveActions" class="text-2xl font-black text-emerald-600 tracking-tight">7</h3>
-        <p class="text-[11px] text-slate-500 font-medium">Active Action Privileges</p>
+    <!-- Table Skeleton -->
+    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+      <div class="p-4 border-b border-slate-100 flex items-center justify-between gap-4">
+        <div class="skeleton-loader h-10 w-80 rounded-xl"></div>
       </div>
-      <div class="h-12 w-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
-        <i class="fa-solid fa-circle-check text-lg"></i>
-      </div>
-    </div>
-
-    <!-- Inactive & Archived Actions -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between">
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Inactive / Archived</span>
-        <h3 id="metricInactiveActions" class="text-2xl font-black text-amber-600 tracking-tight">2</h3>
-        <p class="text-[11px] text-slate-500 font-medium">Disabled or Archived Actions</p>
-      </div>
-      <div class="h-12 w-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
-        <i class="fa-solid fa-box-archive text-lg"></i>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-100">
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-24 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-36 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-20 rounded-md"></div></th>
+              <th class="px-6 py-4 text-right"><div class="skeleton-loader h-3 w-20 rounded-md ml-auto"></div></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <?php for($k=0; $k<5; $k++): ?>
+            <tr class="animate-pulse">
+              <td class="px-6 py-4"><div class="skeleton-loader h-3.5 w-24 rounded-md"></div></td>
+              <td class="px-6 py-4"><div class="skeleton-loader h-3.5 w-48 rounded-md"></div></td>
+              <td class="px-6 py-4"><div class="skeleton-loader h-5 w-20 rounded-full"></div></td>
+              <td class="px-6 py-4 text-right"><div class="skeleton-loader h-7 w-20 rounded-lg ml-auto"></div></td>
+            </tr>
+            <?php endfor; ?>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 
-  <!-- Actions Directory Control Panel & Datatable Workspace -->
-  <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden space-y-4">
-    
-    <!-- Control Panel & Filters -->
-    <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
-      <!-- Search Input -->
-      <div class="relative flex-1 max-w-md">
-        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-        <input 
-          type="text" 
-          id="actionSearchInput" 
-          oninput="filterActions()" 
-          placeholder="Search actions by Action Name or Description..." 
-          class="pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs w-full bg-white focus:outline-none focus:border-brand-medium focus:ring-2 focus:ring-brand-medium/10 transition"
-        >
+  <!-- REAL PAGE CONTENT -->
+  <div id="actionRealContent" class="space-y-6 hidden opacity-0 transition-all duration-700 ease-out transform translate-y-2">
+
+    <!-- Action Overview Metric Cards (3 columns) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <!-- Total Registered Actions -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between">
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Total Registered</span>
+          <h3 id="metricTotalActions" class="text-2xl font-black text-slate-900 tracking-tight">0</h3>
+          <p class="text-[11px] text-slate-500 font-medium">System Action Verbs</p>
+        </div>
+        <div class="h-12 w-12 rounded-2xl bg-brand-light border border-brand-border/60 flex items-center justify-center text-brand-dark shrink-0">
+          <i class="fa-solid fa-bolt text-lg"></i>
+        </div>
       </div>
 
-      <!-- Filters Group -->
-      <div class="flex items-center gap-3">
-        <!-- Status Filter Dropdown -->
-        <select 
-          id="statusFilterSelect" 
-          onchange="filterActions()" 
-          class="px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white text-slate-700 focus:outline-none focus:border-brand-medium transition cursor-pointer"
-        >
-          <option value="ALL">All Statuses</option>
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-          <option value="Archived">Archived</option>
-        </select>
+      <!-- Active Actions -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between">
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Active Verbs</span>
+          <h3 id="metricActiveActions" class="text-2xl font-black text-emerald-600 tracking-tight">0</h3>
+          <p class="text-[11px] text-slate-500 font-medium">Active Action Privileges</p>
+        </div>
+        <div class="h-12 w-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+          <i class="fa-solid fa-circle-check text-lg"></i>
+        </div>
+      </div>
+
+      <!-- Inactive & Archived Actions -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between">
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Inactive / Archived</span>
+          <h3 id="metricInactiveActions" class="text-2xl font-black text-amber-600 tracking-tight">0</h3>
+          <p class="text-[11px] text-slate-500 font-medium">Disabled or Archived Actions</p>
+        </div>
+        <div class="h-12 w-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+          <i class="fa-solid fa-box-archive text-lg"></i>
+        </div>
       </div>
     </div>
 
-    <!-- Structured Action Operations Datatable -->
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="bg-slate-50/80 border-b border-slate-200/80 text-[10px] font-black uppercase tracking-wider text-slate-400">
-            <th class="px-6 py-3.5">Action Name</th>
-            <th class="px-6 py-3.5">Description</th>
-            <th class="px-6 py-3.5 text-center">Status</th>
-            <th class="px-6 py-3.5">Created At</th>
-            <th class="px-6 py-3.5">Updated At</th>
-            <th class="px-6 py-3.5 text-right">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="actionTableBody" class="divide-y divide-slate-100 text-xs font-medium">
-          <!-- Dynamically populated by JS -->
-        </tbody>
-      </table>
+    <!-- Actions Directory Control Panel & Datatable Workspace -->
+    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+      
+      <!-- Status Tabs Header -->
+      <div class="px-5 pt-3.5 pb-0 border-b border-slate-200/80 bg-slate-50/50 flex items-center justify-between flex-wrap gap-2">
+        <div class="flex items-center space-x-1" id="statusTabsContainer">
+          <button type="button" onclick="switchStatusTab('Active')" data-status-tab="Active" class="status-tab-btn px-4 py-2.5 rounded-t-xl text-xs font-black transition-all cursor-pointer bg-white text-[#176B87] border-t-2 border-[#86B6F6] border-x border-slate-200/80 shadow-2xs">
+            <i class="fa-solid fa-circle-check text-emerald-500 mr-1.5 text-[10px]"></i>
+            Active <span id="tabCountActive" class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 font-extrabold">0</span>
+          </button>
+
+          <button type="button" onclick="switchStatusTab('Inactive')" data-status-tab="Inactive" class="status-tab-btn px-4 py-2.5 rounded-t-xl text-xs font-bold transition-all cursor-pointer text-slate-500 hover:text-slate-800 hover:bg-slate-100/60">
+            <i class="fa-solid fa-circle-minus text-slate-400 mr-1.5 text-[10px]"></i>
+            Inactive <span id="tabCountInactive" class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-slate-100 text-slate-600 font-bold">0</span>
+          </button>
+
+          <button type="button" onclick="switchStatusTab('Archived')" data-status-tab="Archived" class="status-tab-btn px-4 py-2.5 rounded-t-xl text-xs font-bold transition-all cursor-pointer text-slate-500 hover:text-slate-800 hover:bg-slate-100/60">
+            <i class="fa-solid fa-box-archive text-amber-500 mr-1.5 text-[10px]"></i>
+            Archived <span id="tabCountArchived" class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-800 font-bold">0</span>
+          </button>
+
+          <button type="button" onclick="switchStatusTab('ALL')" data-status-tab="ALL" class="status-tab-btn px-4 py-2.5 rounded-t-xl text-xs font-bold transition-all cursor-pointer text-slate-500 hover:text-slate-800 hover:bg-slate-100/60">
+            <i class="fa-solid fa-layer-group text-blue-500 mr-1.5 text-[10px]"></i>
+            All <span id="tabCountAll" class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-blue-100 text-blue-800 font-bold">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Control Panel & Filters -->
+      <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/30">
+        <!-- Search Input -->
+        <div class="relative flex-1 max-w-md">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input 
+            type="text" 
+            id="actionSearchInput" 
+            oninput="filterActions()" 
+            placeholder="Search actions by Action Name or Description..." 
+            class="pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs w-full bg-white focus:outline-none focus:border-brand-medium focus:ring-2 focus:ring-brand-medium/10 transition"
+          >
+        </div>
+      </div>
+
+      <!-- Structured Action Operations Datatable -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+              <th class="px-6 py-4">Action Name</th>
+              <th class="px-6 py-4">Description</th>
+              <th class="px-6 py-4">Status</th>
+              <th class="px-6 py-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="actionTableBody" class="divide-y divide-slate-100 text-xs text-slate-700">
+            <!-- Populated dynamically by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Footer / Pagination -->
+      <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-400">
+        <div id="paginationText">
+          Showing 0 to 0 of 0 actions
+        </div>
+        <div class="flex items-center space-x-1" id="paginationControls">
+          <!-- Page buttons rendered by JS -->
+        </div>
+      </div>
+
     </div>
 
-    <!-- Empty State -->
-    <div id="emptyTableState" class="hidden p-10 text-center space-y-2">
-      <i class="fa-solid fa-folder-open text-slate-300 text-3xl block"></i>
-      <p class="text-xs font-bold text-slate-700">No action verbs match your search filter</p>
-      <p class="text-[10px] text-slate-400">Try adjusting your search keyword or category dropdown filter.</p>
-    </div>
+  </div> <!-- End #actionRealContent -->
 
-  </div>
+</main>
 
 </main>
 
@@ -188,6 +252,7 @@ include '../../includes/sidebar.php';
           >
             <option value="Active">Active</option>
             <option value="Inactive">Inactive</option>
+            <option value="Archived">Archived</option>
           </select>
         </div>
 
@@ -227,7 +292,7 @@ include '../../includes/sidebar.php';
         </button>
         <button 
           type="submit" 
-          class="px-5 py-2 bg-[#0F172A] hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition shadow-xs cursor-pointer flex items-center gap-1.5"
+          class="px-5 py-2 bg-[#86B6F6] hover:bg-[#6fa5f5] text-slate-900 font-extrabold rounded-xl text-xs transition shadow-xs cursor-pointer flex items-center gap-1.5 border border-[#72a6eb]"
         >
           <i class="fa-solid fa-floppy-disk text-xs"></i>
           <span>Save Action</span>
@@ -310,6 +375,26 @@ let systemActions = [];
 let currentUserScope = null;
 let archiveTargetActionId = null;
 
+var currentTabStatus = 'Active';
+var currentPage = 1;
+var pageSize = 10;
+
+function switchStatusTab(targetStatus) {
+  currentTabStatus = targetStatus;
+  currentPage = 1;
+
+  document.querySelectorAll('.status-tab-btn').forEach(btn => {
+    const tabVal = btn.getAttribute('data-status-tab');
+    if (tabVal === targetStatus) {
+      btn.className = "status-tab-btn px-4 py-2.5 rounded-t-xl text-xs font-black transition-all cursor-pointer bg-white text-[#176B87] border-t-2 border-[#86B6F6] border-x border-slate-200/80 shadow-2xs";
+    } else {
+      btn.className = "status-tab-btn px-4 py-2.5 rounded-t-xl text-xs font-bold transition-all cursor-pointer text-slate-500 hover:text-slate-800 hover:bg-slate-100/60";
+    }
+  });
+
+  filterActions();
+}
+
 // FETCH ACTIONS FROM Database API
 async function fetchActions() {
   try {
@@ -332,6 +417,8 @@ async function fetchActions() {
   } catch (err) {
     console.error('Error fetching actions FROM DATABASE:', err);
     showToast('Network error connecting to Database.');
+  } finally {
+    hideActionSkeleton();
   }
 }
 
@@ -343,8 +430,18 @@ function renderActionsTable(dataToRender = systemActions) {
 
   tableBody.innerHTML = '';
 
-  if (dataToRender.length === 0) {
+  const totalFiltered = dataToRender.length;
+  const totalPages = Math.ceil(totalFiltered / pageSize) || 1;
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalFiltered);
+  const pageData = dataToRender.slice(startIndex, endIndex);
+
+  if (totalFiltered === 0) {
     if (emptyState) emptyState.classList.remove('hidden');
+    renderPaginationUI(0, 0, 0, 1);
     updateActionMetrics();
     return;
   } else {
@@ -355,20 +452,21 @@ function renderActionsTable(dataToRender = systemActions) {
   const grantedActions = currentUserScope ? (currentUserScope.granted_actions || []) : [];
   const canEdit = isSuperAdmin || grantedActions.includes('EDIT');
 
-  dataToRender.forEach(act => {
+  pageData.forEach(act => {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-slate-50/60 transition group';
 
     // Status Badge HTML
     let statusBadgeHtml = '';
-    if (act.status === 'Active') {
+    const aStatus = act.status || 'Active';
+    if (aStatus === 'Active') {
       statusBadgeHtml = `
         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
           <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
           Active
         </span>
       `;
-    } else if (act.status === 'Inactive') {
+    } else if (aStatus === 'Inactive') {
       statusBadgeHtml = `
         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-slate-100 text-slate-600 border border-slate-200">
           <span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>
@@ -384,8 +482,8 @@ function renderActionsTable(dataToRender = systemActions) {
       `;
     }
 
-    const isChecked = act.status === 'Active';
-    const isArchived = act.status === 'Archived';
+    const isChecked = aStatus === 'Active';
+    const isArchived = aStatus === 'Archived';
 
     tr.innerHTML = `
       <td class="px-6 py-4">
@@ -449,37 +547,113 @@ function renderActionsTable(dataToRender = systemActions) {
     tableBody.appendChild(tr);
   });
 
+  renderPaginationUI(startIndex, endIndex, totalFiltered, totalPages);
   updateActionMetrics();
 }
 
-// UPDATE METRIC CARDS
+function renderPaginationUI(startIndex, endIndex, totalFiltered, totalPages) {
+  const paginationEl = document.getElementById('paginationText');
+  const controlsEl = document.getElementById('paginationControls');
+
+  if (paginationEl) {
+    if (totalFiltered === 0) {
+      paginationEl.innerText = "Showing 0 to 0 of 0 actions";
+    } else {
+      paginationEl.innerText = `Showing ${startIndex + 1} to ${endIndex} of ${totalFiltered} actions`;
+    }
+  }
+
+  if (!controlsEl) return;
+  controlsEl.innerHTML = '';
+
+  if (totalPages <= 1) return;
+
+  // Prev Button
+  const prevBtn = document.createElement('button');
+  prevBtn.className = `px-3 py-1.5 rounded-lg border text-xs font-bold transition flex items-center justify-center ${currentPage === 1 ? 'border-slate-200 bg-white text-slate-300 cursor-not-allowed' : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600 cursor-pointer'}`;
+  prevBtn.disabled = currentPage === 1;
+  prevBtn.innerHTML = '<i class="fa-solid fa-chevron-left text-[9px]"></i>';
+  prevBtn.onclick = () => { if (currentPage > 1) { currentPage--; filterActions(); } };
+  controlsEl.appendChild(prevBtn);
+
+  // Page Numbers
+  for (let i = 1; i <= totalPages; i++) {
+    const pBtn = document.createElement('button');
+    if (i === currentPage) {
+      pBtn.className = "px-3 py-1.5 rounded-lg bg-[#86B6F6] border border-[#72a6eb] text-slate-900 font-black shadow-2xs text-xs";
+    } else {
+      pBtn.className = "px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold transition text-xs cursor-pointer";
+    }
+    pBtn.innerText = i;
+    pBtn.onclick = () => { currentPage = i; filterActions(); };
+    controlsEl.appendChild(pBtn);
+  }
+
+  // Next Button
+  const nextBtn = document.createElement('button');
+  nextBtn.className = `px-3 py-1.5 rounded-lg border text-xs font-bold transition flex items-center justify-center ${currentPage === totalPages ? 'border-slate-200 bg-white text-slate-300 cursor-not-allowed' : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600 cursor-pointer'}`;
+  nextBtn.disabled = currentPage === totalPages;
+  nextBtn.innerHTML = '<i class="fa-solid fa-chevron-right text-[9px]"></i>';
+  nextBtn.onclick = () => { if (currentPage < totalPages) { currentPage++; filterActions(); } };
+  controlsEl.appendChild(nextBtn);
+}
+
+// UPDATE METRIC CARDS AND TAB COUNTS
 function updateActionMetrics() {
+  const total = systemActions.length;
+  const activeCount = systemActions.filter(a => (a.status || 'Active') === 'Active').length;
+  const inactiveCount = systemActions.filter(a => (a.status || '').toLowerCase() === 'inactive').length;
+  const archivedCount = systemActions.filter(a => (a.status || '').toLowerCase() === 'archived').length;
+
   const totalEl = document.getElementById('metricTotalActions');
   const activeEl = document.getElementById('metricActiveActions');
   const inactiveEl = document.getElementById('metricInactiveActions');
 
-  if (totalEl) totalEl.textContent = systemActions.length;
-  
-  const activeCount = systemActions.filter(a => a.status === 'Active').length;
+  if (totalEl) totalEl.textContent = total;
   if (activeEl) activeEl.textContent = activeCount;
+  if (inactiveEl) inactiveEl.textContent = inactiveCount + archivedCount;
 
-  const inactiveCount = systemActions.filter(a => a.status !== 'Active').length;
-  if (inactiveEl) inactiveEl.textContent = inactiveCount;
+  // Update tab counts
+  const tabActive = document.getElementById('tabCountActive');
+  const tabInactive = document.getElementById('tabCountInactive');
+  const tabArchived = document.getElementById('tabCountArchived');
+  const tabAll = document.getElementById('tabCountAll');
+
+  if (tabActive) tabActive.innerText = activeCount;
+  if (tabInactive) tabInactive.innerText = inactiveCount;
+  if (tabArchived) tabArchived.innerText = archivedCount;
+  if (tabAll) tabAll.innerText = total;
+
+  hideActionSkeleton();
+}
+
+function hideActionSkeleton() {
+  const skel = document.getElementById('actionSkeleton');
+  const real = document.getElementById('actionRealContent');
+  if (!skel || !real) return;
+
+  real.classList.remove('hidden');
+  requestAnimationFrame(() => {
+    skel.classList.add('opacity-0', 'pointer-events-none');
+    real.classList.remove('opacity-0', 'translate-y-2');
+    real.classList.add('opacity-100', 'translate-y-0');
+    setTimeout(() => {
+      skel.classList.add('hidden');
+    }, 500);
+  });
 }
 
 // FILTER ACTIONS REAL TIME
 function filterActions() {
   const searchInput = document.getElementById('actionSearchInput');
-  const statusFilter = document.getElementById('statusFilterSelect');
-
   const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
-  const selectedStatus = statusFilter ? statusFilter.value : 'ALL';
 
   const filtered = systemActions.filter(act => {
     const matchesQuery = act.name.toLowerCase().includes(query) || 
                          (act.desc && act.desc.toLowerCase().includes(query));
 
-    const matchesStatus = selectedStatus === 'ALL' || act.status === selectedStatus;
+    const aStatus = act.status || 'Active';
+    const matchesStatus = currentTabStatus === 'ALL' || aStatus.toLowerCase() === currentTabStatus.toLowerCase();
 
     return matchesQuery && matchesStatus;
   });
@@ -499,6 +673,7 @@ async function updateActionStatusInDb(actionId, newStatus) {
     if (result.status === 'success') {
       showToast(`Action status updated to ${newStatus}.`);
       await fetchActions();
+      switchStatusTab(newStatus);
     } else {
       showToast(result.message || 'Failed to update action status.');
     }

@@ -125,6 +125,7 @@ window.civAudit.userActivities.ui = {
           </td>
         </tr>
       `;
+      hideUserActivitiesSkeleton();
       return;
     }
 
@@ -225,8 +226,25 @@ window.civAudit.userActivities.ui = {
         }
       }
     }
+    hideUserActivitiesSkeleton();
   }
 };
+
+function hideUserActivitiesSkeleton() {
+  const skel = document.getElementById('userActivitiesSkeleton');
+  const real = document.getElementById('userActivitiesRealContent');
+  if (!skel || !real) return;
+
+  real.classList.remove('hidden');
+  requestAnimationFrame(() => {
+    skel.classList.add('opacity-0', 'pointer-events-none');
+    real.classList.remove('opacity-0', 'translate-y-2');
+    real.classList.add('opacity-100', 'translate-y-0');
+    setTimeout(() => {
+      skel.classList.add('hidden');
+    }, 500);
+  });
+}
 
 window.changePage = function(delta) {
   if (window.civAudit && window.civAudit.userActivities && window.civAudit.userActivities.ui) {

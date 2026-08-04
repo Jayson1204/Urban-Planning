@@ -24,6 +24,10 @@ async function fetchControlCitizens() {
   } catch (error) {
     console.error('Error fetching citizen accounts:', error);
     if (typeof showToast === 'function') showToast('An error occurred while loading account records.', true);
+  } finally {
+    if (typeof hideCitizenAccountSkeleton === 'function') {
+      hideCitizenAccountSkeleton();
+    }
   }
 }
 

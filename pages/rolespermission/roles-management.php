@@ -4,6 +4,11 @@ include '../../includes/header.php';
 include '../../includes/sidebar.php';
 ?>
 
+<script>
+  window.currentUserRoleId = <?php echo json_encode($_SESSION['role_id'] ?? null); ?>;
+  window.currentUserRoleName = <?php echo json_encode($headerUser['role'] ?? ''); ?>;
+</script>
+
 <main class="flex-1 p-6 md:p-8 w-full space-y-6 overflow-y-auto relative pb-28 bg-[#F8FAFC]">
 
   <!-- Breadcrumb & Page Header -->
@@ -29,7 +34,7 @@ include '../../includes/sidebar.php';
       <button 
         type="button"
         onclick="openCreateModal()" 
-        class="bg-brand-dark hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold px-4.5 py-2.5 rounded-xl text-xs transition duration-200 shadow-xs flex items-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-dark/20"
+        class="bg-[#86B6F6] hover:bg-[#6fa5f5] text-slate-900 font-extrabold px-4.5 py-2.5 rounded-xl text-xs transition duration-200 shadow-xs flex items-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-medium/30 border border-[#72a6eb]"
       >
         <i class="fa-solid fa-plus text-xs"></i>
         <span>Create New Role</span>
@@ -38,136 +43,218 @@ include '../../includes/sidebar.php';
     <?php endif; ?>
   </div>
 
-  <!-- Database RBAC Summary Metric Cards (4 Columns) -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-    
-    <!-- Total Defined Roles Card -->
-    <div 
-      onclick="filterByCard('ALL')" 
-      id="cardTotalRoles"
-      class="role-metric-card active-card bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between"
-      title="Click to view all registered system roles"
-    >
-      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-teal-500 to-brand-dark opacity-90 group-hover:h-1.5 transition-all duration-300"></div>
-      <div class="flex items-start justify-between">
-        <div class="space-y-1">
-          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 group-hover:text-brand-dark dark:group-hover:text-cyan-400 transition-colors block">Total Registered Roles</span>
-          <h3 id="statTotalRoles" class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">0</h3>
+  <!-- FULL CONTENT SKELETON LOADER -->
+  <div id="rolesSkeleton" class="space-y-6 transition-all duration-500 opacity-100 pointer-events-auto">
+    <!-- Metric Cards Skeleton -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <?php for($i=0; $i<4; $i++): ?>
+      <div class="glass-panel rounded-2xl p-5 flex items-center justify-between dark:bg-slate-900/85 dark:border-slate-800/80">
+        <div class="space-y-2.5 w-full">
+          <div class="skeleton-loader h-3 w-28 rounded-md"></div>
+          <div class="skeleton-loader h-7 w-20 rounded-lg"></div>
+          <div class="skeleton-loader h-2.5 w-36 rounded-md"></div>
         </div>
-        <div class="h-12 w-12 rounded-2xl bg-cyan-50 dark:bg-cyan-950/60 border border-cyan-200/80 dark:border-cyan-800/50 flex items-center justify-center text-brand-dark dark:text-cyan-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0 shadow-xs">
-          <i class="fa-solid fa-users-gear text-lg"></i>
-        </div>
+        <div class="skeleton-loader h-11 w-11 rounded-xl shrink-0 ml-3"></div>
       </div>
-      <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-        <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold flex items-center gap-1.5">
-          <span class="h-1.5 w-1.5 rounded-full bg-brand-dark animate-pulse"></span>
-          Defined System Roles
-        </p>
-        <span class="text-[10px] font-black text-brand-dark dark:text-cyan-400 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-all transform group-hover:translate-x-0.5">
-          View All <i class="fa-solid fa-arrow-right text-[9px]"></i>
-        </span>
-      </div>
+      <?php endfor; ?>
     </div>
 
-    <!-- Global Scope Roles Card -->
-    <div 
-      onclick="filterByCard('GLOBAL')" 
-      id="cardGlobalRoles"
-      class="role-metric-card bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between"
-      title="Click to filter Global Scope Roles"
-    >
-      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 opacity-90 group-hover:h-1.5 transition-all duration-300"></div>
-      <div class="flex items-start justify-between">
-        <div class="space-y-1">
-          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors block">Global Scope Roles</span>
-          <h3 id="statGlobalRoles" class="text-3xl font-black text-blue-600 dark:text-blue-400 tracking-tight">0</h3>
-        </div>
-        <div class="h-12 w-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/50 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0 shadow-xs">
-          <i class="fa-solid fa-globe text-lg"></i>
-        </div>
+    <!-- Table Skeleton -->
+    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+      <div class="p-4 border-b border-slate-100 flex items-center justify-between gap-4">
+        <div class="skeleton-loader h-10 w-80 rounded-xl"></div>
+        <div class="skeleton-loader h-10 w-32 rounded-xl"></div>
       </div>
-      <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-        <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold flex items-center gap-1.5">
-          <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-          City-Wide Access Granted
-        </p>
-        <span class="text-[10px] font-black text-blue-600 dark:text-blue-400 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-all transform group-hover:translate-x-0.5">
-          Filter Scope <i class="fa-solid fa-filter text-[9px]"></i>
-        </span>
-      </div>
-    </div>
-
-    <!-- Active Status Roles Card -->
-    <div 
-      onclick="filterByCard('ACTIVE')" 
-      id="cardActiveRoles"
-      class="role-metric-card bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between"
-      title="Click to filter Active Status Roles"
-    >
-      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-600 opacity-90 group-hover:h-1.5 transition-all duration-300"></div>
-      <div class="flex items-start justify-between">
-        <div class="space-y-1">
-          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors block">Active Status Roles</span>
-          <h3 id="statActiveRoles" class="text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">0</h3>
-        </div>
-        <div class="h-12 w-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0 shadow-xs">
-          <i class="fa-solid fa-circle-check text-lg"></i>
-        </div>
-      </div>
-      <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-        <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold flex items-center gap-1.5">
-          <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-          Operational Access Enabled
-        </p>
-        <span class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-all transform group-hover:translate-x-0.5">
-          Filter Active <i class="fa-solid fa-check text-[9px]"></i>
-        </span>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-100">
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-24 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-28 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-20 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-16 rounded-md"></div></th>
+              <th class="px-6 py-4 text-right"><div class="skeleton-loader h-3 w-20 rounded-md ml-auto"></div></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <?php for($k=0; $k<5; $k++): ?>
+            <tr class="animate-pulse">
+              <td class="px-6 py-4"><div class="skeleton-loader h-3.5 w-24 rounded-md"></div></td>
+              <td class="px-6 py-4">
+                <div class="space-y-1.5">
+                  <div class="skeleton-loader h-3.5 w-36 rounded-md"></div>
+                  <div class="skeleton-loader h-2.5 w-28 rounded-md"></div>
+                </div>
+              </td>
+              <td class="px-6 py-4"><div class="skeleton-loader h-5 w-20 rounded-full"></div></td>
+              <td class="px-6 py-4"><div class="skeleton-loader h-5 w-16 rounded-full"></div></td>
+              <td class="px-6 py-4 text-right"><div class="skeleton-loader h-7 w-20 rounded-lg ml-auto"></div></td>
+            </tr>
+            <?php endfor; ?>
+          </tbody>
+        </table>
       </div>
     </div>
-
-    <!-- Protected System Roles Card -->
-    <div 
-      onclick="filterByCard('SYSTEM')" 
-      id="cardSystemRoles"
-      class="role-metric-card bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between"
-      title="Click to filter Protected System Core Roles"
-    >
-      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600 opacity-90 group-hover:h-1.5 transition-all duration-300"></div>
-      <div class="flex items-start justify-between">
-        <div class="space-y-1">
-          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors block">Protected System Roles</span>
-          <h3 id="statSystemRoles" class="text-3xl font-black text-amber-600 dark:text-amber-400 tracking-tight">0</h3>
-        </div>
-        <div class="h-12 w-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/50 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0 shadow-xs">
-          <i class="fa-solid fa-lock text-lg"></i>
-        </div>
-      </div>
-      <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-        <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold flex items-center gap-1.5">
-          <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
-          Immutable Core Roles
-        </p>
-        <span class="text-[10px] font-black text-amber-600 dark:text-amber-400 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-all transform group-hover:translate-x-0.5">
-          Filter Core <i class="fa-solid fa-shield-halved text-[9px]"></i>
-        </span>
-      </div>
-    </div>
-
   </div>
 
-  <!-- Role Directory Table & Filters Workspace -->
-  <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden space-y-4">
-    
-    <!-- Control Panel & Filters Toolbar -->
-    <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
-      <!-- Search Input -->
-      <div class="relative flex-1 max-w-md">
-        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-        <input 
-          type="text" 
-          id="roleSearchInput" 
-          oninput="filterRoles()" 
-          placeholder="Search roles by Name, Prefix (e.g. SADM), or Description..." 
+  <!-- REAL PAGE CONTENT -->
+  <div id="rolesRealContent" class="space-y-6 hidden opacity-0 transition-all duration-700 ease-out transform translate-y-2">
+
+    <!-- Database RBAC Summary Metric Cards (4 Columns) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      
+      <!-- Total Defined Roles Card -->
+      <div 
+        onclick="filterByCard('ALL')" 
+        id="cardTotalRoles"
+        class="role-metric-card active-card bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between"
+        title="Click to view all registered system roles"
+      >
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-teal-500 to-brand-dark opacity-90 group-hover:h-1.5 transition-all duration-300"></div>
+        <div class="flex items-start justify-between">
+          <div class="space-y-1">
+            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 group-hover:text-brand-dark dark:group-hover:text-cyan-400 transition-colors block">Total Registered Roles</span>
+            <h3 id="statTotalRoles" class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">0</h3>
+          </div>
+          <div class="h-12 w-12 rounded-2xl bg-cyan-50 dark:bg-cyan-950/60 border border-cyan-200/80 dark:border-cyan-800/50 flex items-center justify-center text-brand-dark dark:text-cyan-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0 shadow-xs">
+            <i class="fa-solid fa-users-gear text-lg"></i>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+          <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold flex items-center gap-1.5">
+            <span class="h-1.5 w-1.5 rounded-full bg-brand-dark animate-pulse"></span>
+            Defined System Roles
+          </p>
+          <span class="text-[10px] font-black text-brand-dark dark:text-cyan-400 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-all transform group-hover:translate-x-0.5">
+            View All <i class="fa-solid fa-arrow-right text-[9px]"></i>
+          </span>
+        </div>
+      </div>
+
+      <!-- Global Scope Roles Card -->
+      <div 
+        onclick="filterByCard('GLOBAL')" 
+        id="cardGlobalRoles"
+        class="role-metric-card bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between"
+        title="Click to filter Global Scope Roles"
+      >
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 opacity-90 group-hover:h-1.5 transition-all duration-300"></div>
+        <div class="flex items-start justify-between">
+          <div class="space-y-1">
+            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors block">Global Scope Roles</span>
+            <h3 id="statGlobalRoles" class="text-3xl font-black text-blue-600 dark:text-blue-400 tracking-tight">0</h3>
+          </div>
+          <div class="h-12 w-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/50 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0 shadow-xs">
+            <i class="fa-solid fa-globe text-lg"></i>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+          <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold flex items-center gap-1.5">
+            <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+            City-Wide Access Granted
+          </p>
+          <span class="text-[10px] font-black text-blue-600 dark:text-blue-400 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-all transform group-hover:translate-x-0.5">
+            Filter Scope <i class="fa-solid fa-filter text-[9px]"></i>
+          </span>
+        </div>
+      </div>
+
+      <!-- Active Status Roles Card -->
+      <div 
+        onclick="filterByCard('ACTIVE')" 
+        id="cardActiveRoles"
+        class="role-metric-card bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between"
+        title="Click to filter Active Status Roles"
+      >
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-600 opacity-90 group-hover:h-1.5 transition-all duration-300"></div>
+        <div class="flex items-start justify-between">
+          <div class="space-y-1">
+            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors block">Active Status Roles</span>
+            <h3 id="statActiveRoles" class="text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">0</h3>
+          </div>
+          <div class="h-12 w-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0 shadow-xs">
+            <i class="fa-solid fa-circle-check text-lg"></i>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+          <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold flex items-center gap-1.5">
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+            Operational Access Enabled
+          </p>
+          <span class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-all transform group-hover:translate-x-0.5">
+            Filter Active <i class="fa-solid fa-check text-[9px]"></i>
+          </span>
+        </div>
+      </div>
+
+      <!-- Protected System Roles Card -->
+      <div 
+        onclick="filterByCard('SYSTEM')" 
+        id="cardSystemRoles"
+        class="role-metric-card bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between"
+        title="Click to filter Protected System Core Roles"
+      >
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600 opacity-90 group-hover:h-1.5 transition-all duration-300"></div>
+        <div class="flex items-start justify-between">
+          <div class="space-y-1">
+            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors block">Protected System Roles</span>
+            <h3 id="statSystemRoles" class="text-3xl font-black text-amber-600 dark:text-amber-400 tracking-tight">0</h3>
+          </div>
+          <div class="h-12 w-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/50 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0 shadow-xs">
+            <i class="fa-solid fa-lock text-lg"></i>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+          <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold flex items-center gap-1.5">
+            <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+            Immutable Core Roles
+          </p>
+          <span class="text-[10px] font-black text-amber-600 dark:text-amber-400 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-all transform group-hover:translate-x-0.5">
+            Filter Core <i class="fa-solid fa-shield-halved text-[9px]"></i>
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Role Directory Table & Filters Workspace -->
+    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+      
+      <!-- Status Tabs Header -->
+      <div class="px-5 pt-3.5 pb-0 border-b border-slate-200/80 bg-slate-50/50 flex items-center justify-between flex-wrap gap-2">
+        <div class="flex items-center space-x-1" id="statusTabsContainer">
+          <button type="button" onclick="switchStatusTab('Active')" data-status-tab="Active" class="status-tab-btn px-4 py-2.5 rounded-t-xl text-xs font-black transition-all cursor-pointer bg-white text-[#176B87] border-t-2 border-[#86B6F6] border-x border-slate-200/80 shadow-2xs">
+            <i class="fa-solid fa-circle-check text-emerald-500 mr-1.5 text-[10px]"></i>
+            Active <span id="tabCountActive" class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 font-extrabold">0</span>
+          </button>
+
+          <button type="button" onclick="switchStatusTab('Inactive')" data-status-tab="Inactive" class="status-tab-btn px-4 py-2.5 rounded-t-xl text-xs font-bold transition-all cursor-pointer text-slate-500 hover:text-slate-800 hover:bg-slate-100/60">
+            <i class="fa-solid fa-circle-minus text-slate-400 mr-1.5 text-[10px]"></i>
+            Inactive <span id="tabCountInactive" class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-slate-100 text-slate-600 font-bold">0</span>
+          </button>
+
+          <button type="button" onclick="switchStatusTab('Archived')" data-status-tab="Archived" class="status-tab-btn px-4 py-2.5 rounded-t-xl text-xs font-bold transition-all cursor-pointer text-slate-500 hover:text-slate-800 hover:bg-slate-100/60">
+            <i class="fa-solid fa-box-archive text-amber-500 mr-1.5 text-[10px]"></i>
+            Archived <span id="tabCountArchived" class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-800 font-bold">0</span>
+          </button>
+
+          <button type="button" onclick="switchStatusTab('ALL')" data-status-tab="ALL" class="status-tab-btn px-4 py-2.5 rounded-t-xl text-xs font-bold transition-all cursor-pointer text-slate-500 hover:text-slate-800 hover:bg-slate-100/60">
+            <i class="fa-solid fa-layer-group text-blue-500 mr-1.5 text-[10px]"></i>
+            All <span id="tabCountAll" class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-blue-100 text-blue-800 font-bold">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Control Panel & Filters Toolbar -->
+      <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/30">
+        <!-- Search Input -->
+        <div class="relative flex-1 max-w-md">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input 
+            type="text" 
+            id="roleSearchInput" 
+            oninput="filterRoles()" 
+            placeholder="Search roles by Name, Prefix (e.g. SADM), or Description..."  
           class="pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs w-full bg-white focus:outline-none focus:border-brand-medium focus:ring-2 focus:ring-brand-medium/10 transition"
         >
       </div>
@@ -183,17 +270,6 @@ include '../../includes/sidebar.php';
           <option value="ALL">All Access Scopes</option>
           <option value="GLOBAL">Global City Access</option>
           <option value="DEPARTMENT">Department Scoped</option>
-        </select>
-
-        <!-- Status Filter -->
-        <select 
-          id="statusFilterSelect" 
-          onchange="filterRoles()" 
-          class="px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white text-slate-700 focus:outline-none focus:border-brand-medium transition cursor-pointer font-medium"
-        >
-          <option value="ALL">All Statuses</option>
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
         </select>
       </div>
     </div>
@@ -217,22 +293,16 @@ include '../../includes/sidebar.php';
     </div>
 
     <!-- Table Footer / Pagination -->
-    <div class="bg-slate-50/80 px-6 py-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-500">
+    <div class="bg-slate-50/80 px-6 py-3.5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-bold text-slate-500">
       <div id="rolesPaginationText">
         Showing 0 to 0 of 0 defined roles
       </div>
-      <div class="flex items-center space-x-1">
-        <button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-400 cursor-not-allowed transition" disabled>
-          <i class="fa-solid fa-chevron-left text-[9px]"></i>
-        </button>
-        <button class="px-3 py-1.5 rounded-lg bg-brand-light border border-brand-border text-brand-dark font-extrabold shadow-2xs">1</button>
-        <button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-400 cursor-not-allowed transition" disabled>
-          <i class="fa-solid fa-chevron-right text-[9px]"></i>
-        </button>
+      <div class="flex items-center space-x-1" id="rolesPaginationControls">
+        <!-- Page buttons rendered by JS -->
       </div>
     </div>
 
-  </div>
+  </div> <!-- End #rolesRealContent -->
 
 </main>
 
@@ -337,6 +407,7 @@ include '../../includes/sidebar.php';
         >
           <option value="Active">Active</option>
           <option value="Inactive">Inactive</option>
+          <option value="Archived">Archived</option>
         </select>
       </div>
 
@@ -351,7 +422,7 @@ include '../../includes/sidebar.php';
         </button>
         <button 
           type="submit" 
-          class="px-5 py-2 bg-[#0F172A] hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition shadow-xs cursor-pointer flex items-center gap-1.5"
+          class="px-5 py-2 bg-[#86B6F6] hover:bg-[#6fa5f5] text-slate-900 font-extrabold rounded-xl text-xs transition shadow-xs cursor-pointer flex items-center gap-1.5 border border-[#72a6eb]"
         >
           <i class="fa-solid fa-floppy-disk text-xs"></i>
           <span>Save Role</span>

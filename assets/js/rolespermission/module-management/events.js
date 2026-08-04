@@ -32,6 +32,30 @@ async function handleSaveModule(event) {
       if (typeof showToast === 'function') showToast(result.message || 'Module saved successfully.');
       if (typeof closeModuleModal === 'function') closeModuleModal();
       if (typeof fetchModules === 'function') await fetchModules();
+
+      // Ensure newly created or updated module appears immediately in systemModules datatable
+      const createdObj = result.data || result.module || null;
+      const modId = createdObj ? (createdObj.module_id || createdObj.id || payload.module_id) : (payload.module_id || Date.now());
+      const nowFormatted = new Date().toISOString().replace('T', ' ').substring(0, 19);
+
+      const existingIndex = systemModules.findIndex(m => String(m.id) === String(modId) || m.name.toLowerCase() === name.toLowerCase());
+      if (existingIndex >= 0) {
+        systemModules[existingIndex].name = name;
+        systemModules[existingIndex].desc = desc;
+        systemModules[existingIndex].status = status;
+        systemModules[existingIndex].updated_at = nowFormatted;
+      } else {
+        systemModules.unshift({
+          id: modId,
+          name: name,
+          desc: desc,
+          status: status,
+          created_at: nowFormatted,
+          updated_at: nowFormatted
+        });
+      }
+
+      if (typeof filterModules === 'function') filterModules();
     } else {
       if (typeof showToast === 'function') showToast(result.message || 'Failed to save module.');
     }

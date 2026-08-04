@@ -7,15 +7,10 @@ window.pendingActionUser = null;
 // FETCH ALL USERS FROM Database API
 async function fetchAccountStatusUsers() {
   const tbody = document.getElementById('statusTableBody');
-  if (tbody) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="4" class="px-6 py-12 text-center text-slate-400 font-semibold">
-          <i class="fa-solid fa-spinner fa-spin text-2xl mb-3 block text-brand-dark"></i>
-          Loading user security profiles from database...
-        </td>
-      </tr>
-    `;
+  if (tbody && (!tbody.children.length || tbody.querySelector('.fa-spinner'))) {
+    if (typeof renderSkeletonTable === 'function') {
+      renderSkeletonTable();
+    }
   }
 
   try {
@@ -94,6 +89,17 @@ async function fetchAccountStatusUsers() {
 async function updateUserStatusAPI(userId, newStatus, failedAttempts = null) {
   const user = accountUsers.find(u => u.id === userId || u.db_id === userId);
   if (!user) return false;
+
+  const isSelf = (
+    (window.currentUserId && (user.db_id == window.currentUserId || user.id == window.currentUserId)) ||
+    (window.currentEmployeeId && user.id == window.currentEmployeeId) ||
+    (window.currentUserEmail && user.email && user.email.toLowerCase() === window.currentUserEmail.toLowerCase())
+  );
+
+  if (isSelf && ['deactivated', 'inactive', 'locked', 'archived'].includes(newStatus.toLowerCase())) {
+    if (typeof showToast === 'function') showToast("Forbidden. You are not allowed to deactivate, lock, or archive your own account.", true);
+    return false;
+  }
 
   const payload = {
     user_id: user.db_id,

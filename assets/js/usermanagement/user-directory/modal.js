@@ -127,8 +127,23 @@ function openEditModal(userId) {
   const editRole = document.getElementById('editRole');
   if (editRole) editRole.value = user.role_id || '';
 
+  const isSelf = (
+    (window.currentUserId && (user.user_id == window.currentUserId || user.id == window.currentUserId)) ||
+    (window.currentEmployeeId && user.employee_id == window.currentEmployeeId) ||
+    (window.currentUserEmail && user.email && user.email.toLowerCase() === window.currentUserEmail.toLowerCase())
+  );
+
   const editStatus = document.getElementById('editStatus');
-  if (editStatus) editStatus.value = user.status || 'Active';
+  if (editStatus) {
+    editStatus.value = user.status || 'Active';
+    if (isSelf) {
+      editStatus.disabled = true;
+      editStatus.title = "You cannot change the status of your own account.";
+    } else {
+      editStatus.disabled = false;
+      editStatus.title = "";
+    }
+  }
 
   openModal('editModal');
 }

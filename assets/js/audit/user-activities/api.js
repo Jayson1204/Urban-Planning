@@ -7,17 +7,7 @@ window.civAudit.userActivities.api = {
   availableModules: [],
 
   async fetchAuditLogs() {
-    const tbody = document.getElementById('auditTableBody');
-    if (tbody) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="7" class="py-12 text-center text-slate-400 font-semibold">
-            <i class="fa-solid fa-spinner fa-spin text-2xl mb-3 block text-slate-900"></i>
-            Fetching real-time audit logs FROM DATABASE...
-          </td>
-        </tr>
-      `;
-    }
+    // Keep skeleton loading rows intact until data loads
 
     try {
       const basePath = (typeof window.civentralBasePath !== 'undefined') ? window.civentralBasePath : '../../';
@@ -126,6 +116,10 @@ window.civAudit.userActivities.api = {
             </td>
           </tr>
         `;
+      }
+    } finally {
+      if (typeof hideUserActivitiesSkeleton === 'function') {
+        hideUserActivitiesSkeleton();
       }
     }
   }

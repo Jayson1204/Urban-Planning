@@ -31,6 +31,31 @@ function isActionSupportedForResource(resObj, actObj) {
   return true;
 }
 
+function isRoleAllowedForDepartment(roleObj, userDeptId, userDeptName, isSuperAdmin) {
+  if (isSuperAdmin || !userDeptId) return true;
+
+  const roleDeptId = roleObj.department_id || roleObj.role_dept_id;
+  if (roleDeptId && String(roleDeptId) === String(userDeptId)) {
+    return true;
+  }
+
+  if (userDeptName) {
+    const userDeptLower = (userDeptName || '').toLowerCase();
+    const roleNameLower = (roleObj.role_name || '').toLowerCase();
+    const roleDeptLower = (roleObj.department_name || '').toLowerCase();
+
+    const words = userDeptLower.split(/\s+/).filter(w => w.length > 3 && w !== 'department' && w !== 'office');
+    for (const word of words) {
+      if (roleNameLower.includes(word) || roleDeptLower.includes(word)) {
+        return true;
+      }
+    }
+  }
+
+  if (!roleDeptId) return true;
+  return false;
+}
+
 // RENDER ROLE SELECTION SIDEBAR
 function renderRoleSelector(filterQuery = '') {
   const roleListContainer = document.getElementById('roleSelectorList');
@@ -46,17 +71,15 @@ function renderRoleSelector(filterQuery = '') {
     ? window.currentUserDeptId
     : (currentUserScope ? (currentUserScope.department_id || currentUserScope.role_dept_id) : null);
 
+  const userDeptName = (typeof window.currentUserDeptName !== 'undefined')
+    ? window.currentUserDeptName
+    : (currentUserScope ? (currentUserScope.department_name || '') : '');
+
   const filteredRoles = rolesData.filter(r => {
     const nameMatches = (r.role_name || '').toLowerCase().includes(query);
     if (!nameMatches) return false;
     
-    if (isSuperAdmin || !userDeptId) return true;
-    
-    const roleDeptId = r.department_id || r.role_dept_id;
-    if (roleDeptId) {
-      return String(roleDeptId) === String(userDeptId);
-    }
-    return true;
+    return isRoleAllowedForDepartment(r, userDeptId, userDeptName, isSuperAdmin);
   });
 
   if (filteredRoles.length === 0) {
@@ -122,6 +145,53 @@ function isModuleAllowedForDepartment(mod, userDeptId, userDeptName, isSuperAdmi
   return true;
 }
 
+function isResourceGrantedToCurrentUser(res, isSuperAdmin, userGrantedRes) {
+  if (isSuperAdmin) return true;
+
+  const myRoleId = window.currentUserRoleId ? parseInt(window.currentUserRoleId) : null;
+  if (myRoleId && window.savedPermissions) {
+    const myPerms = window.savedPermissions[myRoleId] || window.savedPermissions[String(myRoleId)];
+    if (myPerms && typeof myPerms === 'object') {
+      const resPerms = myPerms[res.id] || myPerms[String(res.id)];
+      if (Array.isArray(resPerms) && resPerms.length > 0) {
+        return true;
+      }
+    }
+  }
+
+  if (!userGrantedRes || !Array.isArray(userGrantedRes) || userGrantedRes.length === 0) return false;
+
+  const resNameLower = (res.name || '').toLowerCase().trim();
+  const resRouteLower = (res.desc || '').toLowerCase().trim();
+
+  return userGrantedRes.some(granted => {
+    const grantedLower = String(granted).toLowerCase().trim();
+    return resNameLower.includes(grantedLower) || 
+           grantedLower.includes(resNameLower) || 
+           (resRouteLower && resRouteLower.includes(grantedLower));
+  });
+}
+
+function isActionGrantedToCurrentUser(res, act, isSuperAdmin, userGrantedActions) {
+  if (isSuperAdmin) return true;
+
+  const myRoleId = window.currentUserRoleId ? parseInt(window.currentUserRoleId) : null;
+  if (myRoleId && window.savedPermissions) {
+    const myPerms = window.savedPermissions[myRoleId] || window.savedPermissions[String(myRoleId)];
+    if (myPerms && typeof myPerms === 'object') {
+      const resPerms = myPerms[res.id] || myPerms[String(res.id)];
+      if (Array.isArray(resPerms)) {
+        return resPerms.map(id => parseInt(id)).includes(parseInt(act.action_id));
+      }
+    }
+  }
+
+  if (!userGrantedActions || !Array.isArray(userGrantedActions) || userGrantedActions.length === 0) return false;
+
+  const actNameUpper = (act.action_name || '').toUpperCase().trim();
+  return userGrantedActions.map(a => String(a).toUpperCase().trim()).includes(actNameUpper);
+}
+
 // RENDER COLLAPSIBLE MODULES AND NESTED RESOURCES
 function renderAccordions() {
   const accordionsContainer = document.getElementById('moduleAccordionList');
@@ -144,6 +214,14 @@ function renderAccordions() {
     ? window.currentUserDeptName
     : (currentUserScope ? (currentUserScope.department_name || '') : '');
 
+  const userGrantedRes = (typeof window.currentUserGrantedResources !== 'undefined' && Array.isArray(window.currentUserGrantedResources))
+    ? window.currentUserGrantedResources
+    : (currentUserScope ? (currentUserScope.granted_resources || []) : []);
+
+  const userGrantedActions = (typeof window.currentUserGrantedActions !== 'undefined' && Array.isArray(window.currentUserGrantedActions))
+    ? window.currentUserGrantedActions
+    : (currentUserScope ? (currentUserScope.granted_actions || []) : []);
+
   const grantedActions = currentUserScope ? (currentUserScope.granted_actions || []) : [];
   let canEditUser = isSuperAdmin || grantedActions.includes('EDIT') || grantedActions.includes('CREATE');
 
@@ -157,8 +235,19 @@ function renderAccordions() {
       return;
     }
 
+    // Filter resources to ONLY those granted to current user by Superadmin
+    const allowedResourcesForUser = mod.resources.filter(res => 
+      isResourceGrantedToCurrentUser(res, isSuperAdmin, userGrantedRes)
+    );
+
+    if (!isSuperAdmin && allowedResourcesForUser.length === 0) {
+      return; // Hide entire module if non-superadmin user has no granted resources in it
+    }
+
     const moduleMatches = mod.name.toLowerCase().includes(query) || mod.desc.toLowerCase().includes(query);
-    const matchingResources = mod.resources.filter(res => 
+    const targetResources = !isSuperAdmin ? allowedResourcesForUser : mod.resources;
+
+    const matchingResources = targetResources.filter(res => 
       res.name.toLowerCase().includes(query) || res.desc.toLowerCase().includes(query)
     );
 
@@ -209,7 +298,7 @@ function renderAccordions() {
       const body = document.createElement('div');
       body.className = 'divide-y divide-slate-100 text-xs';
 
-      const resourcesToRender = query !== '' && !moduleMatches ? matchingResources : mod.resources;
+      const resourcesToRender = query !== '' && !moduleMatches ? matchingResources : targetResources;
 
       if (resourcesToRender.length === 0) {
         body.innerHTML = `
@@ -251,20 +340,23 @@ function renderAccordions() {
 
           actionsData.forEach(act => {
             const isSupported = isActionSupportedForResource(res, act);
+            const isGrantedToCurrentUser = isActionGrantedToCurrentUser(res, act, isSuperAdmin, userGrantedActions);
             const isChecked = resourcePerms.includes(act.action_id) && isSupported;
 
-            const isClickable = canEditUser && isFeatureEnabled && isSupported;
+            const isClickable = canEditUser && isFeatureEnabled && isSupported && isGrantedToCurrentUser;
             const disabledAttr = !isClickable ? 'disabled' : '';
             const labelStyle = !isClickable ? 'opacity-30 cursor-not-allowed pointer-events-none' : 'cursor-pointer';
-            const hintTitle = !canEditUser ? 'View-only access level cannot modify permissions.' : (!isSupported ? `The ${act.action_name} feature is not applicable to ${res.name} in the system UI.` : '');
+            const hintTitle = !isGrantedToCurrentUser 
+              ? `Action ${act.action_name} is not granted to your role by Super Admin.` 
+              : (!canEditUser ? 'View-only access level cannot modify permissions.' : (!isSupported ? `The ${act.action_name} feature is not applicable to ${res.name} in the system UI.` : ''));
 
             const label = document.createElement('label');
             label.className = `flex items-center gap-1.5 select-none ${labelStyle}`;
             if (hintTitle) label.title = hintTitle;
 
             label.innerHTML = `
-              <input type="checkbox" data-resource="${res.id}" data-action="${act.action_id}" ${isChecked ? 'checked' : ''} ${disabledAttr} onchange="if(typeof toggleResourcePermission === 'function') toggleResourcePermission(this)" class="h-4 w-4 rounded border-slate-300 text-brand-dark focus:ring-brand-dark/20 ${!isClickable ? 'cursor-not-allowed bg-slate-100 opacity-40' : 'cursor-pointer'}">
-              <span class="text-[9px] ${!isSupported ? 'text-slate-350 font-bold line-through' : 'text-slate-450 uppercase font-black'} tracking-wide">${act.action_name}</span>
+              <input type="checkbox" data-resource="${res.id}" data-action="${act.action_id}" ${isChecked ? 'checked' : ''} ${disabledAttr} onchange="if(typeof toggleResourcePermission === 'function') toggleResourcePermission(this)" class="h-4 w-4 rounded border-slate-350 text-brand-dark focus:ring-brand-dark/20 ${!isClickable ? 'cursor-not-allowed bg-slate-100 opacity-40' : 'cursor-pointer'}">
+              <span class="text-[9px] ${!isSupported || !isGrantedToCurrentUser ? 'text-slate-350 font-bold line-through' : 'text-slate-450 uppercase font-black'} tracking-wide">${act.action_name}</span>
             `;
             checkboxesDiv.appendChild(label);
           });
@@ -340,4 +432,20 @@ function renderRestrictions() {
       `;
     });
   }
+}
+
+function hidePermissionsSkeleton() {
+  const skel = document.getElementById('permissionsSkeleton');
+  const real = document.getElementById('permissionsRealContent');
+  if (!skel || !real) return;
+
+  real.classList.remove('hidden');
+  requestAnimationFrame(() => {
+    skel.classList.add('opacity-0', 'pointer-events-none');
+    real.classList.remove('opacity-0', 'translate-y-2');
+    real.classList.add('opacity-100', 'translate-y-0');
+    setTimeout(() => {
+      skel.classList.add('hidden');
+    }, 500);
+  });
 }

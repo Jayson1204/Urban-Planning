@@ -37,6 +37,10 @@ async function fetchResources() {
   } catch (err) {
     console.error('Error fetching resources FROM DATABASE:', err);
     if (typeof showToast === 'function') showToast('Network error connecting to Database.');
+  } finally {
+    if (typeof hideResourceSkeleton === 'function') {
+      hideResourceSkeleton();
+    }
   }
 }
 
@@ -78,6 +82,7 @@ async function updateResourceStatusInDb(resourceId, newStatus) {
     if (result.status === 'success') {
       if (typeof showToast === 'function') showToast(`Resource status updated to ${newStatus}.`);
       await fetchResources();
+      if (typeof switchStatusTab === 'function') switchStatusTab(newStatus);
     } else {
       if (typeof showToast === 'function') showToast(result.message || 'Failed to update resource status.');
     }

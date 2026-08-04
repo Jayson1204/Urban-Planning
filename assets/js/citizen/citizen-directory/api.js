@@ -24,6 +24,10 @@ async function fetchCitizens() {
   } catch (error) {
     console.error('Error fetching citizens:', error);
     if (typeof showToast === 'function') showToast('An error occurred while fetching citizens.', true);
+  } finally {
+    if (typeof hideCitizenSkeleton === 'function') {
+      hideCitizenSkeleton();
+    }
   }
 }
 

@@ -5,17 +5,7 @@ window.civAudit.loginHistory.api = {
   allLoginLogs: [],
 
   async fetchLoginHistory() {
-    const tbody = document.getElementById('loginTableBody');
-    if (tbody) {
-      tbody.innerHTML = `
-        <tr id="loadingRow">
-          <td colspan="6" class="py-12 text-center text-slate-400 font-semibold">
-            <i class="fa-solid fa-spinner fa-spin text-2xl mb-3 block text-[#0f172a]"></i>
-            Fetching real-time login history audit logs from database...
-          </td>
-        </tr>
-      `;
-    }
+    // Keep skeleton loading rows intact until data loads
 
     try {
       const basePath = (typeof window.civentralBasePath !== 'undefined') ? window.civentralBasePath : '../../';
@@ -56,6 +46,10 @@ window.civAudit.loginHistory.api = {
       }
       if (window.civAudit.loginHistory.ui) {
         window.civAudit.loginHistory.ui.renderPaginatedTable([], 1);
+      }
+    } finally {
+      if (typeof hideLoginHistorySkeleton === 'function') {
+        hideLoginHistorySkeleton();
       }
     }
   }

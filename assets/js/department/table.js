@@ -111,6 +111,23 @@ function renderDepts(deptsList = departmentsData) {
   });
 
   document.getElementById('deptsPaginationText').innerText = `Showing 1 to ${deptsList.length} of ${departmentsData.length} departments`;
+  hideDeptSkeleton();
+}
+
+function hideDeptSkeleton() {
+  const skel = document.getElementById('deptSkeleton');
+  const real = document.getElementById('deptRealContent');
+  if (!skel || !real) return;
+
+  real.classList.remove('hidden');
+  requestAnimationFrame(() => {
+    skel.classList.add('opacity-0', 'pointer-events-none');
+    real.classList.remove('opacity-0', 'translate-y-2');
+    real.classList.add('opacity-100', 'translate-y-0');
+    setTimeout(() => {
+      skel.classList.add('hidden');
+    }, 500);
+  });
 }
 
 // Update Statistics Cards

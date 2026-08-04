@@ -8,6 +8,9 @@ window.loadCiventralScript('assets/js/usermanagement/account-status/modal.js');
 window.loadCiventralScript('assets/js/usermanagement/account-status/events.js', () => {
 
     function initAccountStatusModule() {
+        if (typeof renderSkeletonTable === 'function') {
+            renderSkeletonTable();
+        }
         if (typeof fetchAccountStatusUsers === 'function') {
             fetchAccountStatusUsers();
         }

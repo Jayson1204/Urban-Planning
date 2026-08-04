@@ -47,6 +47,20 @@ async function handleEditStaff(e) {
   const roleId = parseInt(document.getElementById('editRole').value) || 0;
   const status = document.getElementById('editStatus').value;
 
+  const user = systemUsers.find(u => u.user_id === userId);
+  const isSelf = (
+    (window.currentUserId && userId == window.currentUserId) ||
+    (user && (
+      (window.currentEmployeeId && user.employee_id == window.currentEmployeeId) ||
+      (window.currentUserEmail && user.email && user.email.toLowerCase() === window.currentUserEmail.toLowerCase())
+    ))
+  );
+
+  if (isSelf && ['deactivated', 'inactive', 'locked', 'archived'].includes(status.toLowerCase())) {
+    if (typeof showToast === 'function') showToast("Forbidden. You cannot set your own account status to inactive, locked, or archived.", true);
+    return;
+  }
+
   const nameParts = nameInput.split(/\s+/);
   const firstName = nameParts[0] || '';
   const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';

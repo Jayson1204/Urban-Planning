@@ -101,6 +101,24 @@ function renderControlTable(list = ctrlCitizens) {
 
   const pagText = document.getElementById('ctrlPaginationText');
   if (pagText) pagText.innerText = `Showing 1 to ${list.length} of ${list.length} accounts`;
+
+  hideCitizenAccountSkeleton();
+}
+
+function hideCitizenAccountSkeleton() {
+  const skel = document.getElementById('citizenAccountSkeleton');
+  const real = document.getElementById('citizenAccountRealContent');
+  if (!skel || !real) return;
+
+  real.classList.remove('hidden');
+  requestAnimationFrame(() => {
+    skel.classList.add('opacity-0', 'pointer-events-none');
+    real.classList.remove('opacity-0', 'translate-y-2');
+    real.classList.add('opacity-100', 'translate-y-0');
+    setTimeout(() => {
+      skel.classList.add('hidden');
+    }, 500);
+  });
 }
 
 // UPDATE STATUS RIBBON STATISTICS

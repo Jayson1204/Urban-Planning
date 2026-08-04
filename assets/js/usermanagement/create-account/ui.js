@@ -1,4 +1,14 @@
-// CREATE ACCOUNT UI
+// RENDER SKELETON OPTIONS WHILE LOADING
+function renderSkeletonOptions() {
+  const deptSelect = document.getElementById('department');
+  const roleSelect = document.getElementById('role');
+  if (deptSelect) {
+    deptSelect.innerHTML = '<option value="" disabled selected class="animate-pulse">Loading departments...</option>';
+  }
+  if (roleSelect) {
+    roleSelect.innerHTML = '<option value="" disabled selected class="animate-pulse">Loading roles...</option>';
+  }
+}
 
 function applyUserScopeRules() {
   const deptSelect = document.getElementById('department');
@@ -19,7 +29,7 @@ function applyUserScopeRules() {
         <i class="fa-solid fa-lock text-amber-500 text-base mt-0.5"></i>
         <div class="space-y-1 text-xs">
           <p class="font-bold text-amber-900">Department Scope Clearance Notice</p>
-          <p class="leading-relaxed text-amber-700">As a Department Administrator for <strong>${userDeptName}</strong>, your account creation scope is locked to your department. Available system access roles are restricted to roles for your department.</p>
+          <p class="leading-relaxed text-amber-700">As a Department Administrator for <strong>${userDeptName}</strong>, your account creation scope is locked to your department. Available access roles are restricted to staff and officer roles created for your department (Administrator role creation is restricted).</p>
         </div>
       `;
       roleAlertBox.className = "bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl p-4 flex items-start gap-3 shadow-xs transition duration-300";
@@ -46,11 +56,26 @@ function populateRoles() {
   const currentVal = roleSelect.value;
   roleSelect.innerHTML = '<option value="">Choose system role...</option>';
 
-  const isSuperAdmin = currentUserScope ? !!currentUserScope.is_superadmin : false;
+  const isSuperAdmin = currentUserScope ? (!!currentUserScope.is_superadmin || !!currentUserScope.is_global_access) : false;
+  const userRoleName = currentUserScope ? (currentUserScope.role_name || '').toLowerCase() : '';
 
   systemRoles.forEach(r => {
-    if (!isSuperAdmin && (r.is_superadmin == 1 || r.is_superadmin === true || r.is_global_access == 1 || ['SA', 'SADM'].includes((r.role_prefix || '').toUpperCase()))) {
-      return;
+    const roleNameLower = (r.role_name || '').toLowerCase();
+    const rolePrefixUpper = (r.role_prefix || '').toUpperCase();
+
+    // If not superadmin, exclude superadmin, global access, and any admin/administrator roles
+    if (!isSuperAdmin) {
+      const isSuper = r.is_superadmin == 1 || r.is_superadmin === true || r.is_global_access == 1;
+      const isSuperPrefix = ['SA', 'SADM'].includes(rolePrefixUpper);
+      const isAdminRole = ['ADM', 'DADM', 'ADMIN'].includes(rolePrefixUpper) || 
+                          roleNameLower.includes('admin') || 
+                          roleNameLower.includes('administrator') || 
+                          roleNameLower.includes('superadmin') ||
+                          (userRoleName && roleNameLower === userRoleName);
+
+      if (isSuper || isSuperPrefix || isAdminRole) {
+        return; // Do not show administrator roles to Department Admin
+      }
     }
 
     const opt = document.createElement('option');
@@ -61,7 +86,7 @@ function populateRoles() {
     roleSelect.appendChild(opt);
   });
 
-  if (currentVal) {
+  if (currentVal && Array.from(roleSelect.options).some(o => o.value === currentVal)) {
     roleSelect.value = currentVal;
   }
 }

@@ -20,13 +20,29 @@ async function fetchRoles() {
   } catch (err) {
     console.error('Error fetching roles FROM DATABASE:', err);
     if (typeof showToast === 'function') showToast('Network error connecting to Database.', true);
+  } finally {
+    if (typeof hideRolesSkeleton === 'function') {
+      hideRolesSkeleton();
+    }
   }
 }
 
 // DEACTIVATE ROLE STATUS TOGGLE CONFIRMATION
 async function handleRoleStatusToggle(roleId, toggleInput) {
-  const role = systemRoles.find(r => r.role_id === roleId);
+  const role = systemRoles.find(r => r.role_id === roleId || r.id === roleId);
   if (!role) return;
+
+  const isOwnRole = (
+    (window.currentUserRoleId && (role.role_id == window.currentUserRoleId || role.id == window.currentUserRoleId)) ||
+    (window.currentUserRoleName && role.role_name && role.role_name.toLowerCase() === window.currentUserRoleName.toLowerCase()) ||
+    (currentUserScope && currentUserScope.role_id && (role.role_id == currentUserScope.role_id || role.id == currentUserScope.role_id))
+  );
+
+  if (isOwnRole) {
+    toggleInput.checked = true;
+    if (typeof showToast === 'function') showToast("Operation denied: You cannot deactivate your own assigned role.", true);
+    return;
+  }
 
   if (role.is_system_role) {
     toggleInput.checked = true;
@@ -59,6 +75,7 @@ async function toggleRoleStatusInDb(roleId, newStatus) {
     if (result.status === 'success') {
       if (typeof showToast === 'function') showToast(`Status updated to ${newStatus} for role.`);
       await fetchRoles();
+      if (typeof switchStatusTab === 'function') switchStatusTab(newStatus);
     } else {
       if (typeof showToast === 'function') showToast(result.message || 'Failed to update status.', true);
     }

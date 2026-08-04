@@ -6,17 +6,7 @@ window.civAudit.dataChanges.api = {
   availableModules: [],
 
   async fetchMutationLogs() {
-    const tbody = document.getElementById('mutationTableBody');
-    if (tbody) {
-      tbody.innerHTML = `
-        <tr id="loadingRow">
-          <td colspan="9" class="py-12 text-center text-slate-400 font-semibold">
-            <i class="fa-solid fa-spinner fa-spin text-2xl mb-3 block text-[#0f172a]"></i>
-            Loading real-time data mutation audit logs from database...
-          </td>
-        </tr>
-      `;
-    }
+    // Keep skeleton loading rows intact until data loads
 
     try {
       const basePath = (typeof window.civentralBasePath !== 'undefined') ? window.civentralBasePath : '../../';
@@ -44,12 +34,16 @@ window.civAudit.dataChanges.api = {
         }
       }
     } catch (err) {
-      console.error('Error fetching audit logs:', err);
+      console.error('Error fetching mutation logs:', err);
       if (window.showToast) {
         window.showToast('Error', 'Failed to connect to audit logs database.');
       }
       if (window.civAudit.dataChanges.ui) {
         window.civAudit.dataChanges.ui.renderMutationLogs([]);
+      }
+    } finally {
+      if (typeof hideDataChangesSkeleton === 'function') {
+        hideDataChangesSkeleton();
       }
     }
   }

@@ -36,7 +36,18 @@ async function handleSaveRole(e) {
   };
 
   if (idRef !== '') {
-    payload.role_id = parseInt(idRef);
+    const targetRoleId = parseInt(idRef);
+    const role = systemRoles.find(r => r.role_id === targetRoleId || r.id === targetRoleId);
+    const isOwnRole = (
+      (window.currentUserRoleId && targetRoleId == window.currentUserRoleId) ||
+      (role && window.currentUserRoleName && role.role_name && role.role_name.toLowerCase() === window.currentUserRoleName.toLowerCase()) ||
+      (window.currentUserRoleName && name.toLowerCase() === window.currentUserRoleName.toLowerCase())
+    );
+    if (isOwnRole && ['inactive', 'deactivated', 'archived'].includes(status.toLowerCase())) {
+      if (typeof showToast === 'function') showToast("Forbidden. You cannot set your own assigned role to inactive or archived.", true);
+      return;
+    }
+    payload.role_id = targetRoleId;
   }
 
   const method = idRef === '' ? 'POST' : 'PUT';

@@ -101,6 +101,49 @@ function getUserInitials(user) {
   return f + l;
 }
 
+// RENDER SKELETON TABLE WHILE LOADING DATA
+function renderSkeletonTable() {
+  const tbody = document.getElementById('directoryTableBody');
+  if (!tbody) return;
+
+  let html = '';
+  for (let i = 0; i < 5; i++) {
+    html += `
+      <tr class="animate-pulse">
+        <td class="px-6 py-4 flex items-center space-x-3">
+          <div class="skeleton-loader h-9 w-9 rounded-xl shrink-0"></div>
+          <div class="space-y-1.5 w-full">
+            <div class="skeleton-loader h-3.5 w-36 rounded-md"></div>
+            <div class="skeleton-loader h-2.5 w-44 rounded-md"></div>
+          </div>
+        </td>
+        <td class="px-6 py-4">
+          <div class="skeleton-loader h-3.5 w-24 rounded-md"></div>
+        </td>
+        <td class="px-6 py-4">
+          <div class="space-y-1.5">
+            <div class="skeleton-loader h-3.5 w-36 rounded-md"></div>
+            <div class="skeleton-loader h-2.5 w-28 rounded-md"></div>
+          </div>
+        </td>
+        <td class="px-6 py-4">
+          <div class="skeleton-loader h-5 w-20 rounded-full"></div>
+        </td>
+        <td class="px-6 py-4">
+          <div class="skeleton-loader h-5 w-16 rounded-full"></div>
+        </td>
+        <td class="px-6 py-4 text-right">
+          <div class="skeleton-loader h-7 w-20 rounded-lg ml-auto"></div>
+        </td>
+      </tr>
+    `;
+  }
+  tbody.innerHTML = html;
+
+  const pagEl = document.getElementById('paginationText');
+  if (pagEl) pagEl.innerText = "Loading user records...";
+}
+
 // RENDER DATATABLE FROM Database records
 function renderTable(usersList = systemUsers) {
   const tbody = document.getElementById('directoryTableBody');
@@ -224,6 +267,24 @@ function renderTable(usersList = systemUsers) {
   if (pagEl) {
     pagEl.innerText = `Showing 1 to ${usersList.length} of ${systemUsers.length} profiles`;
   }
+
+  hideDirectorySkeleton();
+}
+
+function hideDirectorySkeleton() {
+  const skel = document.getElementById('directorySkeleton');
+  const real = document.getElementById('directoryRealContent');
+  if (!skel || !real) return;
+
+  real.classList.remove('hidden');
+  requestAnimationFrame(() => {
+    skel.classList.add('opacity-0', 'pointer-events-none');
+    real.classList.remove('opacity-0', 'translate-y-2');
+    real.classList.add('opacity-100', 'translate-y-0');
+    setTimeout(() => {
+      skel.classList.add('hidden');
+    }, 500);
+  });
 }
 
 // UPDATE METRICS BOARD

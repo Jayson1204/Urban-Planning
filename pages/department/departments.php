@@ -34,95 +34,150 @@ include '../../includes/sidebar.php';
     <?php endif; ?>
   </div>
 
-  <!-- Summary Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-    <!-- Total Departments Card -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
-      <div class="absolute top-0 left-0 w-1.5 h-full bg-brand-dark"></div>
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Total Departments</span>
-        <h3 id="statTotalDepts" class="text-2xl font-black text-slate-900 tracking-tight">0 Active</h3>
+  <!-- FULL CONTENT SKELETON LOADER -->
+  <div id="deptSkeleton" class="space-y-6 transition-all duration-500 opacity-100 pointer-events-auto">
+    <!-- Summary Cards Skeleton -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      <?php for($s=0; $s<3; $s++): ?>
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between">
+        <div class="space-y-2 w-full">
+          <div class="skeleton-loader h-3 w-28 rounded-md"></div>
+          <div class="skeleton-loader h-7 w-24 rounded-lg"></div>
+        </div>
+        <div class="skeleton-loader h-10 w-10 rounded-lg shrink-0 ml-3"></div>
       </div>
-      <div class="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-450 group-hover:bg-brand-light group-hover:text-brand-dark transition duration-350">
-        <i class="fa-solid fa-sitemap text-sm"></i>
-      </div>
+      <?php endfor; ?>
     </div>
 
-    <!-- Integrations Card -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
-      <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">System Integrations</span>
-        <h3 id="statIntegrations" class="text-2xl font-black text-slate-900 tracking-tight">100% Core Connected</h3>
-      </div>
-      <div class="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-450 group-hover:bg-emerald-50 group-hover:text-emerald-700 transition duration-350">
-        <i class="fa-solid fa-link text-sm"></i>
-      </div>
+    <!-- Search Bar Skeleton -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
+      <div class="skeleton-loader h-10 w-full max-w-md rounded-xl"></div>
+      <div class="skeleton-loader h-10 w-36 rounded-xl"></div>
     </div>
 
-    <!-- Admins Card -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
-      <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
-      <div class="space-y-1">
-        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Assigned Administrators</span>
-        <h3 id="statAssignedAdmins" class="text-2xl font-black text-slate-900 tracking-tight">0 Assigned</h3>
-      </div>
-      <div class="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-450 group-hover:bg-amber-50 group-hover:text-amber-700 transition duration-350">
-        <i class="fa-solid fa-user-shield text-sm"></i>
+    <!-- Datatable Skeleton -->
+    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-100">
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-32 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-36 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-28 rounded-md"></div></th>
+              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-20 rounded-md"></div></th>
+              <th class="px-6 py-4 text-right"><div class="skeleton-loader h-3 w-16 rounded-md ml-auto"></div></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100/80">
+            <?php for($k=0; $k<5; $k++): ?>
+            <tr class="animate-pulse">
+              <td class="px-6 py-4"><div class="skeleton-loader h-4 w-40 rounded-md"></div></td>
+              <td class="px-6 py-4"><div class="skeleton-loader h-4 w-32 rounded-md"></div></td>
+              <td class="px-6 py-4"><div class="skeleton-loader h-4 w-48 rounded-md"></div></td>
+              <td class="px-6 py-4"><div class="skeleton-loader h-5 w-20 rounded-full"></div></td>
+              <td class="px-6 py-4 text-right"><div class="skeleton-loader h-7 w-20 rounded-lg ml-auto"></div></td>
+            </tr>
+            <?php endfor; ?>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 
-  <!-- Search and Actions Roster Bar -->
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
-    <!-- Search Field -->
-    <div class="relative flex-1 max-w-md">
-      <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-      <input type="text" id="deptSearchInput" placeholder="Search by department name, code, or administrator..." class="pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-xs w-full bg-slate-50/50 focus:bg-white focus:outline-none focus:border-brand-medium focus:ring-2 focus:ring-brand-medium/10 transition">
-    </div>
-    
-    <!-- Export Excel simulator -->
-    <button onclick="exportDeptsCsv()" class="border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 cursor-pointer transition">
-      <i class="fa-solid fa-download"></i>
-      <span>Export Directory</span>
-    </button>
-  </div>
+  <!-- REAL PAGE CONTENT -->
+  <div id="deptRealContent" class="space-y-6 hidden opacity-0 transition-all duration-700 ease-out transform translate-y-2">
 
-  <!-- Datatable list -->
-  <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-wider">
-            <th class="px-6 py-4 w-1/3">Department Details</th>
-            <th class="px-6 py-4">Department Administrator</th>
-            <th class="px-6 py-4">Access Scope Modules</th>
-            <th class="px-6 py-4">Status</th>
-            <th class="px-6 py-4 text-right">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="deptsTableBody" class="divide-y divide-slate-100/80 text-xs">
-          <!-- Dynamically Populated by JS -->
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Table Footer / Pagination -->
-    <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-400">
-      <div id="deptsPaginationText">
-        Showing 0 to 0 of 0 departments
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      <!-- Total Departments Card -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-brand-dark"></div>
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Total Departments</span>
+          <h3 id="statTotalDepts" class="text-2xl font-black text-slate-900 tracking-tight">0 Active</h3>
+        </div>
+        <div class="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-450 group-hover:bg-brand-light group-hover:text-brand-dark transition duration-350">
+          <i class="fa-solid fa-sitemap text-sm"></i>
+        </div>
       </div>
-      <div class="flex items-center space-x-1">
-        <button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 cursor-not-allowed transition" disabled>
-          <i class="fa-solid fa-chevron-left text-[9px]"></i>
-        </button>
-        <button class="px-3 py-1.5 rounded-lg bg-brand-light border border-brand-border text-brand-dark font-extrabold">1</button>
-        <button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 cursor-not-allowed transition" disabled>
-          <i class="fa-solid fa-chevron-right text-[9px]"></i>
-        </button>
+
+      <!-- Integrations Card -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">System Integrations</span>
+          <h3 id="statIntegrations" class="text-2xl font-black text-slate-900 tracking-tight">100% Core Connected</h3>
+        </div>
+        <div class="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-450 group-hover:bg-emerald-50 group-hover:text-emerald-700 transition duration-350">
+          <i class="fa-solid fa-link text-sm"></i>
+        </div>
+      </div>
+
+      <!-- Admins Card -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
+        <div class="space-y-1">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Assigned Administrators</span>
+          <h3 id="statAssignedAdmins" class="text-2xl font-black text-slate-900 tracking-tight">0 Assigned</h3>
+        </div>
+        <div class="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-450 group-hover:bg-amber-50 group-hover:text-amber-700 transition duration-350">
+          <i class="fa-solid fa-user-shield text-sm"></i>
+        </div>
       </div>
     </div>
-  </div>
+
+    <!-- Search and Actions Roster Bar -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
+      <!-- Search Field -->
+      <div class="relative flex-1 max-w-md">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+        <input type="text" id="deptSearchInput" placeholder="Search by department name, code, or administrator..." class="pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-xs w-full bg-slate-50/50 focus:bg-white focus:outline-none focus:border-brand-medium focus:ring-2 focus:ring-brand-medium/10 transition">
+      </div>
+      
+      <!-- Export Excel simulator -->
+      <button onclick="exportDeptsCsv()" class="border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 cursor-pointer transition">
+        <i class="fa-solid fa-download"></i>
+        <span>Export Directory</span>
+      </button>
+    </div>
+
+    <!-- Datatable list -->
+    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+              <th class="px-6 py-4 w-1/3">Department Details</th>
+              <th class="px-6 py-4">Department Administrator</th>
+              <th class="px-6 py-4">Access Scope Modules</th>
+              <th class="px-6 py-4">Status</th>
+              <th class="px-6 py-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="deptsTableBody" class="divide-y divide-slate-100/80 text-xs">
+            <!-- Dynamically Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Footer / Pagination -->
+      <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-400">
+        <div id="deptsPaginationText">
+          Showing 0 to 0 of 0 departments
+        </div>
+        <div class="flex items-center space-x-1">
+          <button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 cursor-not-allowed transition" disabled>
+            <i class="fa-solid fa-chevron-left text-[9px]"></i>
+          </button>
+          <button class="px-3 py-1.5 rounded-lg bg-brand-light border border-brand-border text-brand-dark font-extrabold">1</button>
+          <button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 cursor-not-allowed transition" disabled>
+            <i class="fa-solid fa-chevron-right text-[9px]"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div> <!-- End #deptRealContent -->
 
 </main>
 

@@ -84,7 +84,14 @@ async function fetchPermissionsData() {
         ? window.currentUserDeptId
         : (currentUserScope ? (currentUserScope.department_id || currentUserScope.role_dept_id) : null);
 
+      const userDeptName = (typeof window.currentUserDeptName !== 'undefined')
+        ? window.currentUserDeptName
+        : (currentUserScope ? (currentUserScope.department_name || '') : '');
+
       const validRoles = rolesData.filter(r => {
+        if (typeof isRoleAllowedForDepartment === 'function') {
+          return isRoleAllowedForDepartment(r, userDeptId, userDeptName, isSuperAdmin);
+        }
         if (isSuperAdmin || !userDeptId) return true;
         const rDeptId = r.department_id || r.role_dept_id;
         return !rDeptId || String(rDeptId) === String(userDeptId);
@@ -92,7 +99,15 @@ async function fetchPermissionsData() {
 
       if (validRoles.length > 0 && (!window.selectedRoleId || !validRoles.some(r => r.role_id === window.selectedRoleId))) {
         window.selectedRoleId = validRoles[0].role_id;
-        window.expandedModules[modulesData[0]?.name] = true;
+        if (modulesData[0]) {
+          window.expandedModules[modulesData[0].name] = true;
+        }
+      }
+
+      const activeRoleObj = rolesData.find(r => r.role_id === window.selectedRoleId);
+      const editHeader = document.getElementById('editingRoleHeader');
+      if (editHeader && activeRoleObj) {
+        editHeader.innerText = `Editing Permissions for: ${activeRoleObj.role_name}`;
       }
 
       const searchInput = document.getElementById('roleSearchInput');
@@ -105,6 +120,10 @@ async function fetchPermissionsData() {
   } catch (err) {
     console.error('Error fetching permissions matrix data:', err);
     if (typeof showToast === 'function') showToast('Network error loading permissions matrix FROM DATABASE.', true);
+  } finally {
+    if (typeof hidePermissionsSkeleton === 'function') {
+      hidePermissionsSkeleton();
+    }
   }
 }
 
