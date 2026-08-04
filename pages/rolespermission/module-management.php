@@ -38,54 +38,8 @@ include '../../includes/sidebar.php';
     <?php endif; ?>
   </div>
 
-  <!-- FULL CONTENT SKELETON LOADER -->
-  <div id="moduleSkeleton" class="space-y-6 transition-all duration-500 opacity-100 pointer-events-auto">
-    <!-- Cards Skeleton -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-      <?php for($i=0; $i<3; $i++): ?>
-      <div class="glass-panel rounded-2xl p-5 flex items-center justify-between dark:bg-slate-900/85 dark:border-slate-800/80">
-        <div class="space-y-2.5 w-full">
-          <div class="skeleton-loader h-3 w-28 rounded-md"></div>
-          <div class="skeleton-loader h-7 w-20 rounded-lg"></div>
-          <div class="skeleton-loader h-2.5 w-36 rounded-md"></div>
-        </div>
-        <div class="skeleton-loader h-11 w-11 rounded-xl shrink-0 ml-3"></div>
-      </div>
-      <?php endfor; ?>
-    </div>
-
-    <!-- Table Skeleton -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
-      <div class="p-4 border-b border-slate-100 flex items-center justify-between gap-4">
-        <div class="skeleton-loader h-10 w-80 rounded-xl"></div>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-slate-50 border-b border-slate-100">
-              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-24 rounded-md"></div></th>
-              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-36 rounded-md"></div></th>
-              <th class="px-6 py-4"><div class="skeleton-loader h-3 w-20 rounded-md"></div></th>
-              <th class="px-6 py-4 text-right"><div class="skeleton-loader h-3 w-20 rounded-md ml-auto"></div></th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            <?php for($k=0; $k<5; $k++): ?>
-            <tr class="animate-pulse">
-              <td class="px-6 py-4"><div class="skeleton-loader h-3.5 w-24 rounded-md"></div></td>
-              <td class="px-6 py-4"><div class="skeleton-loader h-3.5 w-48 rounded-md"></div></td>
-              <td class="px-6 py-4"><div class="skeleton-loader h-5 w-20 rounded-full"></div></td>
-              <td class="px-6 py-4 text-right"><div class="skeleton-loader h-7 w-20 rounded-lg ml-auto"></div></td>
-            </tr>
-            <?php endfor; ?>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
   <!-- REAL PAGE CONTENT -->
-  <div id="moduleRealContent" class="space-y-6 hidden opacity-0 transition-all duration-700 ease-out transform translate-y-2">
+  <div id="moduleRealContent" class="space-y-6">
 
     <!-- RBAC Overview Metric Cards (3 columns) -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
