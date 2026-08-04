@@ -31,7 +31,6 @@
         'data-changes.php'
       ];
       $urbanPlanningPages = [
-        'urban-planning-overview.php'
       ];
       $residentPages = [
         'resident-directory.php'
@@ -118,7 +117,7 @@
             </button>
 
             <div id="urbanPlanningDropdown" class="<?php echo in_array($currentPage, $urbanPlanningPages) ? '' : 'hidden'; ?> pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
-              <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/urban-planning-overview.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'urban-planning-overview.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-compass-drafting text-[10px] <?php echo $currentPage == 'urban-planning-overview.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Overview</span></a>
+              <!-- Empty for now — Phase 5 pages (Development Plans, Urban Projects, etc.) will be added here -->
             </div>
           </div>
           <?php endif; ?>
