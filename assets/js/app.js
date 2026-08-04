@@ -1,13 +1,19 @@
 
 (function() {
     const basePath = (typeof window.civentralBasePath !== 'undefined') ? window.civentralBasePath : '../';
-    
-    // Global loader 
+
+    // Cache-busting version for dynamically loaded scripts. Bump this whenever a
+    // bridge-loaded JS file is changed so browsers fetch the new copy instead of a
+    // stale cached one (XAMPP serves static .js with a long cache lifetime).
+    const ASSET_VERSION = '2026-08-04-1';
+
+    // Global loader
     window.loadCiventralScript = function(src, callback = null) {
         return new Promise((resolve, reject) => {
             const script = document.createElement('script');
-            script.src = basePath + src;
-            script.async = false; 
+            const sep = src.indexOf('?') === -1 ? '?' : '&';
+            script.src = basePath + src + sep + 'v=' + ASSET_VERSION;
+            script.async = false;
             script.onload = () => {
                 if (callback) callback();
                 resolve();
