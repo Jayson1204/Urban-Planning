@@ -26,10 +26,11 @@ function filterModules() {
   const filtered = systemModules.filter(mod => {
     const nameStr = (mod.name || '').toLowerCase();
     const descStr = (mod.desc || '').toLowerCase();
-    const matchesQuery = nameStr.includes(query) || descStr.includes(query);
+    const matchesQuery = !query || nameStr.includes(query) || descStr.includes(query);
 
-    const mStatus = mod.status || 'Active';
-    const matchesStatus = currentTabStatus === 'ALL' || mStatus.toLowerCase() === currentTabStatus.toLowerCase();
+    const mStatus = (mod.status || 'Active').trim();
+    const tabTarget = (currentTabStatus || 'Active').trim();
+    const matchesStatus = tabTarget.toUpperCase() === 'ALL' || mStatus.toLowerCase() === tabTarget.toLowerCase();
 
     return matchesQuery && matchesStatus;
   });

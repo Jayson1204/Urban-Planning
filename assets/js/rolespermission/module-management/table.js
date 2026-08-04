@@ -17,6 +17,16 @@ function renderModulesTable(dataToRender = systemModules) {
 
   if (totalFiltered === 0) {
     if (emptyState) emptyState.classList.remove('hidden');
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="6" class="px-6 py-10 text-center text-xs text-slate-400 font-medium bg-slate-50/30">
+          <div class="flex flex-col items-center justify-center space-y-2">
+            <i class="fa-solid fa-folder-open text-2xl text-slate-300"></i>
+            <span>No system modules found for this tab or search filter.</span>
+          </div>
+        </td>
+      </tr>
+    `;
     renderPaginationUI(0, 0, 0, 1);
     updateMetrics();
     return;

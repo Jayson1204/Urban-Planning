@@ -15,52 +15,154 @@ window.isDirty = false;
 async function fetchPermissionsData() {
   try {
     const response = await fetch('../../api/employee/permissions.php');
+    if (!response.ok) {
+      console.warn('Permissions fetch HTTP status:', response.status);
+    }
     const result = await response.json();
 
-    if (result.status === 'success') {
-      currentUserScope = result.current_user || null;
-      rolesData = result.roles || [];
-      actionsData = result.actions || [];
-      const dbModules = result.modules || [];
-      const dbResources = result.resources || [];
-      const dbPermissions = result.permissions || [];
-      const dbRolePermissions = result.role_permissions || [];
+    const isOk = response.ok && (
+      result.status === 'success' || 
+      result.success === true || 
+      result.code === 200 || 
+      (Array.isArray(result.roles) && Array.isArray(result.modules))
+    );
+
+    if (isOk) {
+      currentUserScope = result.current_user || currentUserScope || null;
+      rolesData = Array.isArray(result.roles) ? result.roles : [];
+      actionsData = Array.isArray(result.actions) ? result.actions : [];
+      const dbModules = Array.isArray(result.modules) ? result.modules : [];
+      const dbResources = Array.isArray(result.resources) ? result.resources : [];
+      const dbPermissions = Array.isArray(result.permissions) ? result.permissions : [];
+      const dbRolePermissions = Array.isArray(result.role_permissions) ? result.role_permissions : [];
+
+      // Read custom modules from localStorage
+      let customModules = [];
+      try {
+        const raw = localStorage.getItem('civentral_custom_modules');
+        customModules = raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        console.error('Error reading civentral_custom_modules:', e);
+      }
+
+      // Merge dbModules with customModules
+      const allModulesMap = new Map();
+      dbModules.forEach(m => {
+        if (!m) return;
+        const mKey = String(m.module_id || m.id);
+        allModulesMap.set(mKey, m);
+      });
+
+      customModules.forEach(cm => {
+        if (!cm || !cm.name) return;
+        const key = String(cm.id || cm.module_id);
+        const nameLower = cm.name.trim().toLowerCase();
+        
+        let foundKey = null;
+        for (let [k, existing] of allModulesMap.entries()) {
+          if (!existing) continue;
+          if (k === key || (existing.module_name || existing.name || '').trim().toLowerCase() === nameLower) {
+            foundKey = k;
+            break;
+          }
+        }
+
+        if (foundKey) {
+          allModulesMap.set(foundKey, {
+            ...allModulesMap.get(foundKey),
+            module_name: cm.name,
+            description: cm.desc || cm.description || '',
+            status: cm.status || 'Active'
+          });
+        } else {
+          allModulesMap.set(key, {
+            module_id: cm.id,
+            module_name: cm.name,
+            description: cm.desc || cm.description || '',
+            status: cm.status || 'Active',
+            is_custom: true
+          });
+        }
+      });
+
+      // Read custom resources from localStorage
+      let customResources = [];
+      try {
+        const rawRes = localStorage.getItem('civentral_custom_resources');
+        customResources = rawRes ? JSON.parse(rawRes) : [];
+      } catch (e) {
+        console.error('Error reading civentral_custom_resources:', e);
+      }
+
+      // Merge dbResources with customResources
+      const allResourcesMap = new Map();
+      dbResources.forEach(r => {
+        if (!r) return;
+        allResourcesMap.set(String(r.resource_id || r.id), r);
+      });
+
+      customResources.forEach(cr => {
+        if (!cr || !cr.name) return;
+        const key = String(cr.id || cr.resource_id);
+        if (!allResourcesMap.has(key)) {
+          allResourcesMap.set(key, {
+            resource_id: cr.id,
+            module_id: cr.module_id,
+            resource_name: cr.name,
+            description: cr.desc || '',
+            resource_route: cr.route || '',
+            is_custom: true
+          });
+        }
+      });
+
+      const mergedDbResources = Array.from(allResourcesMap.values());
 
       // Build modulesData with nested resources
-      modulesData = dbModules.map(m => {
-        const resList = dbResources
-          .filter(r => r.module_id === m.module_id)
+      modulesData = Array.from(allModulesMap.values()).map(m => {
+        if (!m) return null;
+        const mId = m.module_id || m.id;
+        let resList = mergedDbResources
+          .filter(r => r && String(r.module_id) === String(mId))
           .map(r => ({
-            id: r.resource_id,
-            name: r.resource_name,
-            desc: r.description || r.resource_route || '',
-            department_id: r.department_id || m.department_id || null
+            id: r.resource_id || r.id,
+            name: r.resource_name || r.name || 'Resource',
+            desc: r.description || r.resource_route || r.desc || '',
+            department_id: r.department_id || m.department_id || null,
+            is_custom: !!r.is_custom
           }));
         
         return {
-          id: m.module_id,
-          name: m.module_name,
-          desc: m.description || '',
+          id: mId,
+          name: m.module_name || m.name || 'Module',
+          desc: m.description || m.desc || '',
           department_id: m.department_id || null,
+          status: m.status || 'Active',
           icon: "fa-folder-tree",
+          is_custom: !!m.is_custom,
           resources: resList
         };
-      });
+      }).filter(Boolean);
 
       const permIdMap = {};
       dbPermissions.forEach(p => {
-        permIdMap[p.permission_id] = {
-          resource_id: p.resource_id,
-          action_id: p.action_id
-        };
+        if (p && p.permission_id) {
+          permIdMap[p.permission_id] = {
+            resource_id: p.resource_id,
+            action_id: p.action_id
+          };
+        }
       });
 
       const permissionsMap = {};
       rolesData.forEach(r => {
-        permissionsMap[r.role_id] = {};
+        if (r && r.role_id) {
+          permissionsMap[r.role_id] = {};
+        }
       });
 
       dbRolePermissions.forEach(rp => {
+        if (!rp) return;
         const pInfo = permIdMap[rp.permission_id];
         if (pInfo && permissionsMap[rp.role_id]) {
           if (!permissionsMap[rp.role_id][pInfo.resource_id]) {
@@ -69,6 +171,31 @@ async function fetchPermissionsData() {
           if (!permissionsMap[rp.role_id][pInfo.resource_id].includes(pInfo.action_id)) {
             permissionsMap[rp.role_id][pInfo.resource_id].push(pInfo.action_id);
           }
+        }
+      });
+
+      // Automatically grant ALL action permissions for newly created/custom modules across roles
+      const allActionIds = (actionsData && actionsData.length > 0)
+        ? actionsData.map(a => parseInt(a.action_id || a.id))
+        : [1, 2, 3, 4, 5, 6];
+
+      modulesData.forEach(mod => {
+        if (mod && mod.is_custom) {
+          (mod.resources || []).forEach(res => {
+            if (!res) return;
+            rolesData.forEach(r => {
+              if (!r || !r.role_id) return;
+              if (!permissionsMap[r.role_id]) permissionsMap[r.role_id] = {};
+              if (!permissionsMap[r.role_id][res.id]) permissionsMap[r.role_id][res.id] = [];
+              
+              allActionIds.forEach(actId => {
+                const actInt = parseInt(actId);
+                if (!permissionsMap[r.role_id][res.id].includes(actInt)) {
+                  permissionsMap[r.role_id][res.id].push(actInt);
+                }
+              });
+            });
+          });
         }
       });
 
@@ -89,6 +216,7 @@ async function fetchPermissionsData() {
         : (currentUserScope ? (currentUserScope.department_name || '') : '');
 
       const validRoles = rolesData.filter(r => {
+        if (!r) return false;
         if (typeof isRoleAllowedForDepartment === 'function') {
           return isRoleAllowedForDepartment(r, userDeptId, userDeptName, isSuperAdmin);
         }

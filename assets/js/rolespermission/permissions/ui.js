@@ -107,7 +107,7 @@ function renderRoleSelector(filterQuery = '') {
 }
 
 function isModuleAllowedForDepartment(mod, userDeptId, userDeptName, isSuperAdmin) {
-  if (isSuperAdmin) return true;
+  if (isSuperAdmin || (mod && mod.is_custom)) return true;
   
   // 1. Check explicit DB department_id if present on module
   if (mod.department_id && userDeptId) {
@@ -146,7 +146,7 @@ function isModuleAllowedForDepartment(mod, userDeptId, userDeptName, isSuperAdmi
 }
 
 function isResourceGrantedToCurrentUser(res, isSuperAdmin, userGrantedRes) {
-  if (isSuperAdmin) return true;
+  if (isSuperAdmin || (res && res.is_custom)) return true;
 
   const myRoleId = window.currentUserRoleId ? parseInt(window.currentUserRoleId) : null;
   if (myRoleId && window.savedPermissions) {
@@ -230,6 +230,12 @@ function renderAccordions() {
   }
 
   modulesData.forEach(mod => {
+    // Exclude archived modules from permissions matrix
+    const modStatus = (mod.status || '').toString().trim().toLowerCase();
+    if (modStatus === 'archived') {
+      return;
+    }
+
     // Check if module is allowed for the user's department
     if (!isModuleAllowedForDepartment(mod, userDeptId, userDeptName, isSuperAdmin)) {
       return;
@@ -240,7 +246,7 @@ function renderAccordions() {
       isResourceGrantedToCurrentUser(res, isSuperAdmin, userGrantedRes)
     );
 
-    if (!isSuperAdmin && allowedResourcesForUser.length === 0) {
+    if (!isSuperAdmin && mod.resources.length > 0 && allowedResourcesForUser.length === 0) {
       return; // Hide entire module if non-superadmin user has no granted resources in it
     }
 
@@ -276,7 +282,7 @@ function renderAccordions() {
         </div>
         <div class="space-y-0.5 min-w-0">
           <h4 class="font-extrabold text-slate-800 tracking-tight text-xs">${mod.name}</h4>
-          <p class="text-[10px] text-slate-400 font-medium leading-relaxed truncate">${mod.desc}</p>
+          <p class="text-[10px] text-slate-400 font-medium leading-relaxed truncate">${mod.desc || 'System Module'}</p>
         </div>
       </div>
 
@@ -303,7 +309,9 @@ function renderAccordions() {
       if (resourcesToRender.length === 0) {
         body.innerHTML = `
           <div class="px-5 py-6 text-center text-[10px] text-slate-400 font-semibold italic">
-            No resources match the active search.
+            ${mod.resources.length === 0 
+              ? 'No resources registered under this module yet. You can define resources in <a href="resource-management.php" class="text-brand-dark underline font-extrabold">Resource Management</a>.' 
+              : 'No resources match the active search filter.'}
           </div>
         `;
       } else {
