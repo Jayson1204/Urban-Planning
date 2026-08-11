@@ -59,8 +59,12 @@ async function handleSaveModule(event) {
       if (typeof closeModuleModal === 'function') closeModuleModal();
 
       // Ensure newly created or updated module appears immediately in local state
+      // The create API returns the new id at the TOP LEVEL (result.module_id),
+      // so check that first; fall back to nested shapes, then to a temp id.
       const createdObj = result.data || result.module || null;
-      const modId = createdObj ? (createdObj.module_id || createdObj.id || payload.module_id) : (payload.module_id || Date.now());
+      const modId = result.module_id || result.id
+        || (createdObj && (createdObj.module_id || createdObj.id))
+        || payload.module_id || Date.now();
       const nowFormatted = new Date().toISOString().replace('T', ' ').substring(0, 19);
 
       const modObj = {

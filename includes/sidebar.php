@@ -31,12 +31,19 @@
         'data-changes.php'
       ];
       $urbanPlanningPages = [
+        'development-plans.php',
+        'urban-projects.php',
+        'infrastructure-records.php'
       ];
       $residentPages = [
-        'resident-directory.php'
+        'resident-directory.php',
+        'household-management.php'
       ];
       $housingPages = [
-        'housing-units.php'
+        'housing-units.php',
+        'beneficiaries.php',
+        'occupancy.php',
+        'relocation-records.php'
       ];
 
       $isSuperAdmin = !empty($headerUser['is_superadmin']) || !empty($headerUser['is_global_access']);
@@ -71,9 +78,9 @@
           <span class="sidebar-text text-[9px] font-bold tracking-widest text-slate-400 uppercase block px-3 mb-2">Urban Planning</span>
 
           <?php
-          // Gated by the local, per-role capstone_module_permissions table (production's
-          // shared permission system has no knowledge of this module).
-          $canAccessResidentMgmt = $isSuperAdmin || (isset($capstoneModulePermRepo) && $capstoneModulePermRepo->roleHasModule($headerUser['role_id'] ?? null, 'resident_management'));
+          // Gated by production's shared Role & Permission system, like every other module:
+          // create the module/resource in Module Management, grant it to a role in Permission Builder.
+          $canAccessResidentMgmt = $isSuperAdmin || $hasResourceAccess(['resident management', 'resident directory', 'resident']);
           if ($canAccessResidentMgmt):
           ?>
           <div class="space-y-1">
@@ -94,13 +101,14 @@
 
             <div id="residentDropdown" class="<?php echo in_array($currentPage, $residentPages) ? '' : 'hidden'; ?> pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
               <a href="<?php echo $basePath ?? '../'; ?>pages/resident/resident-directory.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'resident-directory.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-address-card text-[10px] <?php echo $currentPage == 'resident-directory.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Resident Directory</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/resident/household-management.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'household-management.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-house-chimney text-[10px] <?php echo $currentPage == 'household-management.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Household Management</span></a>
             </div>
           </div>
           <?php endif; ?>
 
           <?php
           // Same reasoning as Resident Management above.
-          $canAccessHousingMgmt = $isSuperAdmin || (isset($capstoneModulePermRepo) && $capstoneModulePermRepo->roleHasModule($headerUser['role_id'] ?? null, 'housing_management'));
+          $canAccessHousingMgmt = $isSuperAdmin || $hasResourceAccess(['housing management', 'housing units', 'housing']);
           if ($canAccessHousingMgmt):
           ?>
           <div class="space-y-1">
@@ -121,13 +129,16 @@
 
             <div id="housingDropdown" class="<?php echo in_array($currentPage, $housingPages) ? '' : 'hidden'; ?> pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
               <a href="<?php echo $basePath ?? '../'; ?>pages/housing/housing-units.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'housing-units.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-house text-[10px] <?php echo $currentPage == 'housing-units.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Housing Units</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/housing/beneficiaries.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'beneficiaries.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-hand-holding-heart text-[10px] <?php echo $currentPage == 'beneficiaries.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Beneficiaries</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/housing/occupancy.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'occupancy.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-house-user text-[10px] <?php echo $currentPage == 'occupancy.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Occupancy</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/housing/relocation-records.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'relocation-records.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-truck-moving text-[10px] <?php echo $currentPage == 'relocation-records.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Relocation Records</span></a>
             </div>
           </div>
           <?php endif; ?>
 
           <?php
           // Same reasoning as Resident Management above.
-          $canAccessUrbanPlanning = $isSuperAdmin || (isset($capstoneModulePermRepo) && $capstoneModulePermRepo->roleHasModule($headerUser['role_id'] ?? null, 'urban_planning'));
+          $canAccessUrbanPlanning = $isSuperAdmin || $hasResourceAccess(['urban planning', 'development plans']);
           if ($canAccessUrbanPlanning):
           ?>
           <div class="space-y-1">
@@ -147,7 +158,9 @@
             </button>
 
             <div id="urbanPlanningDropdown" class="<?php echo in_array($currentPage, $urbanPlanningPages) ? '' : 'hidden'; ?> pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
-              <!-- Empty for now — Phase 5 pages (Development Plans, Urban Projects, etc.) will be added here -->
+              <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/development-plans.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'development-plans.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-file-lines text-[10px] <?php echo $currentPage == 'development-plans.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Development Plans</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/urban-projects.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'urban-projects.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-diagram-project text-[10px] <?php echo $currentPage == 'urban-projects.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Urban Projects</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/infrastructure-records.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'infrastructure-records.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-road text-[10px] <?php echo $currentPage == 'infrastructure-records.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Infrastructure Records</span></a>
             </div>
           </div>
           <?php endif; ?>

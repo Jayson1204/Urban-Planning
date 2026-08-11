@@ -109,4 +109,77 @@ class HousingUnitRepository
     {
         return $this->db->update('housing_units', ['status' => $status], ['unit_id' => $unitId]);
     }
+
+    /**
+     * Per-unit timeline: merges occupancy moves, relocations, and beneficiary awards
+     * into one date-sorted history instead of a separate append-only log table.
+     */
+    public function getHistory($unitId)
+    {
+        $events = [];
+
+        $occupancyRows = $this->db->query(
+            "SELECT o.*, CONCAT_WS(' ', res.first_name, res.middle_name, res.last_name) AS resident_name
+             FROM housing_occupancy o
+             LEFT JOIN residents res ON o.resident_id = res.resident_id
+             WHERE o.unit_id = :unit_id",
+            ['unit_id' => $unitId]
+        );
+        foreach ($occupancyRows as $row) {
+            $events[] = [
+                'date' => $row['move_in_date'],
+                'type' => 'Occupancy Started',
+                'description' => trim($row['resident_name']) . ' moved in.',
+            ];
+            if (!empty($row['move_out_date'])) {
+                $events[] = [
+                    'date' => $row['move_out_date'],
+                    'type' => 'Occupancy Ended',
+                    'description' => trim($row['resident_name']) . ' moved out.',
+                ];
+            }
+        }
+
+        $relocationRows = $this->db->query(
+            "SELECT rel.*, CONCAT_WS(' ', res.first_name, res.middle_name, res.last_name) AS resident_name,
+                    fu.unit_code AS from_unit_code, tu.unit_code AS to_unit_code
+             FROM housing_relocations rel
+             LEFT JOIN residents res ON rel.resident_id = res.resident_id
+             LEFT JOIN housing_units fu ON rel.from_unit_id = fu.unit_id
+             LEFT JOIN housing_units tu ON rel.to_unit_id = tu.unit_id
+             WHERE (rel.from_unit_id = :unit_id OR rel.to_unit_id = :unit_id2) AND rel.status = 'Active'",
+            ['unit_id' => $unitId, 'unit_id2' => $unitId]
+        );
+        foreach ($relocationRows as $row) {
+            $direction = (int)$row['to_unit_id'] === (int)$unitId
+                ? 'relocated in from ' . ($row['from_unit_code'] ?? 'an unrecorded unit')
+                : 'relocated out to ' . ($row['to_unit_code'] ?? 'an unrecorded unit');
+            $events[] = [
+                'date' => $row['relocation_date'],
+                'type' => 'Relocation',
+                'description' => trim($row['resident_name']) . ' ' . $direction . ' (' . $row['reason'] . ').',
+            ];
+        }
+
+        $awardRows = $this->db->query(
+            "SELECT b.award_date, CONCAT_WS(' ', res.first_name, res.middle_name, res.last_name) AS resident_name
+             FROM housing_beneficiaries b
+             LEFT JOIN residents res ON b.resident_id = res.resident_id
+             WHERE b.unit_id = :unit_id AND b.beneficiary_status = 'Awarded' AND b.award_date IS NOT NULL",
+            ['unit_id' => $unitId]
+        );
+        foreach ($awardRows as $row) {
+            $events[] = [
+                'date' => $row['award_date'],
+                'type' => 'Beneficiary Awarded',
+                'description' => trim($row['resident_name']) . ' was awarded this unit.',
+            ];
+        }
+
+        usort($events, function ($a, $b) {
+            return strcmp($b['date'], $a['date']);
+        });
+
+        return $events;
+    }
 }

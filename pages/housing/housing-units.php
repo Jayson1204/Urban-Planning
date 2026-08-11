@@ -269,6 +269,13 @@ include '../../includes/sidebar.php';
         <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Remarks</h5>
         <div id="viewHousingRemarks" class="border border-slate-200/60 rounded-xl px-4 py-3 text-xs text-slate-600 leading-relaxed">No remarks on file.</div>
       </div>
+
+      <div class="space-y-2">
+        <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Housing History</h5>
+        <div id="viewHousingHistory" class="border border-slate-200/60 rounded-xl overflow-hidden text-xs divide-y divide-slate-100 max-h-56 overflow-y-auto">
+          <div class="px-4 py-3 text-slate-400">No recorded history for this unit yet.</div>
+        </div>
+      </div>
     </div>
     <div class="bg-slate-50 border-t border-slate-100 px-6 py-4 flex items-center justify-end">
       <button onclick="closeModal('viewHousingModal')" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition">Close</button>

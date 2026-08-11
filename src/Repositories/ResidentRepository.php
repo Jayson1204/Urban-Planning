@@ -29,8 +29,7 @@ class ResidentRepository
         $params = [];
 
         if (!empty($filters['search'])) {
-            $where[] = "(CONCAT(r.first_name, ' ', COALESCE(r.middle_name, ''), ' ', r.last_name) LIKE :search
-                         OR r.contact_number LIKE :search OR r.email LIKE :search)";
+            $where[] = "CONCAT_WS(' ', r.first_name, r.middle_name, r.last_name, r.contact_number, r.email) LIKE :search";
             $params['search'] = '%' . $filters['search'] . '%';
         }
         if (!empty($filters['barangay'])) {

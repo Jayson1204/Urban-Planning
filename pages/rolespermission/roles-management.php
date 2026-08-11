@@ -470,39 +470,6 @@ include '../../includes/sidebar.php';
   </div>
 </div>
 
-<!-- 3. CAPSTONE MODULE ACCESS MODAL (local-only — not tied to production's resource/action model) -->
-<div id="moduleAccessModal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300 bg-slate-900/60 backdrop-blur-xs">
-  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden transform scale-95 transition-all duration-300 border border-slate-200">
-    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-      <div class="flex items-center gap-2.5">
-        <div class="h-8 w-8 rounded-xl bg-brand-light border border-brand-border flex items-center justify-center text-brand-dark font-bold text-xs">
-          <i class="fa-solid fa-cubes"></i>
-        </div>
-        <div>
-          <h3 class="text-sm font-black text-slate-900 tracking-tight">Capstone Module Access</h3>
-          <p id="moduleAccessRoleLabel" class="text-[10px] text-slate-400 font-medium">&mdash;</p>
-        </div>
-      </div>
-      <button type="button" onclick="closeModal('moduleAccessModal')" class="h-8 w-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer">
-        <i class="fa-solid fa-xmark text-sm"></i>
-      </button>
-    </div>
-    <div class="p-6 space-y-3">
-      <input type="hidden" id="moduleAccessRoleId">
-      <p class="text-[11px] text-slate-500 leading-relaxed">
-        Choose which of the new capstone modules users under this role can see and use. This is a separate, local-only system — it does not touch production's Role &amp; Permission tables, since those modules don't exist there.
-      </p>
-      <div id="moduleAccessCheckboxList" class="space-y-2">
-        <!-- Populated by JS -->
-      </div>
-    </div>
-    <div class="bg-slate-50 border-t border-slate-100 px-6 py-4 flex items-center justify-end space-x-2">
-      <button type="button" onclick="closeModal('moduleAccessModal')" class="border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer">Cancel</button>
-      <button type="button" onclick="handleSaveModuleAccess()" class="bg-[#0f172a] hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer shadow-xs">Save Access</button>
-    </div>
-  </div>
-</div>
-
 <!-- TOAST POPUP NOTIFICATION CONTAINER -->
 <div id="toast" class="fixed bottom-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3.5 rounded-xl shadow-lg flex items-center gap-3 transform translate-y-4 opacity-0 pointer-events-none transition-all duration-300">
   <div class="h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[10px]">

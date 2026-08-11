@@ -70,5 +70,20 @@ async function openViewHousingModal(unitId) {
   const remarksEl = document.getElementById('viewHousingRemarks');
   remarksEl.innerText = unit.remarks && unit.remarks.trim() ? unit.remarks : 'No remarks on file.';
 
+  const historyEl = document.getElementById('viewHousingHistory');
+  historyEl.innerHTML = '<div class="px-4 py-3 text-slate-400">Loading history...</div>';
   openModal('viewHousingModal');
+
+  const history = await fetchHousingUnitHistory(unitId);
+  historyEl.innerHTML = history.length
+    ? history.map(ev => `
+        <div class="px-4 py-2.5">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-700">${ev.type}</span>
+            <span class="text-slate-400 font-mono text-[10px]">${ev.date || ''}</span>
+          </div>
+          <p class="text-slate-500 mt-0.5">${ev.description}</p>
+        </div>
+      `).join('')
+    : '<div class="px-4 py-3 text-slate-400">No recorded history for this unit yet.</div>';
 }

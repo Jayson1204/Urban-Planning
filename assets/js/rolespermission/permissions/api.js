@@ -257,8 +257,12 @@ async function fetchPermissionsData() {
 
 // ACTION: SAVE PERMISSION MATRIX CHANGES TO DATABASE
 async function saveChanges() {
-  const isSuperAdmin = currentUserScope ? !!currentUserScope.is_superadmin : false;
-  const grantedActions = currentUserScope ? (currentUserScope.granted_actions || []) : [];
+  const isSuperAdmin = (typeof window.currentUserIsSuperAdmin !== 'undefined')
+    ? window.currentUserIsSuperAdmin
+    : (currentUserScope ? (!!currentUserScope.is_superadmin || !!currentUserScope.is_global_access) : false);
+  const grantedActions = (typeof window.currentUserGrantedActions !== 'undefined' && Array.isArray(window.currentUserGrantedActions))
+    ? window.currentUserGrantedActions
+    : (currentUserScope ? (currentUserScope.granted_actions || []) : []);
   let canEdit = isSuperAdmin || grantedActions.includes('EDIT') || grantedActions.includes('CREATE');
 
   if (window.selectedRoleId && window.currentUserRoleId && parseInt(window.selectedRoleId) === parseInt(window.currentUserRoleId)) {

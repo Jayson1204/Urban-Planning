@@ -1,5 +1,18 @@
-# Environment variables
+# Environment variables / secrets
 .env
+.env.*
+!.env.example
+
+# Credentials, keys, certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+id_rsa
+id_rsa.*
+secrets.php
+config/secrets*.php
 
 # Dependencies
 /vendor
@@ -8,10 +21,32 @@
 # Logs
 *.log
 
+# Database dumps / backups (schema migrations in /database are kept)
+*.sqlite
+*.sqlite3
+*.dump
+*.sql.gz
+*-backup.sql
+/backups/
+
+# Uploaded files (contain PII / user content, must not be committed)
+# Keep folder scaffolding (.gitkeep) and hardening rules (.htaccess) only.
+/uploads/**
+!/uploads/
+!/uploads/**/
+!/uploads/**/.gitkeep
+!/uploads/**/.htaccess
+!/uploads/.htaccess
+
 # OS files
 .DS_Store
 Thumbs.db
 
-# Uploaded resident documents (contain PII, must not be committed)
-/uploads/residents/*
-!/uploads/residents/.gitkeep
+# Editor / IDE (may contain local paths and settings)
+.vscode/
+.idea/
+*.swp
+*~
+
+# PHP session files
+sess_*

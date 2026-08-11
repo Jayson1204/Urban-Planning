@@ -81,18 +81,35 @@ class HeaderService
                     $perms = $body['permissions'] ?? [];
                     $resources = $body['resources'] ?? [];
                     $actions = $body['actions'] ?? [];
-                    
+                    $modules = $body['modules'] ?? [];
+
                     // Map action names & resource names
                     $actionsMap = [];
                     foreach ($actions as $a) {
                         $actionsMap[$a['action_id']] = strtoupper($a['action_name']);
                     }
-                    
+
                     $resourcesMap = [];
                     foreach ($resources as $r) {
                         $resourcesMap[$r['resource_id']] = strtolower(trim($r['resource_name']));
                     }
-                    
+
+                    // Map module names, and which module each resource belongs to, so sidebar
+                    // gating can match a granted module's name even when the underlying resource
+                    // itself is named something unrelated (e.g. a resource named "test" under
+                    // the "Housing Management" module).
+                    $moduleNameMap = [];
+                    foreach ($modules as $m) {
+                        $mid = $m['module_id'] ?? $m['id'] ?? null;
+                        if ($mid !== null) {
+                            $moduleNameMap[$mid] = strtolower(trim($m['module_name'] ?? $m['name'] ?? ''));
+                        }
+                    }
+                    $resourceModuleMap = [];
+                    foreach ($resources as $r) {
+                        $resourceModuleMap[$r['resource_id']] = $r['module_id'] ?? null;
+                    }
+
                     $permsMap = [];
                     foreach ($perms as $p) {
                         $permsMap[$p['permission_id']] = [
@@ -114,6 +131,11 @@ class HeaderService
                                 }
                                 if (isset($resourcesMap[$resId])) {
                                     $grantedResources[] = $resourcesMap[$resId];
+
+                                    $modId = $resourceModuleMap[$resId] ?? null;
+                                    if ($modId !== null && !empty($moduleNameMap[$modId])) {
+                                        $grantedResources[] = $moduleNameMap[$modId];
+                                    }
                                 }
                                 if (isset($actionsMap[$actId]) && isset($resourcesMap[$resId])) {
                                     $actName = $actionsMap[$actId];

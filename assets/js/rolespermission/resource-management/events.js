@@ -57,8 +57,12 @@ async function handleSaveResource(event) {
     const result = await response.json();
 
     const nowFormatted = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    // The create API returns the new id at the TOP LEVEL (result.resource_id), so check that
+    // first; fall back to nested shapes, then to a temp id (mirrors the same fix in modules.php's events.js).
     const createdObj = result.data || result.resource || null;
-    const resId = createdObj ? (createdObj.resource_id || createdObj.id || payload.resource_id) : (payload.resource_id || Date.now());
+    const resId = result.resource_id || result.id
+      || (createdObj && (createdObj.resource_id || createdObj.id))
+      || payload.resource_id || Date.now();
 
     const resObj = {
       id: resId,

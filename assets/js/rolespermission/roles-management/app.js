@@ -6,7 +6,6 @@ window.loadCiventralScript('assets/js/rolespermission/roles-management/api.js');
 window.loadCiventralScript('assets/js/rolespermission/roles-management/ui.js');
 window.loadCiventralScript('assets/js/rolespermission/roles-management/filters.js');
 window.loadCiventralScript('assets/js/rolespermission/roles-management/modal.js');
-window.loadCiventralScript('assets/js/rolespermission/roles-management/module-access.js');
 window.loadCiventralScript('assets/js/rolespermission/roles-management/form.js', () => {
 
     function initRolesManagementModule() {

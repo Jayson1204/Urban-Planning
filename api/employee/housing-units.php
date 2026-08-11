@@ -23,6 +23,10 @@ if ($method === 'GET') {
         respond(['status' => 'success', 'data' => $housingUnitRepo->stats()]);
     }
 
+    if (!empty($_GET['unit_id']) && ($_GET['action'] ?? '') === 'history') {
+        respond(['status' => 'success', 'data' => $housingUnitRepo->getHistory((int)$_GET['unit_id'])]);
+    }
+
     if (!empty($_GET['id'])) {
         $unit = $housingUnitRepo->find((int)$_GET['id']);
         if (!$unit) {

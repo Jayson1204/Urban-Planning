@@ -195,6 +195,7 @@ require_once __DIR__ . '/../src/bootstrap.php';
       </div>
     </div>
 
-  <script src="<?php echo $basePath ?? '../'; ?>assets/js/app.js"></script>
+  <?php $appJsPath = __DIR__ . '/../assets/js/app.js'; $appJsVer = @filemtime($appJsPath) ?: time(); ?>
+  <script src="<?php echo $basePath ?? '../'; ?>assets/js/app.js?v=<?php echo $appJsVer; ?>"></script>
 
   <div class="flex-1 flex relative">

@@ -141,3 +141,14 @@ async function fetchHousingUnitDetail(unitId) {
     return null;
   }
 }
+
+async function fetchHousingUnitHistory(unitId) {
+  try {
+    const response = await fetch(`../../api/employee/housing-units.php?action=history&unit_id=${unitId}`);
+    const result = await response.json();
+    return result.status === 'success' ? (result.data || []) : [];
+  } catch (err) {
+    console.error('Error fetching housing unit history:', err);
+    return [];
+  }
+}
