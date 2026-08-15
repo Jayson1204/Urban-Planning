@@ -55,6 +55,7 @@ if ($method === 'POST') {
         respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
     }
     $newId = $housingService->createHousingUnit($input);
+    $activityLogService->record('Housing Management', 'Create', 'housing_units', $newId, $input['unit_code'] ?? ('Unit #' . $newId), 'Added a new housing unit.');
     respond(['status' => 'success', 'message' => 'Housing unit added successfully.', 'unit_id' => $newId], 201);
 }
 
@@ -68,6 +69,7 @@ if ($method === 'PUT') {
         respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
     }
     $housingService->updateHousingUnit($unitId, $input);
+    $activityLogService->record('Housing Management', 'Update', 'housing_units', $unitId, $input['unit_code'] ?? ('Unit #' . $unitId), 'Updated a housing unit.');
     respond(['status' => 'success', 'message' => 'Housing unit updated successfully.']);
 }
 
@@ -77,7 +79,10 @@ if ($method === 'DELETE') {
         respond(['status' => 'error', 'message' => 'unit_id is required.'], 422);
     }
     $newStatus = ($_GET['status'] ?? $input['status'] ?? 'Archived') === 'Active' ? 'Active' : 'Archived';
+    $unitRow = $housingUnitRepo->find($unitId);
     $housingUnitRepo->setStatus($unitId, $newStatus);
+    $unitLabel = ($unitRow['unit_code'] ?? null) ?: ('Unit #' . $unitId);
+    $activityLogService->record('Housing Management', $newStatus === 'Archived' ? 'Archive' : 'Restore', 'housing_units', $unitId, $unitLabel, "Marked housing unit as {$newStatus}.");
     respond(['status' => 'success', 'message' => "Housing unit marked as {$newStatus}."]);
 }
 

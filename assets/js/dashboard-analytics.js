@@ -1,128 +1,53 @@
 document.addEventListener("DOMContentLoaded", () => {
-    let trendsChart, demoChart, radarChart;
+    let recordsChart, occupancyChart, projectStatusChart;
 
-    // Dynamic theme styling provider
     function getThemeColors() {
         const isDark = document.documentElement.classList.contains('dark');
         return {
             gridColor: isDark ? '#1e293b' : '#F1F5F9',
             ticksColor: isDark ? '#94A3B8' : '#64748B',
             legendColor: isDark ? '#cbd5e1' : '#475569',
-            radarGridColor: isDark ? '#334155' : '#E2E8F0',
-            radarAngleColor: isDark ? '#1e293b' : '#F1F5F9',
-            radarBg: isDark ? '#0f172a' : '#ffffff'
+            borderColor: isDark ? '#0f172a' : '#ffffff',
         };
     }
 
-    // 1. Line/Area Chart for Trends
-    function renderTrendsChart() {
-        const trendsCanvas = document.getElementById('trendsChart');
-        if (!trendsCanvas) return;
-        const trendsCtx = trendsCanvas.getContext('2d');
+    const OCCUPANCY_COLORS = {
+        'Vacant': '#10B981',
+        'Occupied': '#0D9488',
+        'Reserved': '#7C3AED',
+        'Under Maintenance': '#F59E0B',
+    };
+    const PROJECT_STATUS_COLORS = {
+        'Planned': '#64748B',
+        'Ongoing': '#1E517B',
+        'Completed': '#10B981',
+        'Delayed': '#F59E0B',
+        'Cancelled': '#DC2626',
+    };
+
+    function renderDoughnut(canvasId, chartRef, rows, labelKey, colorMap) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return null;
+        if (chartRef) chartRef.destroy();
         const colors = getThemeColors();
-        
-        const citizenGrad = trendsCtx.createLinearGradient(0, 0, 0, 300);
-        citizenGrad.addColorStop(0, 'rgba(30, 81, 123, 0.22)');
-        citizenGrad.addColorStop(1, 'rgba(30, 81, 123, 0)');
 
-        const appGrad = trendsCtx.createLinearGradient(0, 0, 0, 300);
-        appGrad.addColorStop(0, 'rgba(245, 158, 11, 0.22)');
-        appGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
+        if (!rows.length) {
+            return new Chart(canvas.getContext('2d'), {
+                type: 'doughnut',
+                data: { labels: ['No data'], datasets: [{ data: [1], backgroundColor: ['#E2E8F0'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '70%' }
+            });
+        }
 
-        trendsChart = new Chart(trendsCtx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [
-                    {
-                        label: 'Citizens Registered',
-                        data: [12000, 19000, 24000, 31000, 42000, 56000],
-                        borderColor: '#1E517B',
-                        borderWidth: 3,
-                        fill: true,
-                        backgroundColor: citizenGrad,
-                        tension: 0.4,
-                        pointBackgroundColor: '#1E517B',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6
-                    },
-                    {
-                        label: 'Applications Filed',
-                        data: [8000, 11000, 15000, 22000, 21000, 29000],
-                        borderColor: '#F59E0B',
-                        borderWidth: 3,
-                        fill: true,
-                        backgroundColor: appGrad,
-                        tension: 0.4,
-                        pointBackgroundColor: '#F59E0B',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            font: {
-                                size: 9,
-                                weight: '600'
-                            },
-                            color: colors.ticksColor
-                        }
-                    },
-                    y: {
-                        grid: {
-                            color: colors.gridColor,
-                            lineWidth: 1
-                        },
-                        ticks: {
-                            font: {
-                                size: 9,
-                                weight: '600'
-                            },
-                            color: colors.ticksColor
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // 2. Doughnut Chart for Demographics
-    function renderDemoChart() {
-        const demoCanvas = document.getElementById('demographicsChart');
-        if (!demoCanvas) return;
-        const demoCtx = demoCanvas.getContext('2d');
-        const colors = getThemeColors();
-        demoChart = new Chart(demoCtx, {
+        return new Chart(canvas.getContext('2d'), {
             type: 'doughnut',
             data: {
-                labels: ['Youth', 'Seniors', 'Working Class', 'Students'],
+                labels: rows.map(r => r[labelKey]),
                 datasets: [{
-                    data: [35, 15, 30, 20],
-                    backgroundColor: [
-                        '#1E517B', // youth
-                        '#F59E0B', // senior
-                        '#0D9488', // working class (teal)
-                        '#7C3AED'  // student (purple)
-                    ],
+                    data: rows.map(r => parseInt(r.total, 10)),
+                    backgroundColor: rows.map(r => colorMap[r[labelKey]] || '#94A3B8'),
                     borderWidth: 3,
-                    borderColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff'
+                    borderColor: colors.borderColor,
                 }]
             },
             options: {
@@ -131,15 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 plugins: {
                     legend: {
                         position: 'right',
-                        labels: {
-                            font: {
-                                size: 9,
-                                weight: '700'
-                            },
-                            boxWidth: 10,
-                            color: colors.legendColor,
-                            padding: 12
-                        }
+                        labels: { font: { size: 9, weight: '700' }, boxWidth: 10, color: colors.legendColor, padding: 10 }
                     }
                 },
                 cutout: '70%'
@@ -147,107 +64,139 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 3. Radar Chart for Municipal Service Load
-    function renderRadarChart() {
-        const radarCanvas = document.getElementById('workloadRadarChart');
-        if (!radarCanvas) return;
-        const radarCtx = radarCanvas.getContext('2d');
+    function renderRecordsChart(summary) {
+        const canvas = document.getElementById('dashRecordsChart');
+        if (!canvas) return null;
+        if (recordsChart) recordsChart.destroy();
         const colors = getThemeColors();
-        radarChart = new Chart(radarCtx, {
-            type: 'radar',
+
+        const rows = [
+            { label: 'Residents', total: summary.total_residents || 0, color: '#1E517B' },
+            { label: 'Households', total: summary.total_households || 0, color: '#0D9488' },
+            { label: 'Housing Units', total: summary.total_housing_units || 0, color: '#10B981' },
+            { label: 'Urban Projects', total: summary.total_urban_projects || 0, color: '#7C3AED' },
+            { label: 'Survey Assignments', total: summary.total_survey_assignments || 0, color: '#F59E0B' },
+            { label: 'Survey Results', total: summary.total_survey_results || 0, color: '#EA580C' },
+        ];
+
+        return new Chart(canvas.getContext('2d'), {
+            type: 'bar',
             data: {
-                labels: ['Health Care', 'Social Welfare', 'Education', 'Permits', 'Public Assets'],
-                datasets: [
-                    {
-                        label: 'Service Workload Ratio',
-                        data: [85, 70, 90, 60, 50],
-                        backgroundColor: 'rgba(124, 58, 237, 0.15)',
-                        borderColor: '#7C3AED',
-                        borderWidth: 2,
-                        pointBackgroundColor: '#7C3AED',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 1.5,
-                        pointRadius: 3
-                    }
-                ]
+                labels: rows.map(r => r.label),
+                datasets: [{
+                    label: 'Active Records',
+                    data: rows.map(r => r.total),
+                    backgroundColor: rows.map(r => r.color),
+                    borderRadius: 6,
+                    maxBarThickness: 44,
+                }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
+                plugins: { legend: { display: false } },
                 scales: {
-                    r: {
-                        angleLines: {
-                            color: colors.radarAngleColor
-                        },
-                        grid: {
-                            color: colors.radarGridColor
-                        },
-                        ticks: {
-                            display: false
-                        },
-                        pointLabels: {
-                            font: {
-                                size: 8,
-                                weight: '700'
-                            },
-                            color: colors.ticksColor
-                        }
-                    }
+                    x: { grid: { display: false }, ticks: { font: { size: 9, weight: '600' }, color: colors.ticksColor } },
+                    y: { beginAtZero: true, grid: { color: colors.gridColor }, ticks: { font: { size: 9, weight: '600' }, precision: 0, color: colors.ticksColor } }
                 }
             }
         });
     }
 
-    // Initial Render
-    renderTrendsChart();
-    renderDemoChart();
-    renderRadarChart();
+    function activityIcon(type) {
+        const map = {
+            'Resident': 'fa-user',
+            'Housing Unit': 'fa-house-chimney',
+            'Urban Project': 'fa-map-location-dot',
+            'Survey Assignment': 'fa-clipboard-list',
+        };
+        return map[type] || 'fa-circle-info';
+    }
 
-    // Smooth Skeleton Loader Transition
+    function renderActivityFeed(rows) {
+        const container = document.getElementById('dashActivityFeed');
+        if (!container) return;
+        if (!rows.length) {
+            container.innerHTML = '<div class="px-2 py-6 text-center text-slate-400 text-xs">No recent activity yet.</div>';
+            return;
+        }
+        container.innerHTML = rows.map(r => `
+            <div class="py-3.5 flex items-center justify-between gap-4 text-xs transition hover:bg-slate-50/50 dark:hover:bg-slate-850/50 px-2 rounded-lg -mx-2">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="h-8.5 w-8.5 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0 border border-slate-100 dark:border-slate-700">
+                        <i class="fa-solid ${activityIcon(r.type)} text-xs"></i>
+                    </div>
+                    <div class="min-w-0 space-y-0.5">
+                        <p class="font-bold text-slate-700 dark:text-slate-200 truncate text-[11px]">${r.label || 'Untitled'}</p>
+                        <p class="text-[9px] text-slate-450 dark:text-slate-400 font-medium">${r.type}</p>
+                    </div>
+                </div>
+                <span class="text-[9px] font-black text-slate-400 dark:text-slate-550 shrink-0">${(r.event_date || '').substring(0, 10)}</span>
+            </div>
+        `).join('');
+    }
+
+    function updateKpiBar(barId, labelId, value) {
+        const bar = document.getElementById(barId);
+        const label = document.getElementById(labelId);
+        if (bar) bar.style.width = `${Math.min(100, Math.max(0, value))}%`;
+        if (label) label.innerText = `${value}%`;
+    }
+
     function handleSkeletonTransition() {
         const skeleton = document.getElementById('dashboardSkeleton');
         const realContent = document.getElementById('dashboardRealContent');
-
         if (!skeleton || !realContent) return;
 
-        // Show real content in DOM
         realContent.classList.remove('hidden');
-
-        // Allow browser frame to calculate layout before fading
         requestAnimationFrame(() => {
             skeleton.classList.add('opacity-0', 'pointer-events-none');
             realContent.classList.remove('opacity-0', 'translate-y-2');
             realContent.classList.add('opacity-100', 'translate-y-0');
-
-            setTimeout(() => {
-                skeleton.classList.add('hidden');
-            }, 500);
+            setTimeout(() => { skeleton.classList.add('hidden'); }, 500);
         });
     }
 
-    // Trigger skeleton hide and real content reveal after a smooth loading window
-    setTimeout(handleSkeletonTransition, 600);
+    async function loadDashboard() {
+        const basePath = window.civentralBasePath || '../';
+        try {
+            const response = await fetch(basePath + 'api/employee/analytics.php');
+            const result = await response.json();
+            if (result.status !== 'success') return;
 
-    // Listen for Theme Toggle to dynamically redraw charts
+            const { summary, kpis, charts, recent_activity } = result.data;
+
+            document.getElementById('dashTotalResidents').innerText = summary.total_residents || 0;
+            document.getElementById('dashTotalHouseholds').innerText = summary.total_households || 0;
+            document.getElementById('dashTotalHousingUnits').innerText = summary.total_housing_units || 0;
+            document.getElementById('dashTotalUrbanProjects').innerText = summary.total_urban_projects || 0;
+            document.getElementById('dashTotalSurveyResults').innerText = summary.total_survey_results || 0;
+            document.getElementById('dashTotalSurveyAssignments').innerText = summary.total_survey_assignments || 0;
+            document.getElementById('dashHousingOccupancyRate').innerText = kpis.housing_occupancy_rate;
+            document.getElementById('dashProjectCompletionRate').innerText = kpis.project_completion_rate;
+
+            updateKpiBar('dashKpiHousingBar', 'dashKpiHousingLabel', kpis.housing_occupancy_rate);
+            updateKpiBar('dashKpiSurveyBar', 'dashKpiSurveyLabel', kpis.survey_completion_rate);
+            updateKpiBar('dashKpiProjectBar', 'dashKpiProjectLabel', kpis.project_completion_rate);
+
+            recordsChart = renderRecordsChart(summary);
+            occupancyChart = renderDoughnut('dashHousingOccupancyChart', occupancyChart, charts.housing_occupancy, 'occupancy_status', OCCUPANCY_COLORS);
+            projectStatusChart = renderDoughnut('dashProjectStatusChart', projectStatusChart, charts.urban_project_status, 'project_status', PROJECT_STATUS_COLORS);
+
+            renderActivityFeed(recent_activity || []);
+        } catch (err) {
+            console.error('Error loading dashboard analytics:', err);
+        } finally {
+            setTimeout(handleSkeletonTransition, 400);
+        }
+    }
+
+    loadDashboard();
+
     const themeToggleBtn = document.getElementById('themeToggleBtn');
     if (themeToggleBtn) {
         themeToggleBtn.addEventListener('click', () => {
-            setTimeout(() => {
-                // Destroy old instances
-                if (trendsChart) trendsChart.destroy();
-                if (demoChart) demoChart.destroy();
-                if (radarChart) radarChart.destroy();
-
-                // Re-render with new colors
-                renderTrendsChart();
-                renderDemoChart();
-                renderRadarChart();
-            }, 150);
+            setTimeout(loadDashboard, 150);
         });
     }
 });

@@ -51,6 +51,9 @@ if ($method === 'POST') {
         respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
     }
     $newId = $housingRelocationService->relocate($input);
+    $relResident = $residentRepo->find((int)($input['resident_id'] ?? 0));
+    $relLabel = $relResident ? trim($relResident['first_name'] . ' ' . $relResident['last_name']) : ('Relocation #' . $newId);
+    $activityLogService->record('Housing Management', 'Create', 'housing_relocations', $newId, $relLabel, 'Recorded a resident relocation.');
     respond(['status' => 'success', 'message' => 'Relocation recorded successfully.', 'relocation_id' => $newId], 201);
 }
 
@@ -60,7 +63,11 @@ if ($method === 'DELETE') {
         respond(['status' => 'error', 'message' => 'relocation_id is required.'], 422);
     }
     $newStatus = ($_GET['status'] ?? $input['status'] ?? 'Archived') === 'Active' ? 'Active' : 'Archived';
+    $relRow = $housingRelocationRepo->find($relocationId);
     $housingRelocationService->setStatus($relocationId, $newStatus);
+    $relResident = $relRow ? $residentRepo->find((int)$relRow['resident_id']) : null;
+    $relLabel = $relResident ? trim($relResident['first_name'] . ' ' . $relResident['last_name']) : ('Relocation #' . $relocationId);
+    $activityLogService->record('Housing Management', $newStatus === 'Archived' ? 'Archive' : 'Restore', 'housing_relocations', $relocationId, $relLabel, "Marked relocation record as {$newStatus}.");
     respond(['status' => 'success', 'message' => "Relocation record marked as {$newStatus}."]);
 }
 

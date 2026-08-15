@@ -2,7 +2,14 @@
 $basePath = '../../';
 include '../../includes/header.php';
 include '../../includes/sidebar.php';
+
+$benGrantedActions = $headerUser['granted_actions'] ?? [];
+$benIsPrivileged = !empty($headerUser['is_superadmin']) || !empty($headerUser['is_global_access']);
+$canReviewBenDocuments = $benIsPrivileged || in_array('APPROVE', $benGrantedActions) || in_array('REJECT', $benGrantedActions);
 ?>
+<script>
+  window.benCanReviewDocuments = <?php echo json_encode($canReviewBenDocuments); ?>;
+</script>
 
 <main class="flex-1 p-6 md:p-8 w-full space-y-6 overflow-y-auto">
 
@@ -109,6 +116,10 @@ include '../../includes/sidebar.php';
         <option value="Active">Active</option>
         <option value="Archived">Archived</option>
       </select>
+      <select id="benSortFilter" class="border border-slate-200 rounded-xl px-3 py-2.5 text-xs bg-white focus:outline-none focus:border-brand-medium transition cursor-pointer font-semibold text-slate-700">
+        <option value="">Newest First</option>
+        <option value="priority">Priority (Waitlist)</option>
+      </select>
     </div>
   </div>
 
@@ -121,6 +132,7 @@ include '../../includes/sidebar.php';
             <th class="px-6 py-4 w-1/4">Beneficiary</th>
             <th class="px-6 py-4">Unit</th>
             <th class="px-6 py-4">Category</th>
+            <th class="px-6 py-4">Eligibility Score</th>
             <th class="px-6 py-4">Stage</th>
             <th class="px-6 py-4">Award Date</th>
             <th class="px-6 py-4 text-right">Actions</th>
@@ -233,6 +245,15 @@ include '../../includes/sidebar.php';
               <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Award Date</label>
               <input type="date" id="benAwardDate" class="border border-slate-200 rounded-xl px-3 py-2.5 text-xs w-full focus:outline-none focus:border-brand-medium transition">
             </div>
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Amortization Status</label>
+              <select id="benAmortizationStatus" class="border border-slate-200 rounded-xl px-3 py-2.5 text-xs w-full bg-white focus:outline-none focus:border-brand-medium transition cursor-pointer">
+                <option value="Not Started">Not Started</option>
+                <option value="Current">Current</option>
+                <option value="Delinquent">Delinquent</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -283,15 +304,79 @@ include '../../includes/sidebar.php';
           <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">Family Size</span>
           <p id="viewBenFamilySize" class="text-sm font-extrabold text-slate-800">&mdash;</p>
         </div>
+        <div class="bg-slate-50 border border-slate-200/40 rounded-xl p-3.5 space-y-1">
+          <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">Eligibility Score</span>
+          <p id="viewBenScore" class="text-sm font-extrabold text-slate-800">&mdash;</p>
+        </div>
+        <div class="bg-slate-50 border border-slate-200/40 rounded-xl p-3.5 space-y-1">
+          <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">Amortization Status</span>
+          <p id="viewBenAmortization" class="text-sm font-extrabold text-slate-800">&mdash;</p>
+        </div>
       </div>
       <div class="space-y-2">
         <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Remarks</h5>
         <div id="viewBenRemarks" class="border border-slate-200/60 rounded-xl px-4 py-3 text-xs text-slate-600 leading-relaxed">No remarks on file.</div>
       </div>
+
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Application Documents</h5>
+          <button type="button" onclick="openBenDocumentUpload()" class="text-[10px] font-bold text-brand-dark hover:underline cursor-pointer">
+            <i class="fa-solid fa-upload mr-1"></i>Upload
+          </button>
+        </div>
+        <p class="text-[9px] text-slate-400 leading-relaxed -mt-1">Citizens will submit these directly once the mobile app is available. Until then, staff can upload on the applicant's behalf.</p>
+        <div id="viewBenDocuments" class="border border-slate-200/60 rounded-xl overflow-hidden text-xs divide-y divide-slate-100">
+          <div class="px-4 py-3 text-slate-400">No documents submitted yet.</div>
+        </div>
+      </div>
+
+      <form id="benDocumentUploadForm" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2.5" onsubmit="handleUploadBenDocument(event)">
+        <input type="hidden" id="uploadBenBeneficiaryId">
+        <div class="grid grid-cols-2 gap-2.5">
+          <select id="benDocumentType" required class="border border-slate-200 rounded-lg px-2.5 py-2 text-[11px] w-full bg-white focus:outline-none focus:border-brand-medium">
+            <option value="">Document Type</option>
+            <option value="Valid ID">Valid ID</option>
+            <option value="Proof of Income">Proof of Income</option>
+            <option value="Barangay Certificate">Barangay Certificate</option>
+            <option value="Certificate of Indigency">Certificate of Indigency</option>
+            <option value="Proof of Residency">Proof of Residency</option>
+            <option value="Other">Other</option>
+          </select>
+          <input type="file" id="benDocumentFile" required accept=".pdf,.jpg,.jpeg,.png" class="text-[11px] w-full">
+        </div>
+        <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-[11px] cursor-pointer transition">Save Document</button>
+      </form>
     </div>
     <div class="bg-slate-50 border-t border-slate-100 px-6 py-4 flex items-center justify-end">
       <button onclick="closeModal('viewBeneficiaryModal')" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition">Close</button>
     </div>
+  </div>
+</div>
+
+<!-- 3. REJECT DOCUMENT MODAL -->
+<div id="rejectBenDocumentModal" class="fixed inset-0 z-[60] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300 bg-slate-900/60 backdrop-blur-xs">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden transform scale-95 transition-all duration-300">
+    <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <i class="fa-solid fa-file-circle-xmark text-rose-400"></i>
+        <h3 class="font-extrabold text-sm tracking-tight uppercase">Reject Document</h3>
+      </div>
+      <button onclick="closeModal('rejectBenDocumentModal')" class="text-slate-400 hover:text-white transition cursor-pointer text-sm">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <form id="rejectBenDocumentForm" onsubmit="handleConfirmRejectBenDocument(event)">
+      <input type="hidden" id="rejectBenDocumentId">
+      <div class="p-6 space-y-2">
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Reason for rejection</label>
+        <textarea id="rejectBenDocumentReason" required rows="3" placeholder="Explain what's wrong with this document so the applicant can resubmit..." class="border border-slate-200 rounded-xl px-3 py-2.5 text-xs w-full focus:outline-none focus:border-brand-medium transition resize-none"></textarea>
+      </div>
+      <div class="bg-slate-50 border-t border-slate-100 px-6 py-4 flex items-center justify-end space-x-2">
+        <button type="button" onclick="closeModal('rejectBenDocumentModal')" class="border border-slate-200 bg-white hover:bg-slate-50 text-slate-650 font-bold px-4 py-2 rounded-xl text-xs cursor-pointer transition">Cancel</button>
+        <button type="submit" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl text-xs font-bold cursor-pointer transition shadow-xs">Confirm Rejection</button>
+      </div>
+    </form>
   </div>
 </div>
 

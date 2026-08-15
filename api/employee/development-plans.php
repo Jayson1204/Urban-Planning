@@ -52,6 +52,7 @@ if ($method === 'POST') {
         respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
     }
     $newId = $developmentPlanService->createDevelopmentPlan($input);
+    $activityLogService->record('Urban Planning', 'Create', 'development_plans', $newId, $input['plan_code'] ?? ('Plan #' . $newId), 'Added a new development plan.');
     respond(['status' => 'success', 'message' => 'Development plan added successfully.', 'plan_id' => $newId], 201);
 }
 
@@ -65,6 +66,7 @@ if ($method === 'PUT') {
         respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
     }
     $developmentPlanService->updateDevelopmentPlan($planId, $input);
+    $activityLogService->record('Urban Planning', 'Update', 'development_plans', $planId, $input['plan_code'] ?? ('Plan #' . $planId), 'Updated a development plan.');
     respond(['status' => 'success', 'message' => 'Development plan updated successfully.']);
 }
 
@@ -74,7 +76,10 @@ if ($method === 'DELETE') {
         respond(['status' => 'error', 'message' => 'plan_id is required.'], 422);
     }
     $newStatus = ($_GET['status'] ?? $input['status'] ?? 'Archived') === 'Active' ? 'Active' : 'Archived';
+    $planRow = $developmentPlanRepo->find($planId);
     $developmentPlanRepo->setStatus($planId, $newStatus);
+    $planLabel = ($planRow['plan_code'] ?? null) ?: ('Plan #' . $planId);
+    $activityLogService->record('Urban Planning', $newStatus === 'Archived' ? 'Archive' : 'Restore', 'development_plans', $planId, $planLabel, "Marked development plan as {$newStatus}.");
     respond(['status' => 'success', 'message' => "Development plan marked as {$newStatus}."]);
 }
 

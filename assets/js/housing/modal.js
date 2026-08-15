@@ -44,6 +44,8 @@ async function openEditHousingModal(unitId) {
   document.getElementById('housingOccupancyStatus').value = unit.occupancy_status || 'Vacant';
   document.getElementById('housingBarangay').value = unit.barangay || '';
   document.getElementById('housingStreetAddress').value = unit.street_address || '';
+  document.getElementById('housingLatitude').value = unit.latitude ?? '';
+  document.getElementById('housingLongitude').value = unit.longitude ?? '';
   document.getElementById('housingAmortization').value = unit.monthly_amortization ?? '';
   document.getElementById('housingRemarks').value = unit.remarks || '';
 

@@ -87,6 +87,7 @@ function resetBeneficiaryForm() {
   document.getElementById('benStatus').value = 'Applicant';
   document.getElementById('benCategory').value = 'Informal Settler';
   document.getElementById('benApplicationDate').value = new Date().toISOString().substring(0, 10);
+  document.getElementById('benAmortizationStatus').value = 'Not Started';
 }
 
 function openCreateBeneficiaryModal() {
@@ -123,6 +124,7 @@ async function openEditBeneficiaryModal(beneficiaryId) {
   document.getElementById('benAwardDate').value = b.award_date || '';
   document.getElementById('benMonthlyIncome').value = b.monthly_income ?? '';
   document.getElementById('benFamilySize').value = b.family_size ?? '';
+  document.getElementById('benAmortizationStatus').value = b.amortization_status || 'Not Started';
   document.getElementById('benRemarks').value = b.remarks || '';
 
   document.getElementById('beneficiaryModalTitle').innerText = 'Edit Beneficiary';
@@ -144,9 +146,14 @@ async function openViewBeneficiaryModal(beneficiaryId) {
   document.getElementById('viewBenIncome').innerHTML = benFormatPeso(b.monthly_income);
   document.getElementById('viewBenFamilySize').innerText =
     (b.family_size !== null && b.family_size !== undefined && b.family_size !== '') ? b.family_size : '—';
+  document.getElementById('viewBenScore').innerText =
+    (b.eligibility_score !== null && b.eligibility_score !== undefined && b.eligibility_score !== '') ? `${parseFloat(b.eligibility_score).toFixed(0)} / 100` : '—';
+  document.getElementById('viewBenAmortization').innerText = b.amortization_status || 'Not Started';
 
   const remarksEl = document.getElementById('viewBenRemarks');
   remarksEl.innerText = b.remarks && b.remarks.trim() ? b.remarks : 'No remarks on file.';
+
+  if (typeof renderBenDocuments === 'function') renderBenDocuments(b);
 
   openModal('viewBeneficiaryModal');
 }

@@ -32,8 +32,10 @@
       ];
       $urbanPlanningPages = [
         'development-plans.php',
+        'zoning-clearances.php',
         'urban-projects.php',
-        'infrastructure-records.php'
+        'infrastructure-records.php',
+        'mapping.php'
       ];
       $residentPages = [
         'resident-directory.php',
@@ -44,6 +46,24 @@
         'beneficiaries.php',
         'occupancy.php',
         'relocation-records.php'
+      ];
+      $fieldSurveyPages = [
+        'forms.php',
+        'assignments.php',
+        'results.php',
+        'history.php'
+      ];
+      $reportsPages = [
+        'resident-reports.php',
+        'housing-reports.php',
+        'project-reports.php',
+        'survey-reports.php'
+      ];
+      $aiAssistantPages = [
+        'chat.php'
+      ];
+      $activityLogPages = [
+        'activity.php'
       ];
 
       $isSuperAdmin = !empty($headerUser['is_superadmin']) || !empty($headerUser['is_global_access']);
@@ -75,7 +95,12 @@
             </button>
           </div>
 
-          <span class="sidebar-text text-[9px] font-bold tracking-widest text-slate-400 uppercase block px-3 mb-2">Urban Planning</span>
+          <a href="<?php echo $basePath ?? '../'; ?>pages/dashboard.php" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs tracking-wide transition group cursor-pointer <?php echo $currentPage == 'dashboard.php' ? 'bg-white text-brand-dark border border-brand-border font-bold shadow-xs' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-dark dark:hover:text-[#86B6F6] border border-transparent font-semibold'; ?>">
+            <i class="fa-solid fa-gauge-high text-sm <?php echo $currentPage == 'dashboard.php' ? 'text-brand-medium' : 'text-slate-400'; ?> group-hover:text-brand-medium transition"></i>
+            <span class="sidebar-text truncate">Dashboard</span>
+          </a>
+
+          <span class="sidebar-text text-[9px] font-bold tracking-widest text-slate-400 uppercase block px-3 mb-2 mt-2">Urban Planning</span>
 
           <?php
           // Gated by production's shared Role & Permission system, like every other module:
@@ -138,7 +163,37 @@
 
           <?php
           // Same reasoning as Resident Management above.
-          $canAccessUrbanPlanning = $isSuperAdmin || $hasResourceAccess(['urban planning', 'development plans']);
+          $canAccessFieldSurvey = $isSuperAdmin || $hasResourceAccess(['field survey management', 'field survey', 'survey forms']);
+          if ($canAccessFieldSurvey):
+          ?>
+          <div class="space-y-1">
+           <button
+                  onclick="toggleDropdown('fieldSurveyDropdown', 'fieldSurveyChevron')"
+                  class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs tracking-wide transition group cursor-pointer <?php echo in_array($currentPage, $fieldSurveyPages) ? 'bg-white text-brand-dark border border-brand-border font-bold shadow-xs' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-dark dark:hover:text-[#86B6F6] border border-transparent font-semibold'; ?>">
+
+                  <div class="flex items-center space-x-3">
+                      <i class="fa-solid fa-clipboard-list text-sm <?php echo in_array($currentPage, $fieldSurveyPages) ? 'text-brand-medium' : 'text-slate-400'; ?> group-hover:text-brand-medium transition"></i>
+                      <span class="sidebar-text truncate">Field Survey</span>
+              </div>
+
+              <div class="dropdown-right">
+                  <i id="fieldSurveyChevron"
+                    class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200 <?php echo in_array($currentPage, $fieldSurveyPages) ? 'rotate-180' : ''; ?>"></i>
+              </div>
+            </button>
+
+            <div id="fieldSurveyDropdown" class="<?php echo in_array($currentPage, $fieldSurveyPages) ? '' : 'hidden'; ?> pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
+              <a href="<?php echo $basePath ?? '../'; ?>pages/field-survey/forms.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'forms.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-clipboard-list text-[10px] <?php echo $currentPage == 'forms.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Survey Forms</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/field-survey/assignments.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'assignments.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-clipboard-user text-[10px] <?php echo $currentPage == 'assignments.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Survey Assignments</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/field-survey/results.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'results.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-file-circle-check text-[10px] <?php echo $currentPage == 'results.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Survey Results</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/field-survey/history.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'history.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-timeline text-[10px] <?php echo $currentPage == 'history.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Survey History</span></a>
+            </div>
+          </div>
+          <?php endif; ?>
+
+          <?php
+          // Same reasoning as Resident Management above.
+          $canAccessUrbanPlanning = $isSuperAdmin || $hasResourceAccess(['urban planning', 'development plans', 'zoning clearance']);
           if ($canAccessUrbanPlanning):
           ?>
           <div class="space-y-1">
@@ -159,10 +214,81 @@
 
             <div id="urbanPlanningDropdown" class="<?php echo in_array($currentPage, $urbanPlanningPages) ? '' : 'hidden'; ?> pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
               <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/development-plans.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'development-plans.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-file-lines text-[10px] <?php echo $currentPage == 'development-plans.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Development Plans</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/zoning-clearances.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'zoning-clearances.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-stamp text-[10px] <?php echo $currentPage == 'zoning-clearances.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Zoning Clearances</span></a>
               <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/urban-projects.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'urban-projects.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-diagram-project text-[10px] <?php echo $currentPage == 'urban-projects.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Urban Projects</span></a>
               <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/infrastructure-records.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'infrastructure-records.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-road text-[10px] <?php echo $currentPage == 'infrastructure-records.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Infrastructure Records</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/mapping.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'mapping.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-map-location-dot text-[10px] <?php echo $currentPage == 'mapping.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Barangay Map</span></a>
             </div>
           </div>
+          <?php endif; ?>
+
+          <?php
+          // Same reasoning as Resident Management above.
+          $canAccessReports = $isSuperAdmin || $hasResourceAccess(['reports', 'report management']);
+          if ($canAccessReports):
+          ?>
+          <div class="space-y-1">
+           <button
+                  onclick="toggleDropdown('reportsDropdown', 'reportsChevron')"
+                  class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs tracking-wide transition group cursor-pointer <?php echo in_array($currentPage, $reportsPages) ? 'bg-white text-brand-dark border border-brand-border font-bold shadow-xs' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-dark dark:hover:text-[#86B6F6] border border-transparent font-semibold'; ?>">
+
+                  <div class="flex items-center space-x-3">
+                      <i class="fa-solid fa-file-invoice text-sm <?php echo in_array($currentPage, $reportsPages) ? 'text-brand-medium' : 'text-slate-400'; ?> group-hover:text-brand-medium transition"></i>
+                      <span class="sidebar-text truncate">Reports</span>
+              </div>
+
+              <div class="dropdown-right">
+                  <i id="reportsChevron"
+                    class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200 <?php echo in_array($currentPage, $reportsPages) ? 'rotate-180' : ''; ?>"></i>
+              </div>
+            </button>
+
+            <div id="reportsDropdown" class="<?php echo in_array($currentPage, $reportsPages) ? '' : 'hidden'; ?> pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
+              <a href="<?php echo $basePath ?? '../'; ?>pages/reports/resident-reports.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'resident-reports.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-people-roof text-[10px] <?php echo $currentPage == 'resident-reports.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Resident Reports</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/reports/housing-reports.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'housing-reports.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-house-chimney text-[10px] <?php echo $currentPage == 'housing-reports.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Housing Reports</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/reports/project-reports.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'project-reports.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-diagram-project text-[10px] <?php echo $currentPage == 'project-reports.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Project Reports</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/reports/survey-reports.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'survey-reports.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-clipboard-list text-[10px] <?php echo $currentPage == 'survey-reports.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Survey Reports</span></a>
+            </div>
+          </div>
+          <?php endif; ?>
+
+          <?php
+          // Same reasoning as Resident Management above.
+          $canAccessAiAssistant = $isSuperAdmin || $hasResourceAccess(['ai planning assistant', 'ai assistant', 'ai planning']);
+          if ($canAccessAiAssistant):
+          ?>
+          <div class="space-y-1">
+           <button
+                  onclick="toggleDropdown('aiAssistantDropdown', 'aiAssistantChevron')"
+                  class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs tracking-wide transition group cursor-pointer <?php echo in_array($currentPage, $aiAssistantPages) ? 'bg-white text-brand-dark border border-brand-border font-bold shadow-xs' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-dark dark:hover:text-[#86B6F6] border border-transparent font-semibold'; ?>">
+
+                  <div class="flex items-center space-x-3">
+                      <i class="fa-solid fa-robot text-sm <?php echo in_array($currentPage, $aiAssistantPages) ? 'text-brand-medium' : 'text-slate-400'; ?> group-hover:text-brand-medium transition"></i>
+                      <span class="sidebar-text truncate">AI Assistant</span>
+              </div>
+
+              <div class="dropdown-right">
+                  <i id="aiAssistantChevron"
+                    class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200 <?php echo in_array($currentPage, $aiAssistantPages) ? 'rotate-180' : ''; ?>"></i>
+              </div>
+            </button>
+
+            <div id="aiAssistantDropdown" class="<?php echo in_array($currentPage, $aiAssistantPages) ? '' : 'hidden'; ?> pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
+              <a href="<?php echo $basePath ?? '../'; ?>pages/ai-assistant/chat.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'chat.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-comments text-[10px] <?php echo $currentPage == 'chat.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Chat</span></a>
+            </div>
+          </div>
+          <?php endif; ?>
+
+          <?php
+          // Local-only log: separate from the shared remote Audit Trail below, which has no
+          // visibility into this capstone's own modules. Same manual Module Management step.
+          $canAccessActivityLog = $isSuperAdmin || $hasResourceAccess(['activity logs', 'activity log']);
+          if ($canAccessActivityLog):
+          ?>
+          <a href="<?php echo $basePath ?? '../'; ?>pages/logs/activity.php" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs tracking-wide transition group cursor-pointer <?php echo in_array($currentPage, $activityLogPages) ? 'bg-white text-brand-dark border border-brand-border font-bold shadow-xs' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-dark dark:hover:text-[#86B6F6] border border-transparent font-semibold'; ?>">
+            <i class="fa-solid fa-clock-rotate-left text-sm <?php echo in_array($currentPage, $activityLogPages) ? 'text-brand-medium' : 'text-slate-400'; ?> group-hover:text-brand-medium transition"></i>
+            <span class="sidebar-text truncate">Activity Log</span>
+          </a>
           <?php endif; ?>
 
           <span class="sidebar-text text-[9px] font-bold tracking-widest text-slate-400 uppercase block px-3 mb-2 mt-4">Main Controls</span>

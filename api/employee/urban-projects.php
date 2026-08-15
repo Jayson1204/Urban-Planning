@@ -53,6 +53,7 @@ if ($method === 'POST') {
         respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
     }
     $newId = $urbanProjectService->createProject($input);
+    $activityLogService->record('Urban Planning', 'Create', 'urban_projects', $newId, $input['project_code'] ?? ('Project #' . $newId), 'Added a new urban project.');
     respond(['status' => 'success', 'message' => 'Urban project added successfully.', 'project_id' => $newId], 201);
 }
 
@@ -66,6 +67,7 @@ if ($method === 'PUT') {
         respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
     }
     $urbanProjectService->updateProject($projectId, $input);
+    $activityLogService->record('Urban Planning', 'Update', 'urban_projects', $projectId, $input['project_code'] ?? ('Project #' . $projectId), 'Updated an urban project.');
     respond(['status' => 'success', 'message' => 'Urban project updated successfully.']);
 }
 
@@ -75,7 +77,10 @@ if ($method === 'DELETE') {
         respond(['status' => 'error', 'message' => 'project_id is required.'], 422);
     }
     $newStatus = ($_GET['status'] ?? $input['status'] ?? 'Archived') === 'Active' ? 'Active' : 'Archived';
+    $projectRow = $urbanProjectRepo->find($projectId);
     $urbanProjectRepo->setStatus($projectId, $newStatus);
+    $projectLabel = ($projectRow['project_code'] ?? null) ?: ('Project #' . $projectId);
+    $activityLogService->record('Urban Planning', $newStatus === 'Archived' ? 'Archive' : 'Restore', 'urban_projects', $projectId, $projectLabel, "Marked urban project as {$newStatus}.");
     respond(['status' => 'success', 'message' => "Urban project marked as {$newStatus}."]);
 }
 

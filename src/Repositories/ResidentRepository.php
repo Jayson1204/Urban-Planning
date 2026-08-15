@@ -40,6 +40,14 @@ class ResidentRepository
             $where[] = "r.status = :status";
             $params['status'] = $filters['status'];
         }
+        if (!empty($filters['date_from'])) {
+            $where[] = "r.created_at >= :date_from";
+            $params['date_from'] = $filters['date_from'] . ' 00:00:00';
+        }
+        if (!empty($filters['date_to'])) {
+            $where[] = "r.created_at <= :date_to";
+            $params['date_to'] = $filters['date_to'] . ' 23:59:59';
+        }
 
         $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
 

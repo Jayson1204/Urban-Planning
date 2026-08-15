@@ -17,6 +17,9 @@ if (benCategoryFilter) benCategoryFilter.addEventListener('change', triggerBenFi
 const benRecordStatusFilter = document.getElementById('benRecordStatusFilter');
 if (benRecordStatusFilter) benRecordStatusFilter.addEventListener('change', triggerBenFilter);
 
+const benSortFilter = document.getElementById('benSortFilter');
+if (benSortFilter) benSortFilter.addEventListener('change', triggerBenFilter);
+
 const benResidentSearch = document.getElementById('benResidentSearch');
 if (benResidentSearch) {
   benResidentSearch.addEventListener('input', (e) => triggerResidentPicker(e.target.value));

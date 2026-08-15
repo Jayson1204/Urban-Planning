@@ -32,6 +32,7 @@ if ($method === 'GET') {
         if (!$beneficiary) {
             respond(['status' => 'error', 'message' => 'Beneficiary not found.'], 404);
         }
+        $beneficiary['documents'] = $beneficiaryDocumentRepo->forBeneficiary($beneficiary['beneficiary_id']);
         respond(['status' => 'success', 'data' => $beneficiary]);
     }
 
@@ -41,6 +42,7 @@ if ($method === 'GET') {
         'category' => trim($_GET['category'] ?? ''),
         'status' => trim($_GET['status'] ?? ''),
         'unit_id' => (int)($_GET['unit_id'] ?? 0),
+        'sort' => trim($_GET['sort'] ?? ''),
     ];
     $page = (int)($_GET['page'] ?? 1);
     $perPage = (int)($_GET['per_page'] ?? 10);
@@ -56,6 +58,9 @@ if ($method === 'POST') {
         respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
     }
     $newId = $beneficiaryService->createBeneficiary($input);
+    $benResident = $residentRepo->find((int)($input['resident_id'] ?? 0));
+    $benLabel = $benResident ? trim($benResident['first_name'] . ' ' . $benResident['last_name']) : ('Beneficiary #' . $newId);
+    $activityLogService->record('Housing Management', 'Create', 'housing_beneficiaries', $newId, $benLabel, 'Added a new beneficiary application.');
     respond(['status' => 'success', 'message' => 'Beneficiary added successfully.', 'beneficiary_id' => $newId], 201);
 }
 
@@ -69,6 +74,10 @@ if ($method === 'PUT') {
         respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
     }
     $beneficiaryService->updateBeneficiary($beneficiaryId, $input);
+    $benRow = $housingBeneficiaryRepo->find($beneficiaryId);
+    $benResident = $benRow ? $residentRepo->find((int)$benRow['resident_id']) : null;
+    $benLabel = $benResident ? trim($benResident['first_name'] . ' ' . $benResident['last_name']) : ('Beneficiary #' . $beneficiaryId);
+    $activityLogService->record('Housing Management', 'Update', 'housing_beneficiaries', $beneficiaryId, $benLabel, 'Updated a beneficiary record.');
     respond(['status' => 'success', 'message' => 'Beneficiary updated successfully.']);
 }
 
@@ -78,7 +87,11 @@ if ($method === 'DELETE') {
         respond(['status' => 'error', 'message' => 'beneficiary_id is required.'], 422);
     }
     $newStatus = ($_GET['status'] ?? $input['status'] ?? 'Archived') === 'Active' ? 'Active' : 'Archived';
+    $benRow = $housingBeneficiaryRepo->find($beneficiaryId);
     $beneficiaryService->setStatus($beneficiaryId, $newStatus);
+    $benResident = $benRow ? $residentRepo->find((int)$benRow['resident_id']) : null;
+    $benLabel = $benResident ? trim($benResident['first_name'] . ' ' . $benResident['last_name']) : ('Beneficiary #' . $beneficiaryId);
+    $activityLogService->record('Housing Management', $newStatus === 'Archived' ? 'Archive' : 'Restore', 'housing_beneficiaries', $beneficiaryId, $benLabel, "Marked beneficiary as {$newStatus}.");
     respond(['status' => 'success', 'message' => "Beneficiary marked as {$newStatus}."]);
 }
 

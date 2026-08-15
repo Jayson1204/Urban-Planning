@@ -74,6 +74,7 @@ if ($method === 'POST') {
         'file_size' => $file['size'],
     ]);
 
+    $activityLogService->record('Resident Management', 'Create', 'resident_documents', $documentId, $documentType . ' (' . basename($file['name']) . ')', 'Uploaded a resident document.');
     respond(['status' => 'success', 'message' => 'Document uploaded successfully.', 'document_id' => $documentId], 201);
 }
 
@@ -95,6 +96,7 @@ if ($method === 'DELETE') {
         unlink($absolutePath);
     }
 
+    $activityLogService->record('Resident Management', 'Delete', 'resident_documents', $documentId, $document['document_type'] . ' (' . $document['file_name'] . ')', 'Deleted a resident document.');
     respond(['status' => 'success', 'message' => 'Document deleted successfully.']);
 }
 

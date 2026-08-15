@@ -5,7 +5,7 @@
     // Cache-busting version for dynamically loaded scripts. Bump this whenever a
     // bridge-loaded JS file is changed so browsers fetch the new copy instead of a
     // stale cached one (XAMPP serves static .js with a long cache lifetime).
-    const ASSET_VERSION = '2026-08-11-3';
+    const ASSET_VERSION = '2026-08-15-3';
 
     // Global loader
     window.loadCiventralScript = function(src, callback = null) {
@@ -36,6 +36,13 @@
     window.loadCiventralScript('assets/js/housing-occupancy/app.js');
     window.loadCiventralScript('assets/js/housing-relocations/app.js');
     window.loadCiventralScript('assets/js/urban-planning/app.js');
+    window.loadCiventralScript('assets/js/zoning-clearances/app.js');
+    window.loadCiventralScript('assets/js/mapping/app.js');
     window.loadCiventralScript('assets/js/urban-projects/app.js');
     window.loadCiventralScript('assets/js/infrastructure-records/app.js');
+    window.loadCiventralScript('assets/js/field-survey-forms/app.js');
+    window.loadCiventralScript('assets/js/field-survey-assignments/app.js');
+    window.loadCiventralScript('assets/js/field-survey-results/app.js');
+    window.loadCiventralScript('assets/js/field-survey-history/app.js');
+    window.loadCiventralScript('assets/js/ai-assistant/app.js');
 })();

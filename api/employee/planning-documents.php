@@ -78,6 +78,7 @@ if ($method === 'POST') {
         'file_size' => $file['size'],
     ]);
 
+    $activityLogService->record('Urban Planning', 'Create', 'planning_documents', $documentId, $documentType . ' (' . basename($file['name']) . ')', 'Uploaded a planning document.');
     respond(['status' => 'success', 'message' => 'Document uploaded successfully.', 'document_id' => $documentId], 201);
 }
 
@@ -99,6 +100,7 @@ if ($method === 'DELETE') {
         unlink($absolutePath);
     }
 
+    $activityLogService->record('Urban Planning', 'Delete', 'planning_documents', $documentId, $document['document_type'] . ' (' . $document['file_name'] . ')', 'Deleted a planning document.');
     respond(['status' => 'success', 'message' => 'Document deleted successfully.']);
 }
 

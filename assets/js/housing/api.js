@@ -83,6 +83,8 @@ async function handleSaveHousingUnit(e) {
     occupancy_status: document.getElementById('housingOccupancyStatus').value,
     barangay: document.getElementById('housingBarangay').value.trim(),
     street_address: document.getElementById('housingStreetAddress').value.trim(),
+    latitude: document.getElementById('housingLatitude').value || null,
+    longitude: document.getElementById('housingLongitude').value || null,
     monthly_amortization: document.getElementById('housingAmortization').value || null,
     remarks: document.getElementById('housingRemarks').value.trim(),
   };

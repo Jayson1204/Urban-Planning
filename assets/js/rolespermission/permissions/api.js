@@ -174,30 +174,12 @@ async function fetchPermissionsData() {
         }
       });
 
-      // Automatically grant ALL action permissions for newly created/custom modules across roles
-      const allActionIds = (actionsData && actionsData.length > 0)
-        ? actionsData.map(a => parseInt(a.action_id || a.id))
-        : [1, 2, 3, 4, 5, 6];
-
-      modulesData.forEach(mod => {
-        if (mod && mod.is_custom) {
-          (mod.resources || []).forEach(res => {
-            if (!res) return;
-            rolesData.forEach(r => {
-              if (!r || !r.role_id) return;
-              if (!permissionsMap[r.role_id]) permissionsMap[r.role_id] = {};
-              if (!permissionsMap[r.role_id][res.id]) permissionsMap[r.role_id][res.id] = [];
-              
-              allActionIds.forEach(actId => {
-                const actInt = parseInt(actId);
-                if (!permissionsMap[r.role_id][res.id].includes(actInt)) {
-                  permissionsMap[r.role_id][res.id].push(actInt);
-                }
-              });
-            });
-          });
-        }
-      });
+      // Newly created/custom modules intentionally start with NO granted permissions for any
+      // role (default-deny), same as any DB-synced resource. An admin must explicitly grant
+      // them per role in the Permission Builder. Do not auto-populate permissionsMap here:
+      // savedPermissions is treated as ground truth and saveChanges() POSTs it as a full
+      // replace, so silently pre-granting here would persist real, unintended access the
+      // moment any unrelated change is saved for that role.
 
       window.savedPermissions = JSON.parse(JSON.stringify(permissionsMap));
       window.currentPermissions = JSON.parse(JSON.stringify(permissionsMap));

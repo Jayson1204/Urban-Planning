@@ -58,6 +58,9 @@ if ($method === 'POST') {
         respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
     }
     $newId = $housingOccupancyService->moveIn($input);
+    $occResident = $residentRepo->find((int)($input['resident_id'] ?? 0));
+    $occLabel = $occResident ? trim($occResident['first_name'] . ' ' . $occResident['last_name']) : ('Occupancy #' . $newId);
+    $activityLogService->record('Housing Management', 'Create', 'housing_occupancy', $newId, $occLabel, 'Recorded a resident move-in.');
     respond(['status' => 'success', 'message' => 'Occupancy recorded successfully.', 'occupancy_id' => $newId], 201);
 }
 
@@ -67,10 +70,14 @@ if ($method === 'DELETE') {
         respond(['status' => 'error', 'message' => 'occupancy_id is required.'], 422);
     }
     $moveOutDate = $_GET['move_out_date'] ?? $input['move_out_date'] ?? null;
+    $occRow = $housingOccupancyRepo->find($occupancyId);
     $ok = $housingOccupancyService->vacate($occupancyId, $moveOutDate);
     if (!$ok) {
         respond(['status' => 'error', 'message' => 'Occupancy record not found.'], 404);
     }
+    $occResident = $occRow ? $residentRepo->find((int)$occRow['resident_id']) : null;
+    $occLabel = $occResident ? trim($occResident['first_name'] . ' ' . $occResident['last_name']) : ('Occupancy #' . $occupancyId);
+    $activityLogService->record('Housing Management', 'Update', 'housing_occupancy', $occupancyId, $occLabel, 'Recorded a resident move-out.');
     respond(['status' => 'success', 'message' => 'Resident marked as moved out.']);
 }
 

@@ -1,0 +1,31 @@
+@media print {
+  #sidebar,
+  header,
+  .no-print {
+    display: none !important;
+  }
+
+  body,
+  main {
+    background: #fff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+
+  .glass-panel,
+  main .bg-white,
+  main [class*="border-slate-200"] {
+    box-shadow: none !important;
+    border: 1px solid #d4d4d8 !important;
+  }
+
+  table {
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+}

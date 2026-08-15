@@ -41,6 +41,12 @@ class HousingService
         if (isset($input['monthly_amortization']) && $input['monthly_amortization'] !== '' && !is_numeric($input['monthly_amortization'])) {
             $errors[] = 'Monthly amortization must be a number.';
         }
+        if (isset($input['latitude']) && $input['latitude'] !== '' && (!is_numeric($input['latitude']) || $input['latitude'] < -90 || $input['latitude'] > 90)) {
+            $errors[] = 'Latitude must be a number between -90 and 90.';
+        }
+        if (isset($input['longitude']) && $input['longitude'] !== '' && (!is_numeric($input['longitude']) || $input['longitude'] < -180 || $input['longitude'] > 180)) {
+            $errors[] = 'Longitude must be a number between -180 and 180.';
+        }
 
         return $errors;
     }
@@ -68,6 +74,7 @@ class HousingService
     {
         $allowed = [
             'unit_code', 'project_name', 'unit_type', 'barangay', 'street_address',
+            'latitude', 'longitude',
             'floor_area', 'bedrooms', 'monthly_amortization', 'occupancy_status', 'remarks'
         ];
 

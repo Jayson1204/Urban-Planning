@@ -56,6 +56,7 @@ if ($method === 'POST') {
         respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
     }
     $newId = $householdService->createHousehold($input);
+    $activityLogService->record('Resident Management', 'Create', 'households', $newId, $input['household_number'] ?: ('Household #' . $newId), 'Added a new household record.');
     respond(['status' => 'success', 'message' => 'Household created successfully.', 'household_id' => $newId], 201);
 }
 
@@ -69,6 +70,7 @@ if ($method === 'PUT') {
         respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
     }
     $householdService->updateHousehold($householdId, $input);
+    $activityLogService->record('Resident Management', 'Update', 'households', $householdId, $input['household_number'] ?: ('Household #' . $householdId), 'Updated a household record.');
     respond(['status' => 'success', 'message' => 'Household updated successfully.']);
 }
 
@@ -78,7 +80,10 @@ if ($method === 'DELETE') {
         respond(['status' => 'error', 'message' => 'household_id is required.'], 422);
     }
     $newStatus = ($_GET['status'] ?? $input['status'] ?? 'Archived') === 'Active' ? 'Active' : 'Archived';
+    $householdRow = $householdRepo->find($householdId);
     $householdRepo->setStatus($householdId, $newStatus);
+    $householdLabel = ($householdRow['household_number'] ?? null) ?: ('Household #' . $householdId);
+    $activityLogService->record('Resident Management', $newStatus === 'Archived' ? 'Archive' : 'Restore', 'households', $householdId, $householdLabel, "Marked household as {$newStatus}.");
     respond(['status' => 'success', 'message' => "Household marked as {$newStatus}."]);
 }
 

@@ -54,6 +54,7 @@ if ($method === 'POST') {
         respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
     }
     $newId = $residentService->createResident($input);
+    $activityLogService->record('Resident Management', 'Create', 'residents', $newId, trim(($input['first_name'] ?? '') . ' ' . ($input['last_name'] ?? '')), 'Added a new resident record.');
     respond(['status' => 'success', 'message' => 'Resident added successfully.', 'resident_id' => $newId], 201);
 }
 
@@ -67,6 +68,7 @@ if ($method === 'PUT') {
         respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
     }
     $residentService->updateResident($residentId, $input);
+    $activityLogService->record('Resident Management', 'Update', 'residents', $residentId, trim(($input['first_name'] ?? '') . ' ' . ($input['last_name'] ?? '')), 'Updated a resident record.');
     respond(['status' => 'success', 'message' => 'Resident updated successfully.']);
 }
 
@@ -76,7 +78,10 @@ if ($method === 'DELETE') {
         respond(['status' => 'error', 'message' => 'resident_id is required.'], 422);
     }
     $newStatus = ($_GET['status'] ?? $input['status'] ?? 'Archived') === 'Active' ? 'Active' : 'Archived';
+    $residentRow = $residentRepo->find($residentId);
     $residentRepo->setStatus($residentId, $newStatus);
+    $residentLabel = $residentRow ? trim($residentRow['first_name'] . ' ' . $residentRow['last_name']) : ('Resident #' . $residentId);
+    $activityLogService->record('Resident Management', $newStatus === 'Archived' ? 'Archive' : 'Restore', 'residents', $residentId, $residentLabel, "Marked resident as {$newStatus}.");
     respond(['status' => 'success', 'message' => "Resident marked as {$newStatus}."]);
 }
 

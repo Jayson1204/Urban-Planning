@@ -74,8 +74,12 @@ class HousingBeneficiaryRepository
         $perPage = max(1, (int)$perPage);
         $offset = ($page - 1) * $perPage;
 
+        $orderBy = (($filters['sort'] ?? '') === 'priority')
+            ? 'b.eligibility_score DESC, b.application_date ASC'
+            : 'b.created_at DESC';
+
         $sql = $this->baseSelect() . " {$whereSql}
-                ORDER BY b.created_at DESC
+                ORDER BY {$orderBy}
                 LIMIT {$perPage} OFFSET {$offset}";
         $rows = $this->db->query($sql, $params);
 
@@ -109,6 +113,40 @@ class HousingBeneficiaryRepository
         $sql = "SELECT 1 FROM housing_beneficiaries
                 WHERE unit_id = :unit_id AND beneficiary_status = 'Awarded' AND status = 'Active'";
         $params = ['unit_id' => $unitId];
+        if ($excludeId) {
+            $sql .= " AND beneficiary_id <> :id";
+            $params['id'] = $excludeId;
+        }
+        $rows = $this->db->query($sql, $params);
+        return !empty($rows);
+    }
+
+    public function hasActiveApplicationForResident($residentId, $excludeId = null)
+    {
+        if (empty($residentId)) {
+            return false;
+        }
+        $sql = "SELECT 1 FROM housing_beneficiaries
+                WHERE resident_id = :resident_id AND status = 'Active'
+                AND beneficiary_status IN ('Applicant','Qualified','Awarded')";
+        $params = ['resident_id' => $residentId];
+        if ($excludeId) {
+            $sql .= " AND beneficiary_id <> :id";
+            $params['id'] = $excludeId;
+        }
+        $rows = $this->db->query($sql, $params);
+        return !empty($rows);
+    }
+
+    public function hasActiveApplicationForHousehold($householdId, $excludeId = null)
+    {
+        if (empty($householdId)) {
+            return false;
+        }
+        $sql = "SELECT 1 FROM housing_beneficiaries
+                WHERE household_id = :household_id AND status = 'Active'
+                AND beneficiary_status IN ('Applicant','Qualified','Awarded')";
+        $params = ['household_id' => $householdId];
         if ($excludeId) {
             $sql .= " AND beneficiary_id <> :id";
             $params['id'] = $excludeId;

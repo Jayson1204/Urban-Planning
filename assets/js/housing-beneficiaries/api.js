@@ -25,12 +25,14 @@ async function fetchBeneficiaries(page = 1) {
   const status = document.getElementById('benStatusFilter').value;
   const category = document.getElementById('benCategoryFilter').value;
   const recordStatus = document.getElementById('benRecordStatusFilter').value;
+  const sort = document.getElementById('benSortFilter').value;
 
   const params = new URLSearchParams({ page, per_page: beneficiariesPagination.per_page });
   if (search) params.set('search', search);
   if (status) params.set('beneficiary_status', status);
   if (category) params.set('category', category);
   if (recordStatus) params.set('status', recordStatus);
+  if (sort) params.set('sort', sort);
 
   try {
     const response = await fetch(`../../api/employee/housing-beneficiaries.php?${params.toString()}`);
@@ -86,6 +88,7 @@ async function handleSaveBeneficiary(e) {
     award_date: document.getElementById('benAwardDate').value || null,
     monthly_income: document.getElementById('benMonthlyIncome').value || null,
     family_size: document.getElementById('benFamilySize').value || null,
+    amortization_status: document.getElementById('benAmortizationStatus').value,
     remarks: document.getElementById('benRemarks').value.trim(),
   };
 

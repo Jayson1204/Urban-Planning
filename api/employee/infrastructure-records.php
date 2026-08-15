@@ -52,6 +52,7 @@ if ($method === 'POST') {
         respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
     }
     $newId = $infrastructureRecordService->createRecord($input);
+    $activityLogService->record('Urban Planning', 'Create', 'infrastructure_records', $newId, $input['infrastructure_name'] ?? ('Infrastructure #' . $newId), 'Added a new infrastructure record.');
     respond(['status' => 'success', 'message' => 'Infrastructure record added successfully.', 'record_id' => $newId], 201);
 }
 
@@ -65,6 +66,7 @@ if ($method === 'PUT') {
         respond(['status' => 'error', 'message' => implode(' ', $errors)], 422);
     }
     $infrastructureRecordService->updateRecord($recordId, $input);
+    $activityLogService->record('Urban Planning', 'Update', 'infrastructure_records', $recordId, $input['infrastructure_name'] ?? ('Infrastructure #' . $recordId), 'Updated an infrastructure record.');
     respond(['status' => 'success', 'message' => 'Infrastructure record updated successfully.']);
 }
 
@@ -74,7 +76,10 @@ if ($method === 'DELETE') {
         respond(['status' => 'error', 'message' => 'record_id is required.'], 422);
     }
     $newStatus = ($_GET['status'] ?? $input['status'] ?? 'Archived') === 'Active' ? 'Active' : 'Archived';
+    $infraRow = $infrastructureRecordRepo->find($recordId);
     $infrastructureRecordRepo->setStatus($recordId, $newStatus);
+    $infraLabel = ($infraRow['infrastructure_name'] ?? null) ?: ('Infrastructure #' . $recordId);
+    $activityLogService->record('Urban Planning', $newStatus === 'Archived' ? 'Archive' : 'Restore', 'infrastructure_records', $recordId, $infraLabel, "Marked infrastructure record as {$newStatus}.");
     respond(['status' => 'success', 'message' => "Infrastructure record marked as {$newStatus}."]);
 }
 

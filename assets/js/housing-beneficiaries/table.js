@@ -17,6 +17,16 @@ function benFormatPeso(value) {
   return '₱' + num.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+function benScoreBadge(score) {
+  if (score === null || score === undefined || score === '') return '<span class="text-slate-400">&mdash;</span>';
+  const num = parseFloat(score);
+  if (isNaN(num)) return '<span class="text-slate-400">&mdash;</span>';
+  const cls = num >= 65 ? 'bg-emerald-50 text-emerald-700 border-emerald-150'
+    : num >= 35 ? 'bg-amber-50 text-amber-700 border-amber-150'
+    : 'bg-slate-50 text-slate-500 border-slate-200';
+  return `<span class="text-[10px] font-black px-2 py-0.5 rounded-full border ${cls} inline-flex items-center">${num.toFixed(0)}</span>`;
+}
+
 function renderBeneficiaries() {
   const tbody = document.getElementById('beneficiariesTableBody');
   if (!tbody) return;
@@ -25,7 +35,7 @@ function renderBeneficiaries() {
   if (beneficiariesData.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" class="px-6 py-12 text-center text-slate-400 font-semibold">
+        <td colspan="7" class="px-6 py-12 text-center text-slate-400 font-semibold">
           <i class="fa-solid fa-hand-holding-heart text-3xl mb-3 block opacity-60"></i>
           No beneficiaries matched your query.
         </td>
@@ -60,6 +70,7 @@ function renderBeneficiaries() {
         </td>
         <td class="px-6 py-4.5 text-xs">${unitDisplay}</td>
         <td class="px-6 py-4.5 text-xs text-slate-600">${b.category || '&mdash;'}</td>
+        <td class="px-6 py-4.5">${benScoreBadge(b.eligibility_score)}</td>
         <td class="px-6 py-4.5">${benStageBadge(b.beneficiary_status)}</td>
         <td class="px-6 py-4.5 text-xs text-slate-600 font-mono">${b.award_date || '&mdash;'}</td>
         <td class="px-6 py-4.5 text-right whitespace-nowrap">

@@ -206,6 +206,16 @@ include '../../includes/sidebar.php';
               <input type="text" id="housingStreetAddress" class="border border-slate-200 rounded-xl px-3 py-2.5 text-xs w-full focus:outline-none focus:border-brand-medium transition">
             </div>
           </div>
+          <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Latitude <span class="normal-case font-medium text-slate-350">(for the map, optional)</span></label>
+              <input type="number" step="0.00000001" min="-90" max="90" id="housingLatitude" placeholder="e.g. 14.65883" class="border border-slate-200 rounded-xl px-3 py-2.5 text-xs w-full focus:outline-none focus:border-brand-medium transition">
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Longitude <span class="normal-case font-medium text-slate-350">(for the map, optional)</span></label>
+              <input type="number" step="0.00000001" min="-180" max="180" id="housingLongitude" placeholder="e.g. 120.97324" class="border border-slate-200 rounded-xl px-3 py-2.5 text-xs w-full focus:outline-none focus:border-brand-medium transition">
+            </div>
+          </div>
           <div class="mt-3 space-y-1.5">
             <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Monthly Amortization (₱)</label>
             <input type="number" step="0.01" min="0" id="housingAmortization" class="border border-slate-200 rounded-xl px-3 py-2.5 text-xs w-full focus:outline-none focus:border-brand-medium transition">
