@@ -17,7 +17,6 @@ if (!$authService->isLoggedIn()) {
 \App\Middleware\PermissionMiddleware::requireResource('housing management', $basePath);
 
 $method = $_SERVER['REQUEST_METHOD'];
-$uploadDir = __DIR__ . '/../../uploads/beneficiary-documents/';
 $allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
 $allowedMimes = ['application/pdf', 'image/jpeg', 'image/png'];
 $maxFileSize = 5 * 1024 * 1024; // 5MB
@@ -40,43 +39,22 @@ if ($method === 'POST') {
     if (!$housingBeneficiaryRepo->find($beneficiaryId)) {
         respond(['status' => 'error', 'message' => 'Beneficiary not found.'], 404);
     }
-    if (empty($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
-        respond(['status' => 'error', 'message' => 'No valid file uploaded.'], 422);
-    }
-
-    $file = $_FILES['file'];
-    if ($file['size'] > $maxFileSize) {
-        respond(['status' => 'error', 'message' => 'File exceeds the 5MB size limit.'], 422);
-    }
-
-    $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    $mime = mime_content_type($file['tmp_name']);
-    if (!in_array($extension, $allowedExtensions, true) || !in_array($mime, $allowedMimes, true)) {
-        respond(['status' => 'error', 'message' => 'Only PDF, JPG, and PNG files are allowed.'], 422);
-    }
-
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
-    }
-
-    $storedName = bin2hex(random_bytes(16)) . '.' . $extension;
-    $destination = $uploadDir . $storedName;
-
-    if (!move_uploaded_file($file['tmp_name'], $destination)) {
-        respond(['status' => 'error', 'message' => 'Failed to store the uploaded file.'], 500);
+    $uploaded = $fileUploadService->handleUpload($_FILES['file'] ?? null, 'beneficiary-documents', $allowedExtensions, $allowedMimes, $maxFileSize);
+    if (isset($uploaded['error'])) {
+        respond(['status' => 'error', 'message' => $uploaded['error']], 422);
     }
 
     // submitted_by is 'Staff' here because this endpoint is reached through the staff-only
-    // Web app. The future citizen mobile app will call this same endpoint directly with
-    // submitted_by=Citizen once that client exists.
+    // Web app. The citizen mobile app calls api/citizen/beneficiary-documents.php instead,
+    // which sets submitted_by=Citizen.
     $submittedBy = (trim($_POST['submitted_by'] ?? '') === 'Citizen') ? 'Citizen' : 'Staff';
 
     $documentId = $beneficiaryDocumentRepo->create([
         'beneficiary_id' => $beneficiaryId,
         'document_type' => $documentType,
-        'file_name' => basename($file['name']),
-        'file_path' => 'uploads/beneficiary-documents/' . $storedName,
-        'file_size' => $file['size'],
+        'file_name' => $uploaded['file_name'],
+        'file_path' => $uploaded['file_path'],
+        'file_size' => $uploaded['file_size'],
         'submitted_by' => $submittedBy,
     ]);
 

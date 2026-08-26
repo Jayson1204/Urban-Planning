@@ -1,4 +1,8 @@
-# Citizen Document Upload — Mobile Integration Reference
+# Citizen Document Upload — Mobile Integration Reference (SUPERSEDED — see note)
+
+**Superseded 2026-08-19.** This doc's "the gap" section (no citizen-to-resident link, no citizen-authenticated endpoint) is now closed differently than proposed here: citizen accounts are local (`citizen_accounts`, linked 1:1 to `residents`), not production-proxied, and the real endpoint is `api/citizen-app/beneficiary-documents.php` (session-based, resolves `resident_id` directly from the logged-in account) — not the `api/citizen/beneficiary-documents.php` this doc sketches. The rest of this doc (the Web-side schema/repo/API/admin-UI description below) is still accurate. See `Civentral-CitizenMobile`'s `CLAUDE.md` for the current citizen-app design.
+
+---
 
 Read this before starting the citizen-facing mobile app's document upload feature. It documents what already exists on the Web/backend side (built 2026-08-14) and — just as important — what does **not** exist yet and must be decided/built before a mobile client can call this for real.
 

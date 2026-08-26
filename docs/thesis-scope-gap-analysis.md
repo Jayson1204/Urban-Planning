@@ -10,7 +10,7 @@ Each item follows the existing module recipe from `CLAUDE.md`: `database/phaseN_
 |---|---|---|
 | A. Zoning Clearance System | Done (Module Mgmt entry pending) | None |
 | B. Housing Beneficiary Registry | Done (report export deferred) | None |
-| C. Subdivision and Building Review | Not started | Large — new module |
+| C. Subdivision and Building Review | Done (browser walkthrough pending) | None |
 | D. Occupancy Monitoring Tool | Wrong scope built | Large — separate from existing "Housing Occupancy" |
 | E. Infrastructure Project Coordination | Done | None |
 | F. AI Planning Assistant | Partial | Medium — RAG layer on top of existing chat |
@@ -39,17 +39,19 @@ Closed 2026-08-15 (`database/phase14_beneficiary_scoring.sql`, `BeneficiaryServi
 - [ ] DHSUD/local housing board report export — deferred to the `pages/reports` module rather than duplicating that pattern here
 - [ ] Follow-up: expose the scoring weights/threshold through an admin UI instead of hardcoded constants, if there's time before defense
 
-## C. Subdivision and Building Review — not started
+## C. Subdivision and Building Review — done (full scope)
 
-Nothing exists. Full new module, largest lift after Zoning Clearance:
-- [ ] `database/phaseN_subdivision_building_review.sql` — permit applications, plan document versions, review comments, resubmission history
-- [ ] `SubdivisionReviewRepository`/`Service`, `BuildingPermitRepository`/`Service`
-- [ ] Plan document versioning + comment threading + resubmission tracking
-- [ ] Multi-discipline review routing (architectural, structural, sanitary, electrical, fire safety) with a consolidated evaluation summary — model as one application with N discipline-review sub-records, each with its own status
-- [ ] Permit issuance + conditions of approval, linked to the parcel record
-- [ ] `api/employee/subdivision-review.php`, `api/employee/building-permits.php`, pages, JS bridges, sidebar, Module Management
-
-Given the timeline, consider scoping this to building permits only for the defense and noting subdivision review as a documented follow-on — flag this decision with the team rather than deciding unilaterally.
+Built 2026-08-19 as full scope (Subdivision Plan + Building Permit, not scoped down to permits-only) per explicit user decision (`database/phase17_subdivision_building_review.sql`, `PermitApplicationRepository`/`Service`, `PermitPlanDocumentRepository`, `api/employee/permit-applications.php` + `permit-plan-documents.php`, `pages/urban-planning/permit-applications.php` + `permit-certificate.php`, `assets/js/permit-applications/`):
+- [x] Permit applications, plan document versions, review comments, resubmission history — `permit_applications` / `permit_plan_documents` (versioned, superseding) / `permit_application_reviews` (append-only audit + threaded discipline comments) / `resubmission_round` tracking with a dedicated resubmit action
+- [x] Modeled as one `PermitApplicationRepository`/`Service` pair with an `application_type` discriminator (Subdivision Plan / Building Permit), not two separate repo/service pairs — deliberate deviation from this doc's literal naming suggestion in favor of its own "model as one application with N discipline-review sub-records" guidance
+- [x] Plan document versioning + comment threading + resubmission tracking
+- [x] Multi-discipline review routing (Architectural, Structural, Sanitary, Electrical, Fire Safety) with a consolidated evaluation summary — `permit_discipline_reviews` (one sub-record per discipline per application) + auto-computed `consolidated_result` (informational, mirrors Zoning Clearance's `conformity_result` pattern)
+- [x] Permit issuance + conditions of approval — gated on application Approved **and** all five discipline reviews Approved; zone/parcel linkage is self-declared (`barangay`/`street_address`) same as Zoning Clearance, since no parcel/GIS layer exists yet (see section G)
+- [x] Single `api/employee/permit-applications.php` (not two files) + `api/employee/permit-plan-documents.php`, pages, JS bridge, sidebar entry — deliberate deviation from this doc's literal two-endpoint-file suggestion in favor of the codebase's established one-file-per-resource convention
+- [x] Verified with a standalone PHP CLI test against the real local DB (44 assertions: fee math, discipline auto-creation/routing, consolidated-result recompute, resubmission round + reset, issuance gate, reference-number uniqueness, plan document versioning/superseding, stats/pagination) — all passed
+- [x] No dedicated Module Management / Permission Builder entry needed — confirmed with the user this rides the shared `urban planning` resource grant, same precedent as Zoning Clearance and Barangay Mapping (both explicitly skipped a dedicated resource for the same reason). `PermissionMiddleware::requireResource()` is fallback-permissive by design (any logged-in user passes if no resource matches), so this only affects sidebar visibility and the Create/Edit buttons, both already correctly gated on `urban planning`.
+- [ ] Live browser walkthrough not done this session (Claude-in-Chrome extension wasn't connected) — worth a manual click-through before the defense
+- [ ] Barangay-map integration (surfacing applications on `pages/urban-planning/mapping.php`) explicitly deferred per user instruction
 
 ## D. Occupancy Monitoring Tool — wrong scope built
 
@@ -91,8 +93,8 @@ Suggest sequencing this after A and C exist, since several of these features (do
 1. ~~B (close the gap)~~ — done 2026-08-15
 2. ~~G — spatial layer (web)~~ — done 2026-08-15, barangay-level only (see section G for the parcel-level follow-up C will need)
 3. ~~A — Zoning Clearance System~~ — done 2026-08-15 (built ahead of the spatial layer; zone classification is self-declared for now, see section G)
-4. **C — Subdivision and Building Review** (or scope down to Building Permits only)
-5. **D** — pick Option 1 or 2 above once A/C exist (or are formally descoped)
+4. ~~C — Subdivision and Building Review~~ — done 2026-08-19, full scope (not scoped down)
+5. **D** — pick Option 1 or 2 above now that A/C exist
 6. **F — RAG layer** — last, since it's most valuable once A/C/D have real records to summarize/cite
 7. **G — remaining items** (RA 11032 timers, RA 10173 consent capture) — incremental, can land alongside A/C
 

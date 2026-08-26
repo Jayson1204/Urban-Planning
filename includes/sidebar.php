@@ -33,9 +33,12 @@
       $urbanPlanningPages = [
         'development-plans.php',
         'zoning-clearances.php',
+        'permit-applications.php',
         'urban-projects.php',
         'infrastructure-records.php',
-        'mapping.php'
+        'mapping.php',
+        'subdivisions.php',
+        'housing-projects.php'
       ];
       $residentPages = [
         'resident-directory.php',
@@ -193,7 +196,7 @@
 
           <?php
           // Same reasoning as Resident Management above.
-          $canAccessUrbanPlanning = $isSuperAdmin || $hasResourceAccess(['urban planning', 'development plans', 'zoning clearance']);
+          $canAccessUrbanPlanning = $isSuperAdmin || $hasResourceAccess(['urban planning', 'development plans', 'zoning clearance', 'subdivision', 'building permit', 'permit applications']);
           if ($canAccessUrbanPlanning):
           ?>
           <div class="space-y-1">
@@ -215,9 +218,12 @@
             <div id="urbanPlanningDropdown" class="<?php echo in_array($currentPage, $urbanPlanningPages) ? '' : 'hidden'; ?> pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
               <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/development-plans.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'development-plans.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-file-lines text-[10px] <?php echo $currentPage == 'development-plans.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Development Plans</span></a>
               <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/zoning-clearances.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'zoning-clearances.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-stamp text-[10px] <?php echo $currentPage == 'zoning-clearances.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Zoning Clearances</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/permit-applications.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'permit-applications.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-building-shield text-[10px] <?php echo $currentPage == 'permit-applications.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Subdivision &amp; Building Review</span></a>
               <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/urban-projects.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'urban-projects.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-diagram-project text-[10px] <?php echo $currentPage == 'urban-projects.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Urban Projects</span></a>
               <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/infrastructure-records.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'infrastructure-records.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-road text-[10px] <?php echo $currentPage == 'infrastructure-records.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Infrastructure Records</span></a>
               <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/mapping.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'mapping.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-map-location-dot text-[10px] <?php echo $currentPage == 'mapping.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Barangay Map</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/subdivisions.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'subdivisions.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-city text-[10px] <?php echo $currentPage == 'subdivisions.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Subdivisions</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/urban-planning/housing-projects.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'housing-projects.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-building-shield text-[10px] <?php echo $currentPage == 'housing-projects.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Housing Projects</span></a>
             </div>
           </div>
           <?php endif; ?>

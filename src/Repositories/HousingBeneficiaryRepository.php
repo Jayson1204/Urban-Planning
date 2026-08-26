@@ -163,6 +163,14 @@ class HousingBeneficiaryRepository
         );
     }
 
+    public function forResident($residentId)
+    {
+        return $this->db->query(
+            $this->baseSelect() . " WHERE b.resident_id = :resident_id AND b.status = 'Active' ORDER BY b.created_at DESC",
+            ['resident_id' => $residentId]
+        );
+    }
+
     public function create($data)
     {
         return $this->db->insert('housing_beneficiaries', $data);

@@ -1,4 +1,8 @@
-# Citizen Self-Registration — Mobile Integration Plan
+# Citizen Self-Registration — Mobile Integration Plan (SUPERSEDED)
+
+**Superseded 2026-08-19.** The design below (production-proxied citizen login, a `resident_registration_requests` staging table requiring staff approval) was built, then explicitly reversed by the user: citizen accounts are now **local** (`citizen_accounts` table, linked 1:1 to `residents`), and registration creates the resident **immediately**, no staff review step. See `src/Services/CitizenAccountService.php`, `api/citizen-app/*.php`, and the `Civentral-CitizenMobile` repo's `CLAUDE.md` for the actual current design. This file is kept for history only — do not build against it.
+
+---
 
 Read this before starting citizen self-registration on the mobile app. It's a design sketch only — **nothing described here is built yet**. Same family as `docs/mobile-app-plan.md` (field-surveyor app) and `docs/citizen-document-upload-mobile-api.md` (document uploads) — this is the third citizen-facing capability, on the same citizen mobile app as document uploads, not the field-surveyor app.
 

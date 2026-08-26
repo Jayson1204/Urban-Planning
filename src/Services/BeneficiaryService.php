@@ -48,6 +48,13 @@ class BeneficiaryService
         $this->householdRepo = $householdRepo;
     }
 
+    // Exposes the category scoring weights to read-only callers (e.g. the citizen
+    // app's "Housing Programs" reference content) without duplicating the values.
+    public function getEligibilityCategories()
+    {
+        return self::CATEGORY_SCORES;
+    }
+
     public function validateBeneficiaryInput($input, $isUpdate = false, $excludeId = null)
     {
         $errors = [];

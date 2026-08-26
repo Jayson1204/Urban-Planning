@@ -31,6 +31,8 @@ require_once __DIR__ . '/Repositories/InfrastructureRecordRepository.php';
 require_once __DIR__ . '/Repositories/PlanningDocumentRepository.php';
 require_once __DIR__ . '/Repositories/ZoningUseRegulationRepository.php';
 require_once __DIR__ . '/Repositories/ZoningClearanceRepository.php';
+require_once __DIR__ . '/Repositories/PermitApplicationRepository.php';
+require_once __DIR__ . '/Repositories/PermitPlanDocumentRepository.php';
 require_once __DIR__ . '/Repositories/FieldSurveyFormRepository.php';
 require_once __DIR__ . '/Repositories/FieldSurveyAssignmentRepository.php';
 require_once __DIR__ . '/Repositories/FieldSurveyResultRepository.php';
@@ -38,6 +40,10 @@ require_once __DIR__ . '/Repositories/FieldSurveyPhotoRepository.php';
 require_once __DIR__ . '/Repositories/AnalyticsRepository.php';
 require_once __DIR__ . '/Repositories/ActivityLogRepository.php';
 require_once __DIR__ . '/Repositories/BarangayRepository.php';
+require_once __DIR__ . '/Repositories/SubdivisionRepository.php';
+require_once __DIR__ . '/Repositories/HousingProjectRepository.php';
+require_once __DIR__ . '/Repositories/BuildingRepository.php';
+require_once __DIR__ . '/Repositories/CitizenAccountRepository.php';
 
 // Load Services
 require_once __DIR__ . '/Services/AuthService.php';
@@ -54,6 +60,7 @@ require_once __DIR__ . '/Services/DevelopmentPlanService.php';
 require_once __DIR__ . '/Services/UrbanProjectService.php';
 require_once __DIR__ . '/Services/ZoningConformityService.php';
 require_once __DIR__ . '/Services/ZoningClearanceService.php';
+require_once __DIR__ . '/Services/PermitApplicationService.php';
 require_once __DIR__ . '/Services/InfrastructureRecordService.php';
 require_once __DIR__ . '/Services/FieldSurveyFormService.php';
 require_once __DIR__ . '/Services/FieldSurveyAssignmentService.php';
@@ -61,6 +68,11 @@ require_once __DIR__ . '/Services/FieldSurveyResultService.php';
 require_once __DIR__ . '/Services/GeminiService.php';
 require_once __DIR__ . '/Services/ActivityLogService.php';
 require_once __DIR__ . '/Services/BarangayService.php';
+require_once __DIR__ . '/Services/SubdivisionService.php';
+require_once __DIR__ . '/Services/HousingProjectService.php';
+require_once __DIR__ . '/Services/BuildingService.php';
+require_once __DIR__ . '/Services/CitizenAccountService.php';
+require_once __DIR__ . '/Services/FileUploadService.php';
 
 // Load Middleware
 require_once __DIR__ . '/Middleware/SessionTimeout.php';
@@ -93,6 +105,8 @@ $infrastructureRecordRepo = new \App\Repositories\InfrastructureRecordRepository
 $planningDocumentRepo = new \App\Repositories\PlanningDocumentRepository($db ?? null);
 $zoningUseRegulationRepo = new \App\Repositories\ZoningUseRegulationRepository($db ?? null);
 $zoningClearanceRepo = new \App\Repositories\ZoningClearanceRepository($db ?? null);
+$permitApplicationRepo = new \App\Repositories\PermitApplicationRepository($db ?? null);
+$permitPlanDocumentRepo = new \App\Repositories\PermitPlanDocumentRepository($db ?? null);
 $fieldSurveyFormRepo = new \App\Repositories\FieldSurveyFormRepository($db ?? null);
 $fieldSurveyAssignmentRepo = new \App\Repositories\FieldSurveyAssignmentRepository($db ?? null);
 $fieldSurveyResultRepo = new \App\Repositories\FieldSurveyResultRepository($db ?? null);
@@ -100,6 +114,10 @@ $fieldSurveyPhotoRepo = new \App\Repositories\FieldSurveyPhotoRepository($db ?? 
 $analyticsRepo = new \App\Repositories\AnalyticsRepository($db ?? null);
 $activityLogRepo = new \App\Repositories\ActivityLogRepository($db ?? null);
 $barangayRepo = new \App\Repositories\BarangayRepository($db ?? null);
+$subdivisionRepo = new \App\Repositories\SubdivisionRepository($db ?? null);
+$housingProjectRepo = new \App\Repositories\HousingProjectRepository($db ?? null);
+$buildingRepo = new \App\Repositories\BuildingRepository($db ?? null);
+$citizenAccountRepo = new \App\Repositories\CitizenAccountRepository($db ?? null);
 
 // Initialize Services
 $userService = new \App\Services\UserService($userRepo);
@@ -114,13 +132,19 @@ $developmentPlanService = new \App\Services\DevelopmentPlanService($developmentP
 $urbanProjectService = new \App\Services\UrbanProjectService($urbanProjectRepo);
 $zoningConformityService = new \App\Services\ZoningConformityService($zoningUseRegulationRepo);
 $zoningClearanceService = new \App\Services\ZoningClearanceService($zoningClearanceRepo, $residentRepo, $zoningConformityService);
+$permitApplicationService = new \App\Services\PermitApplicationService($permitApplicationRepo, $residentRepo);
 $infrastructureRecordService = new \App\Services\InfrastructureRecordService($infrastructureRecordRepo);
 $fieldSurveyFormService = new \App\Services\FieldSurveyFormService($fieldSurveyFormRepo);
 $fieldSurveyAssignmentService = new \App\Services\FieldSurveyAssignmentService($fieldSurveyAssignmentRepo, $fieldSurveyFormRepo, $residentRepo, $householdRepo);
 $fieldSurveyResultService = new \App\Services\FieldSurveyResultService($fieldSurveyResultRepo, $fieldSurveyAssignmentRepo);
 $geminiService = new \App\Services\GeminiService($analyticsRepo);
 $activityLogService = new \App\Services\ActivityLogService($activityLogRepo);
-$barangayService = new \App\Services\BarangayService($barangayRepo);
+$barangayService = new \App\Services\BarangayService($barangayRepo, $subdivisionRepo, $housingProjectRepo, $buildingRepo);
+$subdivisionService = new \App\Services\SubdivisionService($subdivisionRepo);
+$housingProjectService = new \App\Services\HousingProjectService($housingProjectRepo);
+$buildingService = new \App\Services\BuildingService($buildingRepo);
+$citizenAccountService = new \App\Services\CitizenAccountService($citizenAccountRepo, $residentRepo, $residentService, $householdService);
+$fileUploadService = new \App\Services\FileUploadService();
 
 // Initialize Header Service (and build user)
 $headerService = new \App\Services\HeaderService($userService, $permService, $authService);

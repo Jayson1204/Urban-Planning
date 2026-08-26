@@ -55,6 +55,17 @@ if ($method === 'POST') {
     }
     $newId = $residentService->createResident($input);
     $activityLogService->record('Resident Management', 'Create', 'residents', $newId, trim(($input['first_name'] ?? '') . ' ' . ($input['last_name'] ?? '')), 'Added a new resident record.');
+
+    // Auto-create a citizen mobile app account when an email is given -- failure to
+    // send the invite email must not fail resident creation.
+    if (!empty(trim($input['email'] ?? ''))) {
+        try {
+            $citizenAccountService->createForResident($newId, $input['email']);
+        } catch (\Throwable $e) {
+            error_log('Citizen account auto-creation failed for resident #' . $newId . ': ' . $e->getMessage());
+        }
+    }
+
     respond(['status' => 'success', 'message' => 'Resident added successfully.', 'resident_id' => $newId], 201);
 }
 

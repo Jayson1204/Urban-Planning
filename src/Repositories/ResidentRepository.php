@@ -89,6 +89,15 @@ class ResidentRepository
         return $rows[0] ?? ['total' => 0, 'active' => 0, 'archived' => 0, 'households_covered' => 0];
     }
 
+    public function findByEmail($email)
+    {
+        $rows = $this->db->query(
+            "SELECT * FROM residents WHERE email = :email ORDER BY resident_id ASC LIMIT 1",
+            ['email' => $email]
+        );
+        return $rows[0] ?? null;
+    }
+
     public function create($data)
     {
         return $this->db->insert('residents', $data);
