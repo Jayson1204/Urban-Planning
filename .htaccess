@@ -9,9 +9,12 @@
 
 # Secure flag is conditional on the actual request scheme, not hardcoded -- this same file is
 # used for both local http:// XAMPP dev (where a hardcoded Secure flag would silently break
-# login, since browsers drop Secure cookies over non-TLS) and production behind HTTPS.
-<IfModule mod_php.c>
-  <If "%{HTTPS} == 'on'">
+# login, since browsers drop Secure cookies over non-TLS) and production behind HTTPS. In
+# production the app sits behind Dokploy's Traefik proxy, which terminates TLS and forwards
+# plain HTTP internally, so %{HTTPS} alone would never see "on" -- check the proxy's forwarded
+# header too.
+<IfModule php_module>
+  <If "%{HTTPS} == 'on' || %{HTTP:X-Forwarded-Proto} == 'https'">
     php_flag session.cookie_secure On
   </If>
 </IfModule>
