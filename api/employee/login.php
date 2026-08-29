@@ -65,7 +65,9 @@ if (empty($employeeIdOrEmail) || empty($password)) {
     ], 400);
 }
 
-if (empty($recaptchaToken)) {
+// Only require a token when a secret key is actually configured -- otherwise the widget
+// isn't rendered on the login page (see login.php) and there's nothing for the user to check.
+if (empty($recaptchaToken) && !empty($recaptchaSecret)) {
     respond([
         'status' => 'error',
         'message' => 'reCAPTCHA verification is required. Please check the robot checkbox.'
