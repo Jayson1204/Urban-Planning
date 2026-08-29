@@ -33,13 +33,13 @@ function renderBenDocuments(beneficiary) {
     <div class="px-4 py-3 flex items-start justify-between gap-3">
       <div class="min-w-0 space-y-1">
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="font-semibold text-slate-700">${d.document_type}</span>
-          <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${benDocStatusBadge(d.review_status)}">${d.review_status}</span>
+          <span class="font-semibold text-slate-700">${escapeHtml(d.document_type)}</span>
+          <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${benDocStatusBadge(d.review_status)}">${escapeHtml(d.review_status)}</span>
           <span class="text-[9px] font-bold text-slate-400 uppercase">${d.submitted_by === 'Citizen' ? 'Submitted by applicant' : 'Uploaded by staff'}</span>
         </div>
-        <a href="../../${d.file_path}" target="_blank" rel="noopener" class="text-[11px] text-brand-dark hover:underline break-all">${d.file_name}</a>
-        ${d.review_status === 'Rejected' && d.review_notes ? `<p class="text-[10px] text-rose-600 leading-relaxed">Reason: ${d.review_notes}</p>` : ''}
-        ${d.reviewed_by_name ? `<p class="text-[9px] text-slate-400">Reviewed by ${d.reviewed_by_name}${d.reviewed_at ? ' on ' + d.reviewed_at.substring(0, 10) : ''}</p>` : ''}
+        <a href="../../${escapeHtml(d.file_path)}" target="_blank" rel="noopener" class="text-[11px] text-brand-dark hover:underline break-all">${escapeHtml(d.file_name)}</a>
+        ${d.review_status === 'Rejected' && d.review_notes ? `<p class="text-[10px] text-rose-600 leading-relaxed">Reason: ${escapeHtml(d.review_notes)}</p>` : ''}
+        ${d.reviewed_by_name ? `<p class="text-[9px] text-slate-400">Reviewed by ${escapeHtml(d.reviewed_by_name)}${d.reviewed_at ? ' on ' + escapeHtml(d.reviewed_at.substring(0, 10)) : ''}</p>` : ''}
       </div>
       <div class="flex items-center gap-1.5 shrink-0">
         ${canReview && d.review_status === 'Pending' ? `

@@ -8,6 +8,9 @@ function proxyRequest($url, $method = 'POST', $body = null, $sendCookie = true) 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
     curl_setopt($ch, CURLOPT_HEADER, true);
+    // Fail fast instead of hanging the whole request when the remote API is slow/unreachable.
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 8);
     
     $headers = [
         'Content-Type: application/json'

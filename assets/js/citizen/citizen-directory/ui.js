@@ -59,27 +59,27 @@ function renderCitizens(list = mockCitizens) {
       <tr class="hover:bg-slate-50/50 transition">
         <!-- Citizen ID -->
         <td class="px-6 py-4 font-mono font-bold text-slate-700 select-all tracking-tight">
-          ${cit.id}
+          ${escapeHtml(cit.id)}
         </td>
 
         <!-- Full Name & Contact -->
         <td class="px-6 py-4">
           <div class="flex flex-col">
-            <span class="font-extrabold text-slate-800 tracking-tight leading-snug">${cit.name}</span>
-            <span class="text-[10px] text-slate-400 font-medium">${cit.email}</span>
+            <span class="font-extrabold text-slate-800 tracking-tight leading-snug">${escapeHtml(cit.name)}</span>
+            <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(cit.email)}</span>
           </div>
         </td>
 
         <!-- Barangay Residency -->
         <td class="px-6 py-4 font-semibold text-slate-650">
-          ${cit.barangay}
+          ${escapeHtml(cit.barangay)}
         </td>
 
         <!-- Status Badge -->
         <td class="px-6 py-4">
           <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${statusClass} inline-flex items-center gap-1.5">
             ${dotIndicator}
-            <span>${cit.status}</span>
+            <span>${escapeHtml(cit.status)}</span>
           </span>
         </td>
 
@@ -87,11 +87,11 @@ function renderCitizens(list = mockCitizens) {
         <td class="px-6 py-4 space-y-1">
           <div class="flex items-center gap-1.5 text-slate-650">
             <span class="text-[9px] font-bold text-slate-400 uppercase">Registered:</span>
-            <span class="font-semibold text-[11px]">${formattedRegDate}</span>
+            <span class="font-semibold text-[11px]">${escapeHtml(formattedRegDate)}</span>
           </div>
           <div class="flex items-center gap-1.5 text-slate-650">
             <span class="text-[9px] font-bold text-slate-400 uppercase">Last Active:</span>
-            <span class="font-semibold text-[11px]">${cit.lastLogin}</span>
+            <span class="font-semibold text-[11px]">${escapeHtml(cit.lastLogin)}</span>
           </div>
         </td>
 

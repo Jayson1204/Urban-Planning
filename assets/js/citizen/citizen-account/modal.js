@@ -43,9 +43,9 @@ function openTimelineModal(citId) {
           <div class="absolute -left-[21px] top-1.5 h-3.5 w-3.5 rounded-full border bg-white border-slate-300 flex items-center justify-center text-[7px] font-black text-slate-400">
             <i class="fa-solid fa-circle text-[5px]"></i>
           </div>
-          <div class="font-extrabold text-slate-800 tracking-tight text-[11px]">${log.action}</div>
-          <div class="text-[10px] text-slate-400 font-medium mt-0.5">${log.date} by <span class="text-slate-600 font-bold">${log.admin}</span></div>
-          <p class="text-[11.5px] text-slate-500 mt-1.5 italic bg-slate-50 p-2 rounded-lg border border-slate-100">Reason: "${log.reason}"</p>
+          <div class="font-extrabold text-slate-800 tracking-tight text-[11px]">${escapeHtml(log.action)}</div>
+          <div class="text-[10px] text-slate-400 font-medium mt-0.5">${escapeHtml(log.date)} by <span class="text-slate-600 font-bold">${escapeHtml(log.admin)}</span></div>
+          <p class="text-[11.5px] text-slate-500 mt-1.5 italic bg-slate-50 p-2 rounded-lg border border-slate-100">Reason: "${escapeHtml(log.reason)}"</p>
         </div>
       `;
     });

@@ -35,13 +35,13 @@ function renderHousingProjects() {
     const row = `
       <tr class="hover:bg-slate-50/50 transition">
         <td class="px-6 py-4.5">
-          <span class="font-black text-slate-900 tracking-tight text-xs block">${p.name}</span>
-          <span class="text-[10px] text-slate-400">${p.source}</span>
+          <span class="font-black text-slate-900 tracking-tight text-xs block">${escapeHtml(p.name)}</span>
+          <span class="text-[10px] text-slate-400">${escapeHtml(p.source)}</span>
         </td>
-        <td class="px-6 py-4.5 text-xs text-slate-600">${p.barangay_name || p.barangay || '&mdash;'}</td>
+        <td class="px-6 py-4.5 text-xs text-slate-600">${escapeHtml(p.barangay_name || p.barangay) || '&mdash;'}</td>
         <td class="px-6 py-4.5 text-xs font-semibold text-slate-700">${p.units ?? 'Data unavailable'}</td>
         <td class="px-6 py-4.5">${hpProjectStatusBadge(p.project_status)}</td>
-        <td class="px-6 py-4.5 text-xs text-slate-600">${p.developer || 'Data unavailable'}</td>
+        <td class="px-6 py-4.5 text-xs text-slate-600">${escapeHtml(p.developer) || 'Data unavailable'}</td>
         <td class="px-6 py-4.5">
           <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${statusClass}">${p.status}</span>
         </td>

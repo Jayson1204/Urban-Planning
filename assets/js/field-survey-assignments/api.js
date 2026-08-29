@@ -29,7 +29,7 @@ async function loadFormOptions() {
     if (result.status === 'success') {
       const forms = result.data || [];
       select.innerHTML = '<option value="">Select a survey form...</option>' +
-        forms.map(f => `<option value="${f.form_id}">${f.form_code} — ${f.form_title}</option>`).join('');
+        forms.map(f => `<option value="${f.form_id}">${escapeHtml(f.form_code)} — ${escapeHtml(f.form_title)}</option>`).join('');
     }
   } catch (err) {
     console.error('Error loading survey forms:', err);
@@ -88,8 +88,19 @@ async function fetchAssignmentStats() {
   }
 }
 
+let isSavingAssignment = false;
+
 async function handleSaveAssignment(e) {
   e.preventDefault();
+
+  if (isSavingAssignment) return;
+  isSavingAssignment = true;
+  const saveBtn = document.getElementById('assignmentSaveBtn');
+  const originalBtnText = saveBtn ? saveBtn.innerText : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...';
+  }
 
   const idRef = document.getElementById('assignmentIdRef').value;
   const subjectType = document.getElementById('assignmentSubjectType').value;
@@ -130,6 +141,12 @@ async function handleSaveAssignment(e) {
   } catch (err) {
     console.error('Error saving survey assignment:', err);
     showToast('Failed to save survey assignment.');
+  } finally {
+    isSavingAssignment = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = originalBtnText;
+    }
   }
 }
 

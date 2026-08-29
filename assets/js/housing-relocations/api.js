@@ -69,8 +69,19 @@ async function fetchRelocationStats() {
   }
 }
 
+let isSavingRelocation = false;
+
 async function handleSaveRelocation(e) {
   e.preventDefault();
+
+  if (isSavingRelocation) return;
+  isSavingRelocation = true;
+  const saveBtn = document.getElementById('relocationSaveBtn');
+  const originalBtnText = saveBtn ? saveBtn.innerText : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...';
+  }
 
   const payload = {
     resident_id: selectedRelResidentId ? parseInt(selectedRelResidentId) : null,
@@ -100,6 +111,12 @@ async function handleSaveRelocation(e) {
   } catch (err) {
     console.error('Error saving relocation record:', err);
     showToast('Failed to record relocation.');
+  } finally {
+    isSavingRelocation = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = originalBtnText;
+    }
   }
 }
 

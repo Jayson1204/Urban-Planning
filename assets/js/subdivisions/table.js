@@ -23,13 +23,13 @@ function renderSubdivisions() {
     const row = `
       <tr class="hover:bg-slate-50/50 transition">
         <td class="px-6 py-4.5">
-          <span class="font-black text-slate-900 tracking-tight text-xs block">${s.name}</span>
+          <span class="font-black text-slate-900 tracking-tight text-xs block">${escapeHtml(s.name)}</span>
           ${s.boundary_geojson ? '<span class="text-[10px] text-slate-400">Has boundary polygon</span>' : '<span class="text-[10px] text-slate-400">Point only</span>'}
         </td>
-        <td class="px-6 py-4.5 text-xs text-slate-600">${s.barangay_name || s.barangay || '&mdash;'}</td>
-        <td class="px-6 py-4.5 text-xs text-slate-600">${s.subdivision_type || '&mdash;'}</td>
-        <td class="px-6 py-4.5 text-xs text-slate-600">${s.subdivision_status || '&mdash;'}</td>
-        <td class="px-6 py-4.5 text-xs text-slate-600">${s.source}</td>
+        <td class="px-6 py-4.5 text-xs text-slate-600">${escapeHtml(s.barangay_name || s.barangay) || '&mdash;'}</td>
+        <td class="px-6 py-4.5 text-xs text-slate-600">${escapeHtml(s.subdivision_type) || '&mdash;'}</td>
+        <td class="px-6 py-4.5 text-xs text-slate-600">${escapeHtml(s.subdivision_status) || '&mdash;'}</td>
+        <td class="px-6 py-4.5 text-xs text-slate-600">${escapeHtml(s.source)}</td>
         <td class="px-6 py-4.5">
           <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${statusClass} inline-flex items-center gap-1.5">${s.status}</span>
         </td>

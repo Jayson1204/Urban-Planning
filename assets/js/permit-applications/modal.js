@@ -125,11 +125,11 @@ function renderPaDisciplines(pa) {
   container.innerHTML = reviews.map(d => `
     <div class="border rounded-xl p-3 space-y-2 ${paDisciplineStatusColor(d.review_status)}">
       <div class="flex items-center justify-between">
-        <span class="font-black text-[11px]">${d.discipline}</span>
-        <span class="text-[9px] font-black uppercase">${d.review_status}</span>
+        <span class="font-black text-[11px]">${escapeHtml(d.discipline)}</span>
+        <span class="text-[9px] font-black uppercase">${escapeHtml(d.review_status)}</span>
       </div>
-      ${d.remarks ? `<p class="text-[10px] leading-relaxed opacity-90">${d.remarks}</p>` : ''}
-      ${d.reviewer_name ? `<p class="text-[9px] opacity-70">${d.reviewer_name}${d.reviewed_at ? ' • ' + d.reviewed_at.substring(0, 10) : ''}</p>` : ''}
+      ${d.remarks ? `<p class="text-[10px] leading-relaxed opacity-90">${escapeHtml(d.remarks)}</p>` : ''}
+      ${d.reviewer_name ? `<p class="text-[9px] opacity-70">${escapeHtml(d.reviewer_name)}${d.reviewed_at ? ' • ' + escapeHtml(d.reviewed_at.substring(0, 10)) : ''}</p>` : ''}
       <form onsubmit="handlePaDisciplineFormSubmit(event, ${pa.application_id}, '${d.discipline}')" class="flex items-center gap-1.5 pt-1">
         <select class="border border-white/60 bg-white/70 rounded-md px-1.5 py-1 text-[10px] flex-1 focus:outline-none">
           <option value="Under Review">Under Review</option>
@@ -176,11 +176,11 @@ function renderPaDocuments(pa) {
     <div class="px-4 py-3 flex items-start justify-between gap-3">
       <div class="min-w-0 space-y-1">
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="font-semibold text-slate-700">${d.document_type} <span class="text-slate-400 font-normal">v${d.version_number}</span></span>
-          <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${paDocStatusTag(d.document_status)}">${d.document_status}</span>
+          <span class="font-semibold text-slate-700">${escapeHtml(d.document_type)} <span class="text-slate-400 font-normal">v${escapeHtml(d.version_number)}</span></span>
+          <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${paDocStatusTag(d.document_status)}">${escapeHtml(d.document_status)}</span>
         </div>
-        <a href="../../${d.file_path}" target="_blank" rel="noopener" class="text-[11px] text-brand-dark hover:underline break-all">${d.file_name}</a>
-        <p class="text-[9px] text-slate-400">${d.submitted_by === 'Applicant' ? 'Submitted by applicant' : 'Uploaded by staff'} • ${(d.uploaded_at || '').substring(0, 10)}</p>
+        <a href="../../${escapeHtml(d.file_path)}" target="_blank" rel="noopener" class="text-[11px] text-brand-dark hover:underline break-all">${escapeHtml(d.file_name)}</a>
+        <p class="text-[9px] text-slate-400">${d.submitted_by === 'Applicant' ? 'Submitted by applicant' : 'Uploaded by staff'} • ${escapeHtml((d.uploaded_at || '').substring(0, 10))}</p>
       </div>
       <button onclick="handleDeletePaDocument(${d.document_id}, ${pa.application_id})" class="text-slate-400 hover:text-red-500 cursor-pointer p-1.5 shrink-0" title="Delete document">
         <i class="fa-solid fa-trash-can text-xs"></i>
@@ -194,16 +194,16 @@ function openPaDocumentUpload() {
 }
 
 function paTimelineEntry(review) {
-  const who = [review.reviewer_name, review.discipline || review.reviewer_role].filter(Boolean).join(' — ');
-  const roundTag = review.resubmission_round > 0 ? `<span class="text-[9px] text-slate-400 font-bold ml-1.5">(Round ${review.resubmission_round})</span>` : '';
+  const who = escapeHtml([review.reviewer_name, review.discipline || review.reviewer_role].filter(Boolean).join(' — '));
+  const roundTag = review.resubmission_round > 0 ? `<span class="text-[9px] text-slate-400 font-bold ml-1.5">(Round ${escapeHtml(review.resubmission_round)})</span>` : '';
   return `
     <div class="px-4 py-3">
       <div class="flex items-center justify-between">
-        <span class="font-bold text-slate-800">${review.action || ''}${roundTag}</span>
-        <span class="text-[10px] text-slate-400 font-mono">${review.created_at || ''}</span>
+        <span class="font-bold text-slate-800">${escapeHtml(review.action || '')}${roundTag}</span>
+        <span class="text-[10px] text-slate-400 font-mono">${escapeHtml(review.created_at || '')}</span>
       </div>
       <p class="text-slate-500 mt-0.5">${who || 'System'}</p>
-      ${review.remarks ? `<p class="text-slate-600 mt-1">${review.remarks}</p>` : ''}
+      ${review.remarks ? `<p class="text-slate-600 mt-1">${escapeHtml(review.remarks)}</p>` : ''}
     </div>
   `;
 }
@@ -216,7 +216,7 @@ async function openViewApplicationModal(applicationId) {
   document.getElementById('viewPaMeta').innerText =
     [pa.applicant_name, pa.application_type, pa.project_name].filter(Boolean).join(' • ') || 'No additional details on file.';
   document.getElementById('viewPaConsolidated').innerText = pa.consolidated_result || 'Pending';
-  document.getElementById('viewPaFee').innerHTML = `${paFormatPeso(pa.fee_amount)} <span class="text-slate-400 font-semibold">(${pa.payment_status || 'Unpaid'})</span>`;
+  document.getElementById('viewPaFee').innerHTML = `${paFormatPeso(pa.fee_amount)} <span class="text-slate-400 font-semibold">(${escapeHtml(pa.payment_status) || 'Unpaid'})</span>`;
 
   const certLink = document.getElementById('viewPaCertificateLink');
   if (pa.application_status === 'Permit Issued' || pa.application_status === 'Denied') {

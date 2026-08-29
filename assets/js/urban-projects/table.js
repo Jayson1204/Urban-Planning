@@ -49,13 +49,13 @@ function renderProjects() {
               <i class="fa-solid fa-diagram-project"></i>
             </div>
             <div>
-              <span class="font-black text-slate-900 tracking-tight text-xs block">${p.project_code}${archivedTag}</span>
-              <span class="text-[10px] text-slate-400 font-medium">${p.project_title || ''}</span>
+              <span class="font-black text-slate-900 tracking-tight text-xs block">${escapeHtml(p.project_code)}${archivedTag}</span>
+              <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(p.project_title || '')}</span>
             </div>
           </div>
         </td>
-        <td class="px-6 py-4.5 text-xs text-slate-600">${p.plan_code ? `<span class="font-mono font-bold">${p.plan_code}</span>` : '<span class="text-slate-400 italic">Unlinked</span>'}</td>
-        <td class="px-6 py-4.5 text-xs text-slate-600">${p.project_type || '&mdash;'}</td>
+        <td class="px-6 py-4.5 text-xs text-slate-600">${p.plan_code ? `<span class="font-mono font-bold">${escapeHtml(p.plan_code)}</span>` : '<span class="text-slate-400 italic">Unlinked</span>'}</td>
+        <td class="px-6 py-4.5 text-xs text-slate-600">${escapeHtml(p.project_type) || '&mdash;'}</td>
         <td class="px-6 py-4.5 text-xs text-slate-600">${formatPeso(p.budget)}</td>
         <td class="px-6 py-4.5">${projectStatusBadge(p.project_status)}</td>
         <td class="px-6 py-4.5 text-right whitespace-nowrap">

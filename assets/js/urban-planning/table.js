@@ -57,7 +57,7 @@ function renderDevelopmentPlans() {
       : '<span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>';
 
     const coverageDisplay = (p.barangay || p.coverage_area)
-      ? `<span class="font-bold text-slate-700">${p.barangay || ''}</span>${p.coverage_area ? `<br><span class="text-[10px] text-slate-400">${p.coverage_area}</span>` : ''}`
+      ? `<span class="font-bold text-slate-700">${escapeHtml(p.barangay || '')}</span>${p.coverage_area ? `<br><span class="text-[10px] text-slate-400">${escapeHtml(p.coverage_area)}</span>` : ''}`
       : '<span class="text-slate-400">&mdash;</span>';
 
     const startDisplay = formatPlanDate(p.start_date);
@@ -74,12 +74,12 @@ function renderDevelopmentPlans() {
               <i class="fa-solid fa-map"></i>
             </div>
             <div>
-              <span class="font-black text-slate-900 tracking-tight text-xs block font-mono">${p.plan_code}</span>
-              <span class="text-[10px] text-slate-400 font-medium">${p.plan_title || 'Untitled plan'}</span>
+              <span class="font-black text-slate-900 tracking-tight text-xs block font-mono">${escapeHtml(p.plan_code)}</span>
+              <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(p.plan_title) || 'Untitled plan'}</span>
             </div>
           </div>
         </td>
-        <td class="px-6 py-4.5 text-xs text-slate-600">${PLAN_TYPE_LABELS[p.plan_type] || p.plan_type || '&mdash;'}</td>
+        <td class="px-6 py-4.5 text-xs text-slate-600">${PLAN_TYPE_LABELS[p.plan_type] || escapeHtml(p.plan_type) || '&mdash;'}</td>
         <td class="px-6 py-4.5 text-xs">${coverageDisplay}</td>
         <td class="px-6 py-4.5 text-xs font-semibold text-slate-700 whitespace-nowrap">${timelineDisplay}</td>
         <td class="px-6 py-4.5">${planStatusBadge(p.plan_status)}</td>

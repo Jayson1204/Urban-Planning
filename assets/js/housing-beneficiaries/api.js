@@ -73,8 +73,19 @@ async function fetchBeneficiaryStats() {
   }
 }
 
+let isSavingBeneficiary = false;
+
 async function handleSaveBeneficiary(e) {
   e.preventDefault();
+
+  if (isSavingBeneficiary) return;
+  isSavingBeneficiary = true;
+  const saveBtn = document.getElementById('beneficiarySaveBtn');
+  const originalBtnText = saveBtn ? saveBtn.innerText : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...';
+  }
 
   const idRef = document.getElementById('beneficiaryIdRef').value;
   const householdId = document.getElementById('benHouseholdId').value;
@@ -114,6 +125,12 @@ async function handleSaveBeneficiary(e) {
   } catch (err) {
     console.error('Error saving beneficiary:', err);
     showToast('Failed to save beneficiary.');
+  } finally {
+    isSavingBeneficiary = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = originalBtnText;
+    }
   }
 }
 

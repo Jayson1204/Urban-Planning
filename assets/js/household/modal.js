@@ -59,8 +59,8 @@ async function openViewHouseholdModal(householdId) {
   membersEl.innerHTML = members.length
     ? members.map(m => `
         <div class="px-4 py-2.5 flex items-center justify-between">
-          <span class="font-semibold text-slate-700">${m.first_name || ''} ${m.middle_name ? m.middle_name + ' ' : ''}${m.last_name || ''}</span>
-          <span class="text-slate-400 text-[10px] font-black uppercase">${m.relationship_to_head || '&mdash;'}</span>
+          <span class="font-semibold text-slate-700">${escapeHtml(m.first_name || '')} ${m.middle_name ? escapeHtml(m.middle_name) + ' ' : ''}${escapeHtml(m.last_name || '')}</span>
+          <span class="text-slate-400 text-[10px] font-black uppercase">${escapeHtml(m.relationship_to_head) || '&mdash;'}</span>
         </div>
       `).join('')
     : '<div class="px-4 py-3 text-slate-400">No members registered under this household.</div>';

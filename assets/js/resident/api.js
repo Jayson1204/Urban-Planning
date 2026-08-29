@@ -69,8 +69,19 @@ async function fetchResidentStats() {
   }
 }
 
+let isSavingResident = false;
+
 async function handleSaveResident(e) {
   e.preventDefault();
+
+  if (isSavingResident) return;
+  isSavingResident = true;
+  const saveBtn = document.getElementById('residentSaveBtn');
+  const originalBtnText = saveBtn ? saveBtn.innerText : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...';
+  }
 
   const idRef = document.getElementById('residentIdRef').value;
   const payload = {
@@ -112,6 +123,12 @@ async function handleSaveResident(e) {
   } catch (err) {
     console.error('Error saving resident:', err);
     showToast('Failed to save resident.');
+  } finally {
+    isSavingResident = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = originalBtnText;
+    }
   }
 }
 

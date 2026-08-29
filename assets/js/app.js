@@ -1,11 +1,25 @@
 
+// Shared HTML-escaping helper. Module render functions build table/modal markup with
+// innerHTML template literals, so any user-submitted free-text field (names, addresses,
+// remarks, etc.) MUST be passed through this before interpolation, or a value like
+// '<img src=x onerror=...>' stored in that field executes in the next viewer's browser.
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 (function() {
     const basePath = (typeof window.civentralBasePath !== 'undefined') ? window.civentralBasePath : '../';
 
     // Cache-busting version for dynamically loaded scripts. Bump this whenever a
     // bridge-loaded JS file is changed so browsers fetch the new copy instead of a
     // stale cached one (XAMPP serves static .js with a long cache lifetime).
-    const ASSET_VERSION = '2026-08-26-1';
+    const ASSET_VERSION = '2026-08-29-4';
 
     // Global loader
     window.loadCiventralScript = function(src, callback = null) {

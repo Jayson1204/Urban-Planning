@@ -44,13 +44,13 @@ function renderResults() {
               <i class="fa-solid fa-file-circle-check"></i>
             </div>
             <div>
-              <span class="font-black text-slate-900 tracking-tight text-xs block font-mono">${r.form_code || '&mdash;'}</span>
-              <span class="text-[10px] text-slate-400 font-medium">${r.form_title || ''}</span>
+              <span class="font-black text-slate-900 tracking-tight text-xs block font-mono">${escapeHtml(r.form_code) || '&mdash;'}</span>
+              <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(r.form_title || '')}</span>
             </div>
           </div>
         </td>
         <td class="px-6 py-4.5 text-xs text-slate-600">
-          ${r.subject_name || '&mdash;'}
+          ${escapeHtml(r.subject_name) || '&mdash;'}
           <span class="text-[10px] text-slate-400 block">${r.subject_type || ''}</span>
         </td>
         <td class="px-6 py-4.5 text-xs font-semibold text-slate-700">${r.survey_date || '&mdash;'}</td>

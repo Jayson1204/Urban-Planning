@@ -67,11 +67,11 @@ function renderResultPhotos(photos) {
   }
   container.innerHTML = photos.map(p => `
     <div class="relative group rounded-xl overflow-hidden border border-slate-200/60 aspect-square">
-      <img src="../../${p.file_path}" alt="${p.caption || 'Survey photo'}" class="w-full h-full object-cover">
+      <img src="../../${escapeHtml(p.file_path)}" alt="${escapeHtml(p.caption) || 'Survey photo'}" class="w-full h-full object-cover">
       <button type="button" onclick="handleDeletePhoto(${p.photo_id}, ${p.result_id})" class="absolute top-1 right-1 h-6 w-6 rounded-full bg-slate-900/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer" title="Delete photo">
         <i class="fa-solid fa-xmark text-[10px]"></i>
       </button>
-      ${p.caption ? `<span class="absolute bottom-0 left-0 right-0 bg-slate-900/70 text-white text-[9px] px-1.5 py-1 truncate">${p.caption}</span>` : ''}
+      ${p.caption ? `<span class="absolute bottom-0 left-0 right-0 bg-slate-900/70 text-white text-[9px] px-1.5 py-1 truncate">${escapeHtml(p.caption)}</span>` : ''}
     </div>
   `).join('');
 }

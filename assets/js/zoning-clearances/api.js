@@ -81,8 +81,19 @@ async function fetchClearanceDetail(clearanceId) {
   }
 }
 
+let isSavingClearance = false;
+
 async function handleSaveClearance(e) {
   e.preventDefault();
+
+  if (isSavingClearance) return;
+  isSavingClearance = true;
+  const saveBtn = document.getElementById('zcSaveBtn');
+  const originalBtnText = saveBtn ? saveBtn.innerText : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...';
+  }
 
   const idRef = document.getElementById('zcIdRef').value;
   const payload = {
@@ -121,6 +132,12 @@ async function handleSaveClearance(e) {
   } catch (err) {
     console.error('Error saving zoning clearance:', err);
     showToast('Failed to save zoning clearance.');
+  } finally {
+    isSavingClearance = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = originalBtnText;
+    }
   }
 }
 

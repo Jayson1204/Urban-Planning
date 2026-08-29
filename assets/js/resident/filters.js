@@ -23,8 +23,8 @@ function triggerHouseholdSearch(term) {
     }
     resultsBox.innerHTML = households.map(h => `
       <button type="button" onclick='selectHousehold(${JSON.stringify(h).replace(/'/g, "&apos;")})' class="w-full text-left px-3 py-2.5 text-[11px] hover:bg-slate-50 border-b border-slate-100 last:border-0 cursor-pointer">
-        <span class="font-bold text-slate-700">${h.barangay}</span> — ${h.street_address}
-        ${h.household_number ? `<span class="text-slate-400 font-mono"> (HH ${h.household_number})</span>` : ''}
+        <span class="font-bold text-slate-700">${escapeHtml(h.barangay)}</span> — ${escapeHtml(h.street_address)}
+        ${h.household_number ? `<span class="text-slate-400 font-mono"> (HH ${escapeHtml(h.household_number)})</span>` : ''}
       </button>
     `).join('');
     resultsBox.classList.remove('hidden');

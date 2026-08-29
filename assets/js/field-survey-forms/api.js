@@ -69,8 +69,19 @@ async function fetchSurveyFormStats() {
   }
 }
 
+let isSavingSurveyForm = false;
+
 async function handleSaveSurveyForm(e) {
   e.preventDefault();
+
+  if (isSavingSurveyForm) return;
+  isSavingSurveyForm = true;
+  const saveBtn = document.getElementById('surveyFormSaveBtn');
+  const originalBtnText = saveBtn ? saveBtn.innerText : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...';
+  }
 
   const idRef = document.getElementById('surveyFormIdRef').value;
   const payload = {
@@ -103,6 +114,12 @@ async function handleSaveSurveyForm(e) {
   } catch (err) {
     console.error('Error saving survey form:', err);
     showToast('Failed to save survey form.');
+  } finally {
+    isSavingSurveyForm = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = originalBtnText;
+    }
   }
 }
 

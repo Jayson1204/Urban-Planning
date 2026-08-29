@@ -105,8 +105,8 @@ async function openViewResidentModal(residentId) {
   membersContainer.innerHTML = members.length
     ? members.map(m => `
         <div class="px-4 py-2.5 flex items-center justify-between">
-          <span class="font-semibold text-slate-700">${m.first_name} ${m.last_name}</span>
-          <span class="text-[10px] text-slate-400 font-bold uppercase">${m.relationship_to_head || ''}</span>
+          <span class="font-semibold text-slate-700">${escapeHtml(m.first_name)} ${escapeHtml(m.last_name)}</span>
+          <span class="text-[10px] text-slate-400 font-bold uppercase">${escapeHtml(m.relationship_to_head || '')}</span>
         </div>
       `).join('')
     : '<div class="px-4 py-3 text-slate-400">Not part of a household.</div>';
@@ -119,8 +119,8 @@ async function openViewResidentModal(residentId) {
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-file-lines text-slate-400"></i>
             <div>
-              <span class="font-semibold text-slate-700 block">${d.document_type}</span>
-              <a href="../../${d.file_path}" target="_blank" class="text-[10px] text-brand-dark hover:underline">${d.file_name}</a>
+              <span class="font-semibold text-slate-700 block">${escapeHtml(d.document_type)}</span>
+              <a href="../../${escapeHtml(d.file_path)}" target="_blank" class="text-[10px] text-brand-dark hover:underline">${escapeHtml(d.file_name)}</a>
             </div>
           </div>
           <button onclick="handleDeleteDocument(${d.document_id}, ${resident.resident_id})" class="text-slate-400 hover:text-red-500 cursor-pointer" title="Delete document">

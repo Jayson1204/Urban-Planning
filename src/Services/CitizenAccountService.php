@@ -4,6 +4,15 @@ namespace App\Services;
 
 class CitizenAccountService
 {
+    // Brute-force lockout: after this many consecutive failed login attempts, the account
+    // is locked for LOCKOUT_MINUTES regardless of whether the next password would be correct.
+    private const MAX_LOGIN_ATTEMPTS = 5;
+    private const LOCKOUT_MINUTES = 15;
+
+    // Minimum gap between two password-reset emails to the same account, so
+    // forgot-password.php can't be used to spam a citizen's inbox / burn SMTP sends.
+    private const RESET_EMAIL_COOLDOWN_SECONDS = 60;
+
     private $accountRepo;
     private $residentRepo;
     private $residentService;
@@ -108,15 +117,37 @@ class CitizenAccountService
         return ['citizen_account_id' => $citizenAccountId, 'resident_id' => $residentId];
     }
 
+    // Returns the account row on success, or ['error' => message] on failure (bad
+    // credentials, inactive account, or an active lockout) -- distinct from a plain null/array
+    // return so the caller can surface a "try again in N minutes" message during a lockout.
     public function login($email, $password)
     {
         $account = $this->accountRepo->findByEmail(trim((string)$email));
-        if (!$account || !$account['password_hash'] || !password_verify($password, $account['password_hash'])) {
-            return null;
+        $genericError = ['error' => 'Invalid email or password.'];
+
+        if (!$account) {
+            return $genericError;
         }
-        if ($account['status'] !== 'Active') {
-            return null;
+
+        if (!empty($account['locked_until']) && strtotime($account['locked_until']) > time()) {
+            $minutesLeft = (int)ceil((strtotime($account['locked_until']) - time()) / 60);
+            return ['error' => "Too many failed attempts. Try again in {$minutesLeft} minute(s)."];
         }
+
+        $isValid = $account['password_hash']
+            && password_verify($password, $account['password_hash'])
+            && $account['status'] === 'Active';
+
+        if (!$isValid) {
+            $attempts = (int)$account['failed_login_attempts'] + 1;
+            $lockedUntil = $attempts >= self::MAX_LOGIN_ATTEMPTS
+                ? date('Y-m-d H:i:s', strtotime('+' . self::LOCKOUT_MINUTES . ' minutes'))
+                : null;
+            $this->accountRepo->recordFailedAttempt($account['citizen_account_id'], $attempts, $lockedUntil);
+            return $genericError;
+        }
+
+        $this->accountRepo->resetFailedAttempts($account['citizen_account_id']);
         return $account;
     }
 
@@ -159,10 +190,20 @@ class CitizenAccountService
         $email = trim((string)$email);
         $account = $this->accountRepo->findByEmail($email);
         if ($account && $account['status'] === 'Active' && $account['password_hash']) {
-            $token = bin2hex(random_bytes(32));
-            $expiresAt = date('Y-m-d H:i:s', strtotime('+1 hour'));
-            $this->accountRepo->setToken($account['citizen_account_id'], $token, $expiresAt);
-            $this->sendResetPasswordEmail($email, $token);
+            // A token issued less than RESET_EMAIL_COOLDOWN_SECONDS ago still has close to its
+            // full 1-hour expiry left -- use that as the "recently sent" signal without needing
+            // a separate last-sent column.
+            $secondsUntilExpiry = !empty($account['password_set_token_expires_at'])
+                ? strtotime($account['password_set_token_expires_at']) - time()
+                : 0;
+            $recentlySent = $secondsUntilExpiry > (3600 - self::RESET_EMAIL_COOLDOWN_SECONDS);
+
+            if (!$recentlySent) {
+                $token = bin2hex(random_bytes(32));
+                $expiresAt = date('Y-m-d H:i:s', strtotime('+1 hour'));
+                $this->accountRepo->setToken($account['citizen_account_id'], $token, $expiresAt);
+                $this->sendResetPasswordEmail($email, $token);
+            }
         }
         return ['ok' => true];
     }

@@ -56,18 +56,18 @@ function renderClearances() {
       <tr class="hover:bg-slate-50/50 transition ${isArchived ? 'opacity-60' : ''}">
         <td class="px-6 py-4.5">
           <div>
-            <span class="font-black text-slate-900 tracking-tight text-xs block font-mono">${zc.reference_number || ''}${archivedTag}</span>
-            <span class="text-[10px] text-slate-400 font-medium">${zc.applicant_name || 'Unknown applicant'}</span>
+            <span class="font-black text-slate-900 tracking-tight text-xs block font-mono">${escapeHtml(zc.reference_number || '')}${archivedTag}</span>
+            <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(zc.applicant_name) || 'Unknown applicant'}</span>
           </div>
         </td>
         <td class="px-6 py-4.5 text-xs text-slate-600">
-          <span class="font-bold text-slate-700">${zc.zone_classification || '&mdash;'}</span><br>
-          <span class="text-[10px] text-slate-400">${zc.use_category || ''}</span>
+          <span class="font-bold text-slate-700">${escapeHtml(zc.zone_classification) || '&mdash;'}</span><br>
+          <span class="text-[10px] text-slate-400">${escapeHtml(zc.use_category || '')}</span>
         </td>
         <td class="px-6 py-4.5">${zcConformityBadge(zc.conformity_result)}</td>
         <td class="px-6 py-4.5 text-xs text-slate-600">
           ${zcFormatPeso(zc.fee_amount)}<br>
-          <span class="text-[10px] text-slate-400">${zc.payment_status || ''}</span>
+          <span class="text-[10px] text-slate-400">${escapeHtml(zc.payment_status || '')}</span>
         </td>
         <td class="px-6 py-4.5">${zcStageBadge(zc.clearance_status)}</td>
         <td class="px-6 py-4.5 text-right whitespace-nowrap">

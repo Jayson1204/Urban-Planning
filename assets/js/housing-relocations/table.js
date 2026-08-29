@@ -42,11 +42,11 @@ function renderRelocations() {
             <div class="h-9 w-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 shrink-0 font-bold text-xs">
               <i class="fa-solid fa-user"></i>
             </div>
-            <span class="font-black text-slate-900 tracking-tight text-xs block">${r.resident_name || 'Unknown resident'}${archivedTag}</span>
+            <span class="font-black text-slate-900 tracking-tight text-xs block">${escapeHtml(r.resident_name) || 'Unknown resident'}${archivedTag}</span>
           </div>
         </td>
-        <td class="px-6 py-4.5 text-xs font-mono text-slate-600">${r.from_unit_code || '&mdash;'}</td>
-        <td class="px-6 py-4.5 text-xs font-mono text-slate-600">${r.to_unit_code || '&mdash;'}</td>
+        <td class="px-6 py-4.5 text-xs font-mono text-slate-600">${escapeHtml(r.from_unit_code) || '&mdash;'}</td>
+        <td class="px-6 py-4.5 text-xs font-mono text-slate-600">${escapeHtml(r.to_unit_code) || '&mdash;'}</td>
         <td class="px-6 py-4.5 text-xs text-slate-600 font-mono">${r.relocation_date || '&mdash;'}</td>
         <td class="px-6 py-4.5">${relReasonBadge(r.reason)}</td>
         <td class="px-6 py-4.5">

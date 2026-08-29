@@ -42,8 +42,8 @@ function renderSurveyForms() {
               <i class="fa-solid fa-clipboard-list"></i>
             </div>
             <div>
-              <span class="font-black text-slate-900 tracking-tight text-xs block font-mono">${f.form_code}</span>
-              <span class="text-[10px] text-slate-400 font-medium">${f.form_title}</span>
+              <span class="font-black text-slate-900 tracking-tight text-xs block font-mono">${escapeHtml(f.form_code)}</span>
+              <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(f.form_title)}</span>
             </div>
           </div>
         </td>

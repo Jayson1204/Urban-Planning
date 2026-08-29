@@ -27,13 +27,13 @@ function renderOccupancy() {
               <i class="fa-solid fa-user"></i>
             </div>
             <div>
-              <span class="font-black text-slate-900 tracking-tight text-xs block">${o.resident_name || 'Unknown resident'}</span>
-              <span class="text-[10px] text-slate-400 font-medium">${o.resident_barangay || ''}</span>
+              <span class="font-black text-slate-900 tracking-tight text-xs block">${escapeHtml(o.resident_name) || 'Unknown resident'}</span>
+              <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(o.resident_barangay || '')}</span>
             </div>
           </div>
         </td>
         <td class="px-6 py-4.5 text-xs">
-          <span class="font-bold text-slate-700 font-mono">${o.unit_code || ''}</span>${o.project_name ? `<br><span class="text-[10px] text-slate-400">${o.project_name}</span>` : ''}
+          <span class="font-bold text-slate-700 font-mono">${escapeHtml(o.unit_code || '')}</span>${o.project_name ? `<br><span class="text-[10px] text-slate-400">${escapeHtml(o.project_name)}</span>` : ''}
         </td>
         <td class="px-6 py-4.5 text-xs text-slate-600 font-mono">${o.move_in_date || '&mdash;'}</td>
         <td class="px-6 py-4.5 text-xs text-slate-600 font-mono">${o.move_out_date || '&mdash;'}</td>

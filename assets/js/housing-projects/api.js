@@ -22,7 +22,7 @@ async function loadHpBarangayOptions() {
     const select = document.getElementById('hpBarangayId');
     if (select) {
       select.innerHTML = '<option value="">Select barangay...</option>' +
-        options.map(b => `<option value="${b.barangay_id}">${b.name}</option>`).join('');
+        options.map(b => `<option value="${b.barangay_id}">${escapeHtml(b.name)}</option>`).join('');
     }
   } catch (err) {
     console.error('Error loading barangay list:', err);
@@ -67,38 +67,50 @@ async function fetchHousingProjectDetail(id) {
   }
 }
 
+let isSavingHp = false;
+
 async function handleSaveHousingProject(e) {
   e.preventDefault();
-  const idRef = document.getElementById('hpIdRef').value;
-  const boundaryText = document.getElementById('hpBoundary').value.trim();
 
-  if (boundaryText) {
-    try {
-      JSON.parse(boundaryText);
-    } catch (err) {
-      showToast('Boundary GeoJSON is not valid JSON.');
-      return;
-    }
+  if (isSavingHp) return;
+  isSavingHp = true;
+  const saveBtn = document.getElementById('hpSaveBtn');
+  const originalBtnText = saveBtn ? saveBtn.innerText : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...';
   }
 
-  const payload = {
-    name: document.getElementById('hpName').value.trim(),
-    barangay_id: document.getElementById('hpBarangayId').value || null,
-    barangay: document.getElementById('hpBarangayId').selectedOptions[0]?.text || null,
-    developer: document.getElementById('hpDeveloper').value.trim(),
-    units: document.getElementById('hpUnits').value || null,
-    project_status: document.getElementById('hpProjectStatus').value || null,
-    source: document.getElementById('hpSource').value.trim(),
-    latitude: document.getElementById('hpLatitude').value,
-    longitude: document.getElementById('hpLongitude').value,
-    boundary_geojson: boundaryText || null,
-    description: document.getElementById('hpDescription').value.trim(),
-  };
-
-  const isEdit = idRef !== '';
-  if (isEdit) payload.housing_project_id = parseInt(idRef);
-
   try {
+    const idRef = document.getElementById('hpIdRef').value;
+    const boundaryText = document.getElementById('hpBoundary').value.trim();
+
+    if (boundaryText) {
+      try {
+        JSON.parse(boundaryText);
+      } catch (err) {
+        showToast('Boundary GeoJSON is not valid JSON.');
+        return;
+      }
+    }
+
+    const payload = {
+      name: document.getElementById('hpName').value.trim(),
+      barangay_id: document.getElementById('hpBarangayId').value || null,
+      barangay: document.getElementById('hpBarangayId').selectedOptions[0]?.text || null,
+      developer: document.getElementById('hpDeveloper').value.trim(),
+      units: document.getElementById('hpUnits').value || null,
+      project_status: document.getElementById('hpProjectStatus').value || null,
+      source: document.getElementById('hpSource').value.trim(),
+      latitude: document.getElementById('hpLatitude').value,
+      longitude: document.getElementById('hpLongitude').value,
+      boundary_geojson: boundaryText || null,
+      description: document.getElementById('hpDescription').value.trim(),
+    };
+
+    const isEdit = idRef !== '';
+    if (isEdit) payload.housing_project_id = parseInt(idRef);
+
     const response = await fetch('../../api/employee/housing-projects.php', {
       method: isEdit ? 'PUT' : 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -115,6 +127,12 @@ async function handleSaveHousingProject(e) {
   } catch (err) {
     console.error('Error saving housing project:', err);
     showToast('Failed to save housing project.');
+  } finally {
+    isSavingHp = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = originalBtnText;
+    }
   }
 }
 

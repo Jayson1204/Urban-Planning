@@ -51,7 +51,7 @@ function renderHousingUnits() {
       : '<span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>';
 
     const locationDisplay = (u.barangay || u.street_address)
-      ? `<span class="font-bold text-slate-700">${u.barangay || ''}</span>${u.street_address ? `<br><span class="text-[10px] text-slate-400">${u.street_address}</span>` : ''}`
+      ? `<span class="font-bold text-slate-700">${escapeHtml(u.barangay || '')}</span>${u.street_address ? `<br><span class="text-[10px] text-slate-400">${escapeHtml(u.street_address)}</span>` : ''}`
       : '<span class="text-slate-400">&mdash;</span>';
 
     const row = `
@@ -62,12 +62,12 @@ function renderHousingUnits() {
               <i class="fa-solid fa-house"></i>
             </div>
             <div>
-              <span class="font-black text-slate-900 tracking-tight text-xs block font-mono">${u.unit_code}</span>
-              <span class="text-[10px] text-slate-400 font-medium">${u.project_name || 'No project'}</span>
+              <span class="font-black text-slate-900 tracking-tight text-xs block font-mono">${escapeHtml(u.unit_code)}</span>
+              <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(u.project_name) || 'No project'}</span>
             </div>
           </div>
         </td>
-        <td class="px-6 py-4.5 text-xs text-slate-600">${HOUSING_UNIT_TYPE_LABELS[u.unit_type] || u.unit_type || '&mdash;'}</td>
+        <td class="px-6 py-4.5 text-xs text-slate-600">${HOUSING_UNIT_TYPE_LABELS[u.unit_type] || escapeHtml(u.unit_type) || '&mdash;'}</td>
         <td class="px-6 py-4.5 text-xs">${locationDisplay}</td>
         <td class="px-6 py-4.5 text-xs font-semibold text-slate-700">${formatPeso(u.monthly_amortization)}</td>
         <td class="px-6 py-4.5">${occupancyBadge(u.occupancy_status)}</td>

@@ -97,8 +97,8 @@ async function renderPlanDocuments(planId) {
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-file-lines text-slate-400"></i>
             <div>
-              <span class="font-semibold text-slate-700 block">${d.document_type}</span>
-              <a href="../../${d.file_path}" target="_blank" class="text-[10px] text-brand-dark hover:underline">${d.file_name}</a>
+              <span class="font-semibold text-slate-700 block">${escapeHtml(d.document_type)}</span>
+              <a href="../../${escapeHtml(d.file_path)}" target="_blank" class="text-[10px] text-brand-dark hover:underline">${escapeHtml(d.file_name)}</a>
             </div>
           </div>
           <button onclick="handleDeletePlanDocument(${d.document_id}, ${planId})" class="text-slate-400 hover:text-red-500 cursor-pointer" title="Delete document">

@@ -41,8 +41,8 @@ function renderHouseholds() {
               <i class="fa-solid fa-house-chimney"></i>
             </div>
             <div>
-              <span class="font-black text-slate-900 tracking-tight text-xs block">${h.barangay || ''}${archivedTag}</span>
-              <span class="text-[10px] text-slate-400 font-medium">${h.street_address || ''}${h.household_number ? ' • HH ' + h.household_number : ''}</span>
+              <span class="font-black text-slate-900 tracking-tight text-xs block">${escapeHtml(h.barangay || '')}${archivedTag}</span>
+              <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(h.street_address || '')}${h.household_number ? ' • HH ' + escapeHtml(h.household_number) : ''}</span>
             </div>
           </div>
         </td>

@@ -70,8 +70,19 @@ async function fetchInfraStats() {
   }
 }
 
+let isSavingInfra = false;
+
 async function handleSaveInfra(e) {
   e.preventDefault();
+
+  if (isSavingInfra) return;
+  isSavingInfra = true;
+  const saveBtn = document.getElementById('infraSaveBtn');
+  const originalBtnText = saveBtn ? saveBtn.innerText : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...';
+  }
 
   const idRef = document.getElementById('infraIdRef').value;
   const payload = {
@@ -107,6 +118,12 @@ async function handleSaveInfra(e) {
   } catch (err) {
     console.error('Error saving infrastructure record:', err);
     showToast('Failed to save infrastructure record.');
+  } finally {
+    isSavingInfra = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = originalBtnText;
+    }
   }
 }
 

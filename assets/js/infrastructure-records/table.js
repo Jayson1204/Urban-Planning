@@ -41,13 +41,13 @@ function renderInfraRecords() {
               <i class="fa-solid fa-road"></i>
             </div>
             <div>
-              <span class="font-black text-slate-900 tracking-tight text-xs block">${r.infrastructure_name}${archivedTag}</span>
-              <span class="text-[10px] text-slate-400 font-medium">${r.barangay || ''}</span>
+              <span class="font-black text-slate-900 tracking-tight text-xs block">${escapeHtml(r.infrastructure_name)}${archivedTag}</span>
+              <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(r.barangay || '')}</span>
             </div>
           </div>
         </td>
-        <td class="px-6 py-4.5 text-xs text-slate-600">${r.infrastructure_type || '&mdash;'}</td>
-        <td class="px-6 py-4.5 text-xs text-slate-600">${r.project_code ? `<span class="font-mono font-bold">${r.project_code}</span>` : '<span class="text-slate-400 italic">Unlinked</span>'}</td>
+        <td class="px-6 py-4.5 text-xs text-slate-600">${escapeHtml(r.infrastructure_type) || '&mdash;'}</td>
+        <td class="px-6 py-4.5 text-xs text-slate-600">${r.project_code ? `<span class="font-mono font-bold">${escapeHtml(r.project_code)}</span>` : '<span class="text-slate-400 italic">Unlinked</span>'}</td>
         <td class="px-6 py-4.5">${infraConditionBadge(r.condition_status)}</td>
         <td class="px-6 py-4.5">
           <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${isArchived ? 'bg-slate-50 text-slate-500 border-slate-200' : 'bg-emerald-50 text-emerald-700 border-emerald-150'}">${r.status || 'Active'}</span>

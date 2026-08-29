@@ -67,8 +67,19 @@ async function fetchHouseholdStats() {
   }
 }
 
+let isSavingHousehold = false;
+
 async function handleSaveHousehold(e) {
   e.preventDefault();
+
+  if (isSavingHousehold) return;
+  isSavingHousehold = true;
+  const saveBtn = document.getElementById('householdSaveBtn');
+  const originalBtnText = saveBtn ? saveBtn.innerText : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...';
+  }
 
   const idRef = document.getElementById('householdIdRef').value;
   const payload = {
@@ -100,6 +111,12 @@ async function handleSaveHousehold(e) {
   } catch (err) {
     console.error('Error saving household:', err);
     showToast('Failed to save household.');
+  } finally {
+    isSavingHousehold = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = originalBtnText;
+    }
   }
 }
 

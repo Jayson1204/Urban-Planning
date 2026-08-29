@@ -15,10 +15,10 @@ if (!$email || !$password) {
     respondCitizenApp(['status' => 'error', 'message' => 'Email and password are required.'], 422);
 }
 
-$account = $citizenAccountService->login($email, $password);
-if (!$account) {
-    respondCitizenApp(['status' => 'error', 'message' => 'Invalid email or password.'], 401);
+$result = $citizenAccountService->login($email, $password);
+if (isset($result['error'])) {
+    respondCitizenApp(['status' => 'error', 'message' => $result['error']], 401);
 }
 
-$_SESSION['citizen_account_id'] = $account['citizen_account_id'];
+$_SESSION['citizen_account_id'] = $result['citizen_account_id'];
 respondCitizenApp(['status' => 'success', 'message' => 'Logged in.']);

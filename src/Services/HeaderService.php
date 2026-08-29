@@ -4,6 +4,11 @@ namespace App\Services;
 
 class HeaderService
 {
+    // How long a fetched permission set is reused before re-querying the remote API.
+    // bootstrap.php (and therefore this method) runs on every page load AND every local
+    // API call, so without this a single page view can trigger several remote calls back to back.
+    private const PERMISSIONS_CACHE_TTL_SECONDS = 30;
+
     private $userService;
     private $permissionService;
     private $authService;
@@ -64,18 +69,38 @@ class HeaderService
                 $headerUser['is_superadmin'] = false;
             }
 
-            // Permissions: Query LGU REST API on every load for instant panel changes
+            // Permissions: query the LGU REST API for panel changes, but only once per
+            // PERMISSIONS_CACHE_TTL_SECONDS -- this runs on every page load AND every local
+            // API call (both require bootstrap.php), so without a cache a single page view
+            // can trigger this remote call several times in a row.
             if (!empty($user['role_id'])) {
+                $targetRoleId = intval($user['role_id']);
+                $cacheAge = time() - (int)($_SESSION['user_permissions_fetched_at'] ?? 0);
+                $cacheIsFresh = ($_SESSION['user_permissions_role_id'] ?? null) === $targetRoleId
+                    && $cacheAge < self::PERMISSIONS_CACHE_TTL_SECONDS
+                    && isset($_SESSION['user_granted_actions'], $_SESSION['user_granted_resources']);
+
+                if ($cacheIsFresh) {
+                    $headerUser['granted_actions'] = $_SESSION['user_granted_actions'];
+                    $headerUser['granted_resources'] = $_SESSION['user_granted_resources'];
+                    return $headerUser;
+                }
+
                 require_once __DIR__ . '/../../config/proxy.php';
                 $apiBaseUrl = getenv('EXPO_PUBLIC_API_BASE_URL') ?: 'https://civentral.tech/api/employee';
                 $remoteUrl = rtrim($apiBaseUrl, '/') . '/permissions.php';
                 $res = proxyRequest($remoteUrl, 'GET', null);
-                
-                $grantedActions = [];
-                $grantedResources = [];
-                $userPermsMap = [];
-                
+
+                // Fall back to the last known-good permissions on a failed/timed-out remote
+                // call, rather than dropping the user's access on a transient network blip.
+                $grantedActions = $_SESSION['user_granted_actions'] ?? [];
+                $grantedResources = $_SESSION['user_granted_resources'] ?? [];
+                $userPermsMap = $_SESSION['user_permissions_map'] ?? [];
+
                 if (!empty($res['body']) && $res['code'] === 200) {
+                    $grantedActions = [];
+                    $grantedResources = [];
+                    $userPermsMap = [];
                     $body = $res['body'];
                     $rolesPerms = $body['role_permissions'] ?? [];
                     $perms = $body['permissions'] ?? [];
@@ -118,7 +143,6 @@ class HeaderService
                         ];
                     }
                     
-                    $targetRoleId = intval($user['role_id']);
                     foreach ($rolesPerms as $rp) {
                         if (intval($rp['role_id']) === $targetRoleId) {
                             $pId = $rp['permission_id'];
@@ -150,11 +174,16 @@ class HeaderService
                             }
                         }
                     }
+
+                    // Only refresh the cache timestamp on a successful fetch, so a failed/timed-out
+                    // call retries on the next request instead of holding the fallback for the full TTL.
+                    $_SESSION['user_permissions_fetched_at'] = time();
+                    $_SESSION['user_permissions_role_id'] = $targetRoleId;
                 }
-                
+
                 $headerUser['granted_actions'] = array_values(array_unique($grantedActions));
                 $headerUser['granted_resources'] = array_values(array_unique($grantedResources));
-                
+
                 // Cache inside local session
                 $_SESSION['user_granted_actions'] = $headerUser['granted_actions'];
                 $_SESSION['user_granted_resources'] = $headerUser['granted_resources'];

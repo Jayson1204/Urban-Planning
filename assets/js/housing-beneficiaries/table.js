@@ -48,7 +48,7 @@ function renderBeneficiaries() {
   beneficiariesData.forEach(b => {
     const isArchived = b.status === 'Archived';
     const unitDisplay = b.unit_id
-      ? `<span class="font-bold text-slate-700 font-mono">${b.unit_code || ''}</span>${b.project_name ? `<br><span class="text-[10px] text-slate-400">${b.project_name}</span>` : ''}`
+      ? `<span class="font-bold text-slate-700 font-mono">${escapeHtml(b.unit_code || '')}</span>${b.project_name ? `<br><span class="text-[10px] text-slate-400">${escapeHtml(b.project_name)}</span>` : ''}`
       : '<span class="text-slate-400 italic">Unassigned</span>';
 
     const archivedTag = isArchived
@@ -63,8 +63,8 @@ function renderBeneficiaries() {
               <i class="fa-solid fa-user"></i>
             </div>
             <div>
-              <span class="font-black text-slate-900 tracking-tight text-xs block">${b.resident_name || 'Unknown resident'}${archivedTag}</span>
-              <span class="text-[10px] text-slate-400 font-medium">${b.resident_barangay || ''}</span>
+              <span class="font-black text-slate-900 tracking-tight text-xs block">${escapeHtml(b.resident_name) || 'Unknown resident'}${archivedTag}</span>
+              <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(b.resident_barangay || '')}</span>
             </div>
           </div>
         </td>

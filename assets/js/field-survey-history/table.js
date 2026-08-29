@@ -19,10 +19,10 @@ function renderHistoryTimeline(events) {
       </div>
       <div class="flex-1 min-w-0">
         <div class="flex items-center justify-between gap-2">
-          <span class="font-bold text-slate-700">${ev.type}</span>
-          <span class="text-slate-400 font-mono text-[10px] shrink-0">${ev.date || ''}</span>
+          <span class="font-bold text-slate-700">${escapeHtml(ev.type)}</span>
+          <span class="text-slate-400 font-mono text-[10px] shrink-0">${escapeHtml(ev.date || '')}</span>
         </div>
-        <p class="text-slate-500 mt-0.5">${ev.description}</p>
+        <p class="text-slate-500 mt-0.5">${escapeHtml(ev.description)}</p>
       </div>
     </div>
   `).join('');

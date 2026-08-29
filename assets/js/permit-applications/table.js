@@ -59,18 +59,18 @@ function renderApplications() {
       <tr class="hover:bg-slate-50/50 transition ${isArchived ? 'opacity-60' : ''}">
         <td class="px-6 py-4.5">
           <div>
-            <span class="font-black text-slate-900 tracking-tight text-xs block font-mono">${pa.reference_number || ''}${archivedTag}</span>
-            <span class="text-[10px] text-slate-400 font-medium">${pa.applicant_name || 'Unknown applicant'}</span>
+            <span class="font-black text-slate-900 tracking-tight text-xs block font-mono">${escapeHtml(pa.reference_number || '')}${archivedTag}</span>
+            <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(pa.applicant_name) || 'Unknown applicant'}</span>
           </div>
         </td>
         <td class="px-6 py-4.5 text-xs text-slate-600">
           <span class="font-bold text-slate-700">${pa.application_type || '&mdash;'}</span><br>
-          <span class="text-[10px] text-slate-400">${pa.project_name || ''}</span>
+          <span class="text-[10px] text-slate-400">${escapeHtml(pa.project_name || '')}</span>
         </td>
         <td class="px-6 py-4.5">${paConsolidatedBadge(pa.consolidated_result)}</td>
         <td class="px-6 py-4.5 text-xs text-slate-600">
           ${paFormatPeso(pa.fee_amount)}<br>
-          <span class="text-[10px] text-slate-400">${pa.payment_status || ''}</span>
+          <span class="text-[10px] text-slate-400">${escapeHtml(pa.payment_status || '')}</span>
         </td>
         <td class="px-6 py-4.5">${paStageBadge(pa.application_status)}</td>
         <td class="px-6 py-4.5 text-right whitespace-nowrap">

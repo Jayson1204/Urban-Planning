@@ -52,6 +52,22 @@ class CitizenAccountRepository
         return $this->db->insert('citizen_accounts', $data);
     }
 
+    public function recordFailedAttempt($citizenAccountId, $attempts, $lockedUntil)
+    {
+        return $this->db->update('citizen_accounts', [
+            'failed_login_attempts' => $attempts,
+            'locked_until' => $lockedUntil,
+        ], ['citizen_account_id' => $citizenAccountId]);
+    }
+
+    public function resetFailedAttempts($citizenAccountId)
+    {
+        return $this->db->update('citizen_accounts', [
+            'failed_login_attempts' => 0,
+            'locked_until' => null,
+        ], ['citizen_account_id' => $citizenAccountId]);
+    }
+
     public function setPassword($citizenAccountId, $passwordHash)
     {
         return $this->db->update('citizen_accounts', [

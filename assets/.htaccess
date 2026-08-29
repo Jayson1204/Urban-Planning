@@ -1,0 +1,8 @@
+# Bridge JS/CSS here are already cache-busted with ?v=ASSET_VERSION (see assets/js/app.js),
+# so it's safe to let the browser cache them aggressively instead of re-fetching on every
+# page load -- a new version string produces a new URL, bypassing this cache automatically.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css)$">
+    Header set Cache-Control "public, max-age=2592000, immutable"
+  </FilesMatch>
+</IfModule>

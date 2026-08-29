@@ -67,8 +67,19 @@ async function fetchOccupancyStats() {
   }
 }
 
+let isSavingOccupancy = false;
+
 async function handleSaveOccupancy(e) {
   e.preventDefault();
+
+  if (isSavingOccupancy) return;
+  isSavingOccupancy = true;
+  const saveBtn = document.getElementById('occupancySaveBtn');
+  const originalBtnText = saveBtn ? saveBtn.innerText : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...';
+  }
 
   const payload = {
     resident_id: selectedOccResidentId ? parseInt(selectedOccResidentId) : null,
@@ -96,6 +107,12 @@ async function handleSaveOccupancy(e) {
   } catch (err) {
     console.error('Error saving occupancy record:', err);
     showToast('Failed to record occupancy.');
+  } finally {
+    isSavingOccupancy = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = originalBtnText;
+    }
   }
 }
 

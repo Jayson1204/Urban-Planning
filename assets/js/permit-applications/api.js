@@ -81,8 +81,19 @@ async function fetchApplicationDetail(applicationId) {
   }
 }
 
+let isSavingApplication = false;
+
 async function handleSaveApplication(e) {
   e.preventDefault();
+
+  if (isSavingApplication) return;
+  isSavingApplication = true;
+  const saveBtn = document.getElementById('paSaveBtn');
+  const originalBtnText = saveBtn ? saveBtn.innerText : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...';
+  }
 
   const idRef = document.getElementById('paIdRef').value;
   const isEdit = idRef !== '';
@@ -125,6 +136,12 @@ async function handleSaveApplication(e) {
   } catch (err) {
     console.error('Error saving permit application:', err);
     showToast('Failed to save application.');
+  } finally {
+    isSavingApplication = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = originalBtnText;
+    }
   }
 }
 

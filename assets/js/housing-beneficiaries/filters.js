@@ -21,9 +21,9 @@ function triggerResidentPicker(term) {
     }
     box.innerHTML = residents.map(r => `
       <button type="button" onclick='selectResident(${JSON.stringify(r).replace(/'/g, "&apos;")})' class="w-full text-left px-3 py-2.5 text-[11px] hover:bg-slate-50 border-b border-slate-100 last:border-0 cursor-pointer">
-        <span class="font-bold text-slate-700">${residentFullName(r)}</span>
-        ${r.barangay ? `<span class="text-slate-400"> — ${r.barangay}</span>` : ''}
-        ${r.household_number ? `<span class="text-slate-400 font-mono"> (HH ${r.household_number})</span>` : ''}
+        <span class="font-bold text-slate-700">${escapeHtml(residentFullName(r))}</span>
+        ${r.barangay ? `<span class="text-slate-400"> — ${escapeHtml(r.barangay)}</span>` : ''}
+        ${r.household_number ? `<span class="text-slate-400 font-mono"> (HH ${escapeHtml(r.household_number)})</span>` : ''}
       </button>
     `).join('');
     box.classList.remove('hidden');
@@ -47,9 +47,9 @@ function triggerUnitPicker(term) {
     }
     box.innerHTML = units.map(u => `
       <button type="button" onclick='selectBenUnit(${JSON.stringify(u).replace(/'/g, "&apos;")})' class="w-full text-left px-3 py-2.5 text-[11px] hover:bg-slate-50 border-b border-slate-100 last:border-0 cursor-pointer">
-        <span class="font-bold text-slate-700 font-mono">${u.unit_code}</span>
-        ${u.project_name ? `<span class="text-slate-400"> — ${u.project_name}</span>` : ''}
-        <span class="text-slate-400"> [${u.occupancy_status || ''}]</span>
+        <span class="font-bold text-slate-700 font-mono">${escapeHtml(u.unit_code)}</span>
+        ${u.project_name ? `<span class="text-slate-400"> — ${escapeHtml(u.project_name)}</span>` : ''}
+        <span class="text-slate-400"> [${escapeHtml(u.occupancy_status || '')}]</span>
       </button>
     `).join('');
     box.classList.remove('hidden');

@@ -23,7 +23,7 @@ async function loadSubdivisionBarangayOptions() {
     const select = document.getElementById('subdivisionBarangayId');
     if (select) {
       select.innerHTML = '<option value="">Select barangay...</option>' +
-        subdivisionBarangayOptions.map(b => `<option value="${b.barangay_id}">${b.name}</option>`).join('');
+        subdivisionBarangayOptions.map(b => `<option value="${b.barangay_id}">${escapeHtml(b.name)}</option>`).join('');
     }
   } catch (err) {
     console.error('Error loading barangay list:', err);
@@ -66,37 +66,49 @@ async function fetchSubdivisionDetail(subdivisionId) {
   }
 }
 
+let isSavingSubdivision = false;
+
 async function handleSaveSubdivision(e) {
   e.preventDefault();
-  const idRef = document.getElementById('subdivisionIdRef').value;
-  const boundaryText = document.getElementById('subdivisionBoundary').value.trim();
 
-  if (boundaryText) {
-    try {
-      JSON.parse(boundaryText);
-    } catch (err) {
-      showToast('Boundary GeoJSON is not valid JSON.');
-      return;
-    }
+  if (isSavingSubdivision) return;
+  isSavingSubdivision = true;
+  const saveBtn = document.getElementById('subdivisionSaveBtn');
+  const originalBtnText = saveBtn ? saveBtn.innerText : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...';
   }
 
-  const payload = {
-    name: document.getElementById('subdivisionName').value.trim(),
-    barangay_id: document.getElementById('subdivisionBarangayId').value || null,
-    barangay: document.getElementById('subdivisionBarangayId').selectedOptions[0]?.text || null,
-    subdivision_type: document.getElementById('subdivisionType').value.trim(),
-    subdivision_status: document.getElementById('subdivisionStatusText').value.trim(),
-    source: document.getElementById('subdivisionSource').value.trim(),
-    latitude: document.getElementById('subdivisionLatitude').value,
-    longitude: document.getElementById('subdivisionLongitude').value,
-    boundary_geojson: boundaryText || null,
-    description: document.getElementById('subdivisionDescription').value.trim(),
-  };
-
-  const isEdit = idRef !== '';
-  if (isEdit) payload.subdivision_id = parseInt(idRef);
-
   try {
+    const idRef = document.getElementById('subdivisionIdRef').value;
+    const boundaryText = document.getElementById('subdivisionBoundary').value.trim();
+
+    if (boundaryText) {
+      try {
+        JSON.parse(boundaryText);
+      } catch (err) {
+        showToast('Boundary GeoJSON is not valid JSON.');
+        return;
+      }
+    }
+
+    const payload = {
+      name: document.getElementById('subdivisionName').value.trim(),
+      barangay_id: document.getElementById('subdivisionBarangayId').value || null,
+      barangay: document.getElementById('subdivisionBarangayId').selectedOptions[0]?.text || null,
+      subdivision_type: document.getElementById('subdivisionType').value.trim(),
+      subdivision_status: document.getElementById('subdivisionStatusText').value.trim(),
+      source: document.getElementById('subdivisionSource').value.trim(),
+      latitude: document.getElementById('subdivisionLatitude').value,
+      longitude: document.getElementById('subdivisionLongitude').value,
+      boundary_geojson: boundaryText || null,
+      description: document.getElementById('subdivisionDescription').value.trim(),
+    };
+
+    const isEdit = idRef !== '';
+    if (isEdit) payload.subdivision_id = parseInt(idRef);
+
     const response = await fetch('../../api/employee/subdivisions.php', {
       method: isEdit ? 'PUT' : 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -113,6 +125,12 @@ async function handleSaveSubdivision(e) {
   } catch (err) {
     console.error('Error saving subdivision:', err);
     showToast('Failed to save subdivision.');
+  } finally {
+    isSavingSubdivision = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = originalBtnText;
+    }
   }
 }
 

@@ -1,10 +1,7 @@
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.innerText = str;
-  return div.innerHTML;
-}
-
 // Lightweight formatter for Gemini's markdown-ish output: bold, bullet lines, line breaks.
+// Uses the shared escapeHtml() from assets/js/app.js (loaded before any bridge script,
+// including this one), not a local copy -- avoids two same-named global functions where
+// whichever loads last silently wins for every caller in the app.
 // Intentionally minimal (no markdown library) since the assistant's replies are short and
 // mostly plain text with occasional **bold** or "- " bullet lines.
 function formatAiText(text) {

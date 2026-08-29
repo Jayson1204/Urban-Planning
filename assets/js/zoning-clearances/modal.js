@@ -122,15 +122,15 @@ async function openEditClearanceModal(clearanceId) {
 }
 
 function zcTimelineEntry(review) {
-  const who = [review.reviewer_name, review.reviewer_role].filter(Boolean).join(' — ');
+  const who = escapeHtml([review.reviewer_name, review.reviewer_role].filter(Boolean).join(' — '));
   return `
     <div class="px-4 py-3">
       <div class="flex items-center justify-between">
-        <span class="font-bold text-slate-800">${review.action || ''}</span>
-        <span class="text-[10px] text-slate-400 font-mono">${review.created_at || ''}</span>
+        <span class="font-bold text-slate-800">${escapeHtml(review.action || '')}</span>
+        <span class="text-[10px] text-slate-400 font-mono">${escapeHtml(review.created_at || '')}</span>
       </div>
       <p class="text-slate-500 mt-0.5">${who || 'System'}</p>
-      ${review.remarks ? `<p class="text-slate-600 mt-1">${review.remarks}</p>` : ''}
+      ${review.remarks ? `<p class="text-slate-600 mt-1">${escapeHtml(review.remarks)}</p>` : ''}
     </div>
   `;
 }
@@ -143,7 +143,7 @@ async function openViewClearanceModal(clearanceId) {
   document.getElementById('viewZcMeta').innerText =
     [zc.applicant_name, zc.zone_classification, zc.use_category].filter(Boolean).join(' • ') || 'No additional details on file.';
   document.getElementById('viewZcConformity').innerText = zc.conformity_result || 'Pending';
-  document.getElementById('viewZcFee').innerHTML = `${zcFormatPeso(zc.fee_amount)} <span class="text-slate-400 font-semibold">(${zc.payment_status || 'Unpaid'})</span>`;
+  document.getElementById('viewZcFee').innerHTML = `${zcFormatPeso(zc.fee_amount)} <span class="text-slate-400 font-semibold">(${escapeHtml(zc.payment_status) || 'Unpaid'})</span>`;
   document.getElementById('viewZcConformityNotes').innerText = zc.conformity_notes || 'No conformity notes on file.';
 
   const certLink = document.getElementById('viewZcCertificateLink');

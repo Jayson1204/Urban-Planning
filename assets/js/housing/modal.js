@@ -81,10 +81,10 @@ async function openViewHousingModal(unitId) {
     ? history.map(ev => `
         <div class="px-4 py-2.5">
           <div class="flex items-center justify-between">
-            <span class="font-bold text-slate-700">${ev.type}</span>
-            <span class="text-slate-400 font-mono text-[10px]">${ev.date || ''}</span>
+            <span class="font-bold text-slate-700">${escapeHtml(ev.type)}</span>
+            <span class="text-slate-400 font-mono text-[10px]">${escapeHtml(ev.date || '')}</span>
           </div>
-          <p class="text-slate-500 mt-0.5">${ev.description}</p>
+          <p class="text-slate-500 mt-0.5">${escapeHtml(ev.description)}</p>
         </div>
       `).join('')
     : '<div class="px-4 py-3 text-slate-400">No recorded history for this unit yet.</div>';

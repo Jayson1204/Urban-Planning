@@ -1,7 +1,7 @@
 function fullName(r) {
-  const mid = r.middle_name ? ` ${r.middle_name}` : '';
-  const suf = r.suffix ? ` ${r.suffix}` : '';
-  return `${r.first_name}${mid} ${r.last_name}${suf}`;
+  const mid = r.middle_name ? ` ${escapeHtml(r.middle_name)}` : '';
+  const suf = r.suffix ? ` ${escapeHtml(r.suffix)}` : '';
+  return `${escapeHtml(r.first_name)}${mid} ${escapeHtml(r.last_name)}${suf}`;
 }
 
 function renderResidents() {
@@ -30,8 +30,8 @@ function renderResidents() {
       : '<span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>';
 
     const householdDisplay = r.household_id
-      ? `<span class="font-bold text-slate-700">${r.household_barangay || ''}</span><br><span class="text-[10px] text-slate-400 font-mono">HH ${r.household_number || r.household_id}</span>`
-      : `<span class="text-slate-500">${r.barangay || '&mdash;'}</span>`;
+      ? `<span class="font-bold text-slate-700">${escapeHtml(r.household_barangay || '')}</span><br><span class="text-[10px] text-slate-400 font-mono">HH ${escapeHtml(r.household_number || r.household_id)}</span>`
+      : `<span class="text-slate-500">${escapeHtml(r.barangay) || '&mdash;'}</span>`;
 
     const row = `
       <tr class="hover:bg-slate-50/50 transition">
@@ -42,14 +42,14 @@ function renderResidents() {
             </div>
             <div>
               <span class="font-black text-slate-900 tracking-tight text-xs block">${fullName(r)}</span>
-              <span class="text-[10px] text-slate-400 font-medium">${r.relationship_to_head || ''}</span>
+              <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(r.relationship_to_head || '')}</span>
             </div>
           </div>
         </td>
         <td class="px-6 py-4.5 text-xs">${householdDisplay}</td>
         <td class="px-6 py-4.5 text-xs">
-          <div>${r.contact_number || '&mdash;'}</div>
-          <div class="text-[10px] text-slate-400">${r.email || ''}</div>
+          <div>${escapeHtml(r.contact_number) || '&mdash;'}</div>
+          <div class="text-[10px] text-slate-400">${escapeHtml(r.email || '')}</div>
         </td>
         <td class="px-6 py-4.5">
           <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${statusClass} inline-flex items-center gap-1.5">

@@ -1,0 +1,38 @@
+# Session cookie hardening (mod_php picks this up for every script under this directory,
+# no per-file code changes needed). HttpOnly stops JS from reading the session cookie
+# (defense in depth alongside fixing stored-XSS at the source); SameSite=Lax blocks the
+# cookie being sent on most cross-site requests.
+<IfModule php_module>
+  php_flag session.cookie_httponly On
+  php_value session.cookie_samesite Lax
+</IfModule>
+
+# Secure flag is conditional on the actual request scheme, not hardcoded -- this same file is
+# used for both local http:// XAMPP dev (where a hardcoded Secure flag would silently break
+# login, since browsers drop Secure cookies over non-TLS) and production behind HTTPS.
+<IfModule mod_php.c>
+  <If "%{HTTPS} == 'on'">
+    php_flag session.cookie_secure On
+  </If>
+</IfModule>
+
+# This app is served from the repo root (no public/ folder), so without this, Apache's default
+# directory listing would let anyone browse to config/, database/, vendor/, etc. and download
+# raw source, schema, or dependency-lock files directly over HTTP.
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^(config|src|database|vendor|docs|diagram|scripts|\.claude|\.git)/ - [F,L]
+  RewriteRule \.(sql|md|lock|log)$ - [F,L]
+</IfModule>
+
+<FilesMatch "^(composer\.json|composer\.lock|CLAUDE\.md|setup\.md|\.env(\..*)?|\.gitignore)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>

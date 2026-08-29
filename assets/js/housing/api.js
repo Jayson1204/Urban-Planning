@@ -70,8 +70,19 @@ async function fetchHousingStats() {
   }
 }
 
+let isSavingHousingUnit = false;
+
 async function handleSaveHousingUnit(e) {
   e.preventDefault();
+
+  if (isSavingHousingUnit) return;
+  isSavingHousingUnit = true;
+  const saveBtn = document.getElementById('housingUnitSaveBtn');
+  const originalBtnText = saveBtn ? saveBtn.innerText : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...';
+  }
 
   const idRef = document.getElementById('housingIdRef').value;
   const payload = {
@@ -111,6 +122,12 @@ async function handleSaveHousingUnit(e) {
   } catch (err) {
     console.error('Error saving housing unit:', err);
     showToast('Failed to save housing unit.');
+  } finally {
+    isSavingHousingUnit = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = originalBtnText;
+    }
   }
 }
 

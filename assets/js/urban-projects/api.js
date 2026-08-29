@@ -70,8 +70,19 @@ async function fetchProjectStats() {
   }
 }
 
+let isSavingProject = false;
+
 async function handleSaveProject(e) {
   e.preventDefault();
+
+  if (isSavingProject) return;
+  isSavingProject = true;
+  const saveBtn = document.getElementById('projectSaveBtn');
+  const originalBtnText = saveBtn ? saveBtn.innerText : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...';
+  }
 
   const idRef = document.getElementById('projectIdRef').value;
   const payload = {
@@ -112,6 +123,12 @@ async function handleSaveProject(e) {
   } catch (err) {
     console.error('Error saving urban project:', err);
     showToast('Failed to save urban project.');
+  } finally {
+    isSavingProject = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = originalBtnText;
+    }
   }
 }
 

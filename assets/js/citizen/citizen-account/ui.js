@@ -46,14 +46,14 @@ function renderControlTable(list = ctrlCitizens) {
       <tr class="hover:bg-slate-50/50 transition">
         <!-- Citizen ID -->
         <td class="px-6 py-4 font-mono font-bold text-slate-700 tracking-tight select-all">
-          ${cit.id}
+          ${escapeHtml(cit.id)}
         </td>
 
         <!-- Citizen User -->
         <td class="px-6 py-4">
           <div class="flex flex-col">
-            <span class="font-extrabold text-slate-800 tracking-tight leading-snug">${cit.name}</span>
-            <span class="text-[10px] text-slate-400 font-medium">${cit.email}</span>
+            <span class="font-extrabold text-slate-800 tracking-tight leading-snug">${escapeHtml(cit.name)}</span>
+            <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(cit.email)}</span>
           </div>
         </td>
 
@@ -61,13 +61,13 @@ function renderControlTable(list = ctrlCitizens) {
         <td class="px-6 py-4">
           <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${badgeClass} inline-flex items-center gap-1.5">
             ${iconIndicator}
-            <span>${cit.status}</span>
+            <span>${escapeHtml(cit.status)}</span>
           </span>
         </td>
 
         <!-- Violations logs -->
         <td class="px-6 py-4">
-          <span class="${violationClass}">${cit.violations}</span>
+          <span class="${violationClass}">${escapeHtml(cit.violations)}</span>
         </td>
 
         <!-- State Controller Actions -->

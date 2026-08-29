@@ -44,17 +44,17 @@ function renderAssignments() {
               <i class="fa-solid fa-clipboard-list"></i>
             </div>
             <div>
-              <span class="font-black text-slate-900 tracking-tight text-xs block font-mono">${a.form_code || '&mdash;'}</span>
-              <span class="text-[10px] text-slate-400 font-medium">${a.form_title || ''}</span>
+              <span class="font-black text-slate-900 tracking-tight text-xs block font-mono">${escapeHtml(a.form_code) || '&mdash;'}</span>
+              <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(a.form_title || '')}</span>
             </div>
           </div>
         </td>
         <td class="px-6 py-4.5 text-xs text-slate-600">
           <i class="fa-solid ${subjectIcon(a.subject_type)} text-[10px] text-slate-400 mr-1"></i>
-          ${a.subject_name || '&mdash;'}
+          ${escapeHtml(a.subject_name) || '&mdash;'}
           <span class="text-[10px] text-slate-400 block">${a.subject_type || ''}</span>
         </td>
-        <td class="px-6 py-4.5 text-xs text-slate-600">${a.assigned_to || '&mdash;'}</td>
+        <td class="px-6 py-4.5 text-xs text-slate-600">${escapeHtml(a.assigned_to) || '&mdash;'}</td>
         <td class="px-6 py-4.5 text-xs font-semibold text-slate-700">${a.due_date || '&mdash;'}</td>
         <td class="px-6 py-4.5">${assignmentProgressBadge(a.assignment_status)}</td>
         <td class="px-6 py-4.5 text-right whitespace-nowrap">

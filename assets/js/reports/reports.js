@@ -12,14 +12,14 @@ document.addEventListener('DOMContentLoaded', () => {
             emptyIcon: 'fa-people-roof',
             emptyText: 'No residents matched your filters.',
             renderRow: (r) => {
-                const name = [r.first_name, r.middle_name, r.last_name, r.suffix].filter(Boolean).join(' ');
+                const name = escapeHtml([r.first_name, r.middle_name, r.last_name, r.suffix].filter(Boolean).join(' '));
                 const isActive = r.status === 'Active';
                 const statusClass = isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-150' : 'bg-slate-50 text-slate-500 border-slate-200';
                 return `
                     <tr class="hover:bg-slate-50/50 transition">
                         <td class="px-6 py-3.5 font-bold text-slate-800">${name}</td>
-                        <td class="px-6 py-3.5">${r.household_barangay || r.barangay || '&mdash;'}${r.household_number ? ` <span class="text-slate-400 font-mono text-[10px]">(HH ${r.household_number})</span>` : ''}</td>
-                        <td class="px-6 py-3.5">${r.contact_number || '&mdash;'}</td>
+                        <td class="px-6 py-3.5">${escapeHtml(r.household_barangay || r.barangay) || '&mdash;'}${r.household_number ? ` <span class="text-slate-400 font-mono text-[10px]">(HH ${escapeHtml(r.household_number)})</span>` : ''}</td>
+                        <td class="px-6 py-3.5">${escapeHtml(r.contact_number) || '&mdash;'}</td>
                         <td class="px-6 py-3.5"><span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${statusClass}">${r.status}</span></td>
                         <td class="px-6 py-3.5 text-slate-500">${(r.created_at || '').substring(0, 10)}</td>
                     </tr>`;
@@ -35,8 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const statusClass = isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-150' : 'bg-slate-50 text-slate-500 border-slate-200';
                 return `
                     <tr class="hover:bg-slate-50/50 transition">
-                        <td class="px-6 py-3.5 font-bold text-slate-800">${r.unit_code}<div class="text-[10px] text-slate-400 font-medium">${r.project_name || ''}</div></td>
-                        <td class="px-6 py-3.5">${r.barangay || '&mdash;'}</td>
+                        <td class="px-6 py-3.5 font-bold text-slate-800">${escapeHtml(r.unit_code)}<div class="text-[10px] text-slate-400 font-medium">${escapeHtml(r.project_name || '')}</div></td>
+                        <td class="px-6 py-3.5">${escapeHtml(r.barangay) || '&mdash;'}</td>
                         <td class="px-6 py-3.5">${r.occupancy_status}</td>
                         <td class="px-6 py-3.5"><span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${statusClass}">${r.status}</span></td>
                         <td class="px-6 py-3.5 text-slate-500">${(r.created_at || '').substring(0, 10)}</td>
@@ -52,8 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const budget = r.budget ? Number(r.budget).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }) : '&mdash;';
                 return `
                     <tr class="hover:bg-slate-50/50 transition">
-                        <td class="px-6 py-3.5 font-bold text-slate-800">${r.project_code}<div class="text-[10px] text-slate-400 font-medium">${r.project_title}</div></td>
-                        <td class="px-6 py-3.5">${r.barangay || '&mdash;'}<div class="text-[10px] text-slate-400">${r.project_type || ''}</div></td>
+                        <td class="px-6 py-3.5 font-bold text-slate-800">${escapeHtml(r.project_code)}<div class="text-[10px] text-slate-400 font-medium">${escapeHtml(r.project_title)}</div></td>
+                        <td class="px-6 py-3.5">${escapeHtml(r.barangay) || '&mdash;'}<div class="text-[10px] text-slate-400">${escapeHtml(r.project_type || '')}</div></td>
                         <td class="px-6 py-3.5">${r.project_status}</td>
                         <td class="px-6 py-3.5">${budget}</td>
                         <td class="px-6 py-3.5 text-slate-500">${(r.created_at || '').substring(0, 10)}</td>
@@ -70,8 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const statusClass = isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-150' : 'bg-slate-50 text-slate-500 border-slate-200';
                 return `
                     <tr class="hover:bg-slate-50/50 transition">
-                        <td class="px-6 py-3.5 font-bold text-slate-800">${r.form_code || ''}<div class="text-[10px] text-slate-400 font-medium">${r.form_title || ''}</div></td>
-                        <td class="px-6 py-3.5">${r.subject_name || '&mdash;'}</td>
+                        <td class="px-6 py-3.5 font-bold text-slate-800">${escapeHtml(r.form_code || '')}<div class="text-[10px] text-slate-400 font-medium">${escapeHtml(r.form_title || '')}</div></td>
+                        <td class="px-6 py-3.5">${escapeHtml(r.subject_name) || '&mdash;'}</td>
                         <td class="px-6 py-3.5">${r.condition_rating || '&mdash;'}</td>
                         <td class="px-6 py-3.5"><span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${statusClass}">${r.status}</span></td>
                         <td class="px-6 py-3.5 text-slate-500">${r.survey_date || '&mdash;'}</td>

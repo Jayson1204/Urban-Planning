@@ -22,6 +22,15 @@ if (!function_exists('loadEnv')) {
 
 loadEnv(__DIR__ . '/../.env');
 
+// APP_DEBUG was documented (.env.example, setup.md) but never actually wired up --
+// PHP error display depended entirely on the server's own php.ini. Default to hardened
+// (no error output to the browser) unless APP_DEBUG is explicitly true.
+$appDebug = filter_var(getenv('APP_DEBUG'), FILTER_VALIDATE_BOOLEAN);
+ini_set('display_errors', $appDebug ? '1' : '0');
+ini_set('display_startup_errors', $appDebug ? '1' : '0');
+error_reporting(E_ALL);
+ini_set('log_errors', '1');
+
 class Database {
     private static $instance = null;
     private $pdo;

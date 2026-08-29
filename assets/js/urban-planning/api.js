@@ -72,8 +72,19 @@ async function fetchPlanStats() {
   }
 }
 
+let isSavingPlan = false;
+
 async function handleSaveDevelopmentPlan(e) {
   e.preventDefault();
+
+  if (isSavingPlan) return;
+  isSavingPlan = true;
+  const saveBtn = document.getElementById('planSaveBtn');
+  const originalBtnText = saveBtn ? saveBtn.innerText : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...';
+  }
 
   const idRef = document.getElementById('planIdRef').value;
   const payload = {
@@ -112,6 +123,12 @@ async function handleSaveDevelopmentPlan(e) {
   } catch (err) {
     console.error('Error saving development plan:', err);
     showToast('Failed to save development plan.');
+  } finally {
+    isSavingPlan = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = originalBtnText;
+    }
   }
 }
 
