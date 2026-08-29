@@ -1,0 +1,12 @@
+.git
+.env
+.env.*
+!.env.example
+vendor/
+uploads/*
+!uploads/.htaccess
+!uploads/residents/.gitkeep
+.claude/
+diagram/
+*.log
+node_modules/
