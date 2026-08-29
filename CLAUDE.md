@@ -10,7 +10,7 @@ CIVENTRAL Urban Planning is a PHP (no framework) web app served by XAMPP (Apache
 - **PHP CLI** (Git Bash): `/c/xampp/php/php.exe` (Windows path: `C:\xampp\php\php.exe`).
 - **Lint a PHP file**: `php -l path/to/file.php`.
 - **Apply a DB migration** (no migration tool — SQL files are run manually):
-  `/c/xampp/php/php.exe -r "require 'config/database.php'; \$db->getPdo()->exec(file_get_contents('database/phaseN_x.sql'));"`
+  `/c/xampp/php/php.exe -r "require 'config/database.php'; \$db->getPdo()->exec(file_get_contents('database/x.sql'));"`
 - **Install PHP deps**: `composer install` (only dependency is PHPMailer).
 - **Tests**: there is no test framework. The convention is standalone PHP CLI scripts that `require config/database.php` plus the repository/service classes and assert behavior; run them with the php.exe above. Write these to the scratch/temp dir, not the repo.
 
@@ -42,10 +42,10 @@ Pages under `pages/<area>/*.php` set `$basePath = '../../'`, then `include heade
 - `window.civentralBasePath` (set in header.php) is the base path for all dynamic script loads.
 
 ### Adding a new module (mirror an existing one, e.g. housing)
-`database/phaseN_*.sql` → `src/Repositories/XRepository.php` (find/paginate/stats/create/update/setStatus) → `src/Services/XService.php` (validate + whitelist-sanitize) → register both in `bootstrap.php` → `api/employee/x.php` (auth + `requireResource` + REST + `respond`) → `pages/<area>/x.php` view → `assets/js/<module>/` bridge registered in `app.js` → sidebar entry (gated with `$hasResourceAccess([...keywords])`) + `assets/js/dashboard.js` dropdown arrays → create the matching module/resource in **Module Management** (production) → grant it to roles in **Permission Builder**.
+`database/x.sql` (descriptively named, appended to the apply-order list in `setup.md`) → `src/Repositories/XRepository.php` (find/paginate/stats/create/update/setStatus) → `src/Services/XService.php` (validate + whitelist-sanitize) → register both in `bootstrap.php` → `api/employee/x.php` (auth + `requireResource` + REST + `respond`) → `pages/<area>/x.php` view → `assets/js/<module>/` bridge registered in `app.js` → sidebar entry (gated with `$hasResourceAccess([...keywords])`) + `assets/js/dashboard.js` dropdown arrays → create the matching module/resource in **Module Management** (production) → grant it to roles in **Permission Builder**.
 
 ### Database
-Local schema lives in `database/phaseN_*.sql`, applied manually. PDO runs with `EMULATE_PREPARES => false`: a named placeholder reused within one query throws `HY093`. Use a single placeholder (e.g. `CONCAT_WS(' ', a, b, c) LIKE :search`) rather than repeating `:search`.
+Local schema lives in `database/*.sql` (descriptively named, no numbering — apply order is documented explicitly in `setup.md` since some tables have foreign keys on earlier ones), applied manually. PDO runs with `EMULATE_PREPARES => false`: a named placeholder reused within one query throws `HY093`. Use a single placeholder (e.g. `CONCAT_WS(' ', a, b, c) LIKE :search`) rather than repeating `:search`.
 
 ### Environment
 `.env` is loaded by `config/database.php`. Keys: `DB_HOST/DB_PORT/DB_NAME/DB_USER/DB_PASSWORD` (local MySQL), `EXPO_PUBLIC_API_BASE_URL` (override remote proxy target), `RECAPTCHA_SITE_KEY/RECAPTCHA_SECRET_KEY`, `APP_ENV/APP_DEBUG`. See `.env.example`.

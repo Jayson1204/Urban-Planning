@@ -30,7 +30,7 @@ No new external libraries beyond Leaflet were introduced (per `CLAUDE.md`'s "pre
 
 ## Database
 
-`database/phase16_barangay_mapping.sql`:
+`database/barangay_mapping.sql`:
 
 ```sql
 CREATE TABLE barangays (

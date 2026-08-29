@@ -1,4 +1,4 @@
--- Phase 4.2 extension: Beneficiary Application Documents.
+-- Beneficiary Application Documents (Housing Management extension).
 -- Supporting documents for a housing beneficiary application (valid ID, proof of
 -- income, barangay certificate, etc.). Citizens submit these themselves via the
 -- future mobile app (submitted_by = 'Citizen'); until that exists, staff can enter

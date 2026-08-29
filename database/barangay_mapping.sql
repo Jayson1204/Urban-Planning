@@ -1,4 +1,4 @@
--- Phase 16: Barangay Mapping (spatial layer foundation).
+-- Barangay Mapping (spatial layer foundation).
 -- Adds a reference table of Caloocan's 188 barangays (name/PSGC code/centroid),
 -- matched by name against the free-text `barangay` column already used across
 -- residents/housing_units/urban_projects/infrastructure_records/zoning_clearances.

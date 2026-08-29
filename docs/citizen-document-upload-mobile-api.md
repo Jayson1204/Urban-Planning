@@ -16,7 +16,7 @@ The admin review UI is already live: **Housing Management → Beneficiaries → 
 
 ## What's already built (Web side only)
 
-- **Table**: `housing_beneficiary_documents` (`database/phase12_beneficiary_documents.sql`)
+- **Table**: `housing_beneficiary_documents` (`database/housing_beneficiary_documents.sql`)
   - `beneficiary_id` — FK to `housing_beneficiaries` (cascade delete)
   - `document_type` — ENUM: `Valid ID`, `Proof of Income`, `Barangay Certificate`, `Certificate of Indigency`, `Proof of Residency`, `Other`
   - `file_name`, `file_path`, `file_size`

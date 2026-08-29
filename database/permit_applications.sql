@@ -1,4 +1,6 @@
--- Phase 17: Subdivision and Building Review.
+-- Permit Applications (subdivision plat and building permit review).
+-- The tables below are the permit application/review workflow, not the geography tables
+-- (see gis_layers.sql for the actual `subdivisions`/`buildings` tables).
 -- Module 5.x - Permit application intake (subdivision plats and building permits,
 -- modeled as one application type field rather than two separate tables, per the
 -- gap-analysis doc's own guidance), plan document versioning, multi-discipline
@@ -6,7 +8,7 @@
 -- and permit issuance with conditions of approval.
 -- No parcel/GIS layer exists yet, so barangay/street_address are self-declared
 -- rather than derived from a real parcel map (same simplification as
--- zoning_clearances.zone_classification; see phase15).
+-- zoning_clearances.zone_classification; see zoning_clearances.sql).
 
 CREATE TABLE IF NOT EXISTS `permit_applications` (
   `application_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,

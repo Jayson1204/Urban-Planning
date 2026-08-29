@@ -1,4 +1,4 @@
--- Phase 5 follow-up: Urban Projects, Infrastructure Records, and Planning Documents.
+-- Urban Planning follow-up: Urban Projects, Infrastructure Records, and Planning Documents.
 -- Urban Projects and Infrastructure Records optionally FK to a development plan.
 -- Planning Documents FK directly to a plan and are managed inline from the plan's
 -- view modal (mirrors resident_documents), not as a standalone module page.

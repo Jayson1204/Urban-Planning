@@ -1,4 +1,4 @@
--- Phase 4 follow-up: Occupancy and Relocation Records.
+-- Housing Management follow-up: Occupancy and Relocation Records.
 -- Occupancy is decoupled from the beneficiary applicant/award lifecycle so a unit's
 -- occupant history can span multiple stays and survive relocations. Relocating a
 -- resident ends their occupancy on the source unit and starts a new one on the

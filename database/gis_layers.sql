@@ -1,4 +1,4 @@
--- Phase 18: GIS layers on top of the Phase 16 barangay map (subdivisions,
+-- GIS layers on top of the barangay map (subdivisions,
 -- housing projects, building footprints). Does not touch `barangays` or the
 -- boundary GeoJSON. All three tables carry a real `barangay_id` FK (unlike
 -- the legacy name-joined `housing_units.barangay`), computed at import time

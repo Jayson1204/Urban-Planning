@@ -1,4 +1,4 @@
--- Phase 14: Housing Beneficiary Registry follow-up.
+-- Housing Beneficiary Registry follow-up.
 -- Adds a server-computed eligibility score (used for waitlist/priority ordering)
 -- and an amortization status field for tracking awarded beneficiaries only.
 

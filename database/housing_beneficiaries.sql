@@ -1,4 +1,4 @@
--- Phase 4: Housing Management
+-- Housing Management
 -- Module 4.2 - Beneficiaries. Links a Phase 3 resident (and optionally their
 -- household) to a housing unit and tracks the applicant -> awarded lifecycle.
 

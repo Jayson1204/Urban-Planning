@@ -1,4 +1,4 @@
--- Phase 3: Resident Management
+-- Resident Management
 -- New local tables. Independent of the production-proxied `users`/`citizens` data
 -- (see project memory: residents are decoupled from citizen portal accounts for now).
 

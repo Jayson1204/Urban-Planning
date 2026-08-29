@@ -1,4 +1,4 @@
--- Phase 15: Zoning Clearance System.
+-- Zoning Clearance System.
 -- Module 5.x - Online application intake, rule-based conformity pre-screening,
 -- multi-level review routing, and fee/payment tracking for zoning clearances.
 -- No parcel/GIS layer exists yet, so zone_classification is applicant/staff-declared

@@ -1,4 +1,4 @@
--- Phase 20: Local citizen accounts for the citizen mobile app.
+-- Local citizen accounts for the citizen mobile app.
 -- Distinct from the production-proxied citizen accounts used by Citizen Management
 -- (pages/citizen/citizen-directory.php, api/citizen/*.php) -- those are untouched.
 -- Each row links exactly one resident to exactly one login. password_hash is NULL

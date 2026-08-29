@@ -1,4 +1,4 @@
--- Phase 11: Field Survey module, sub-module 4 — Photo Uploads.
+-- Field Survey module, sub-module 4 — Photo Uploads.
 -- Evidence photos attached to a survey result, same upload pattern as resident_documents.
 CREATE TABLE IF NOT EXISTS `field_survey_photos` (
   `photo_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,

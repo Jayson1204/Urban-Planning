@@ -1,4 +1,4 @@
--- Phase 5: Urban Planning
+-- Urban Planning
 -- Module 5.1 - Development Plans (core planning record, no FK deps).
 -- Later Phase 5 modules (Urban Projects, Infrastructure Records, Planning Documents)
 -- will FK to `development_plans`.

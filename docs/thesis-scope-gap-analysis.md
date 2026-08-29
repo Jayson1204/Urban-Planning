@@ -2,7 +2,7 @@
 
 Comparison of `docs/BSIT_Group 147_Chapter_1-2.docx` Section 1.3.1 ("In Scope") against the current codebase, done 2026-08-15. Use this as the working checklist to close the gap between what the manuscript claims and what the system actually does before defense.
 
-Each item follows the existing module recipe from `CLAUDE.md`: `database/phaseN_*.sql` -> Repository -> Service -> register in `bootstrap.php` -> `api/employee/x.php` -> `pages/<area>/x.php` -> JS bridge -> sidebar entry -> Module Management + Permission Builder (production).
+Each item follows the existing module recipe from `CLAUDE.md`: `database/x.sql` -> Repository -> Service -> register in `bootstrap.php` -> `api/employee/x.php` -> `pages/<area>/x.php` -> JS bridge -> sidebar entry -> Module Management + Permission Builder (production).
 
 ## Status summary
 
@@ -18,7 +18,7 @@ Each item follows the existing module recipe from `CLAUDE.md`: `database/phaseN_
 
 ## A. Zoning Clearance System — done
 
-Built 2026-08-15 as an MVP scoped down from the full doc description (`database/phase15_zoning_clearances.sql`, `ZoningUseRegulationRepository`/`ZoningClearanceRepository`, `ZoningConformityService`/`ZoningClearanceService`, `api/employee/zoning-clearances.php`, `pages/urban-planning/zoning-clearances.php` + `zoning-clearance-certificate.php`, `assets/js/zoning-clearances/`):
+Built 2026-08-15 as an MVP scoped down from the full doc description (`database/zoning_clearances.sql`, `ZoningUseRegulationRepository`/`ZoningClearanceRepository`, `ZoningConformityService`/`ZoningClearanceService`, `api/employee/zoning-clearances.php`, `pages/urban-planning/zoning-clearances.php` + `zoning-clearance-certificate.php`, `assets/js/zoning-clearances/`):
 - [x] Online application intake with a resident-applicant picker (reused from Housing Beneficiaries), system-generated `ZC-YYYY-NNNNNN` reference numbers
 - [x] Rule-based conformity pre-screening — seeded 8-zone x 7-use regulation matrix, checked live in the intake form (`?action=preview`) and again server-side on save, citing the violated criteria + ordinance reference note
 - [x] Multi-level approval workflow — append-only `zoning_clearance_reviews` audit log (reviewer, free-text role, action, remarks) driven by a status-transition endpoint that requires remarks on every change
@@ -31,7 +31,7 @@ Built 2026-08-15 as an MVP scoped down from the full doc description (`database/
 
 ## B. Housing Beneficiary Registry — done (except reporting)
 
-Closed 2026-08-15 (`database/phase14_beneficiary_scoring.sql`, `BeneficiaryService`, `HousingBeneficiaryRepository`, and the beneficiaries page/JS bridge):
+Closed 2026-08-15 (`database/housing_beneficiary_scoring.sql`, `BeneficiaryService`, `HousingBeneficiaryRepository`, and the beneficiaries page/JS bridge):
 - [x] Duplicate detection — blocks a new/re-opened application when the resident already has an open application, or when the resident's household already has another open application (one award per household)
 - [x] Eligibility scoring — server-computed 0-100 score (income, family size, category/vulnerability, household tenure), weights as documented class constants on `BeneficiaryService`; recomputed on every create/update
 - [x] Waitlist / prioritization ordering — "Priority (Waitlist)" sort option orders by `eligibility_score DESC`
@@ -41,7 +41,7 @@ Closed 2026-08-15 (`database/phase14_beneficiary_scoring.sql`, `BeneficiaryServi
 
 ## C. Subdivision and Building Review — done (full scope)
 
-Built 2026-08-19 as full scope (Subdivision Plan + Building Permit, not scoped down to permits-only) per explicit user decision (`database/phase17_subdivision_building_review.sql`, `PermitApplicationRepository`/`Service`, `PermitPlanDocumentRepository`, `api/employee/permit-applications.php` + `permit-plan-documents.php`, `pages/urban-planning/permit-applications.php` + `permit-certificate.php`, `assets/js/permit-applications/`):
+Built 2026-08-19 as full scope (Subdivision Plan + Building Permit, not scoped down to permits-only) per explicit user decision (`database/permit_applications.sql`, `PermitApplicationRepository`/`Service`, `PermitPlanDocumentRepository`, `api/employee/permit-applications.php` + `permit-plan-documents.php`, `pages/urban-planning/permit-applications.php` + `permit-certificate.php`, `assets/js/permit-applications/`):
 - [x] Permit applications, plan document versions, review comments, resubmission history — `permit_applications` / `permit_plan_documents` (versioned, superseding) / `permit_application_reviews` (append-only audit + threaded discipline comments) / `resubmission_round` tracking with a dedicated resubmit action
 - [x] Modeled as one `PermitApplicationRepository`/`Service` pair with an `application_type` discriminator (Subdivision Plan / Building Permit), not two separate repo/service pairs — deliberate deviation from this doc's literal naming suggestion in favor of its own "model as one application with N discipline-review sub-records" guidance
 - [x] Plan document versioning + comment threading + resubmission tracking
@@ -83,7 +83,7 @@ Suggest sequencing this after A and C exist, since several of these features (do
 - [x] Audit logging — `ActivityLogRepository`/`Service` (phase13, new)
 - [x] Executive dashboard / cross-module KPIs — `AnalyticsRepository` (new)
 - [x] Notifications — `NotificationService`
-- [x] Interactive web map — built 2026-08-15 (`database/phase16_barangay_mapping.sql`, `BarangayRepository`/`BarangayService`, `api/employee/barangays.php`, `pages/urban-planning/mapping.php`, `assets/js/mapping/`): Leaflet boundary map of all 188 Caloocan barangays (PSA/PSGC-sourced GeoJSON, not hand-drawn) with search, click/hover, a barangay info panel (housing units/occupancy/applications, joined by name — no FK exists on `barangay` columns), and a housing-project marker layer (`housing_units` gained optional `latitude`/`longitude`). Mobile mapping and AI-map integration (chat -> highlight barangays) are still open — no React Native app exists in this repo yet, and `GeminiService` isn't a query/tool-calling architecture, so building either now would be speculative ahead of need, per this doc's own guidance.
+- [x] Interactive web map — built 2026-08-15 (`database/barangay_mapping.sql`, `BarangayRepository`/`BarangayService`, `api/employee/barangays.php`, `pages/urban-planning/mapping.php`, `assets/js/mapping/`): Leaflet boundary map of all 188 Caloocan barangays (PSA/PSGC-sourced GeoJSON, not hand-drawn) with search, click/hover, a barangay info panel (housing units/occupancy/applications, joined by name — no FK exists on `barangay` columns), and a housing-project marker layer (`housing_units` gained optional `latitude`/`longitude`). Mobile mapping and AI-map integration (chat -> highlight barangays) are still open — no React Native app exists in this repo yet, and `GeminiService` isn't a query/tool-calling architecture, so building either now would be speculative ahead of need, per this doc's own guidance.
 - [ ] Shared parcel-centric spatial data model — the barangay-level layer above is not parcel-centric. Zoning Clearance (A) still self-declares its zone (no parcel/zoning-district polygon layer yet); Building Review (C) will need this when it's built. A natural follow-up once C exists: add a `zoning_districts` (or parcel) polygon layer and a real point-in-polygon zone lookup, replacing the self-declared zone field.
 - [ ] RA 11032 processing-time compliance monitoring — needs per-application timestamps against statutory processing-time limits; depends on A/C existing
 - [ ] RA 10173 data privacy safeguards (consent capture, field-level access restriction, retention rules) — not evident in current schema; needs a consent-capture field on citizen-facing intake forms and a retention-policy note, at minimum

@@ -1,4 +1,4 @@
--- Phase 11: Field Survey module, sub-module 3 — Survey Results.
+-- Field Survey module, sub-module 3 — Survey Results.
 -- One result per assignment: the surveyor's findings once fieldwork is done.
 CREATE TABLE IF NOT EXISTS `field_survey_results` (
   `result_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,

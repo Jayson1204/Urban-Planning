@@ -1,4 +1,4 @@
--- Phase 9: Local Activity Log.
+-- Local Activity Log.
 -- Records create/update/archive/restore events from this capstone's own local-DB
 -- modules (Residents, Housing, Urban Planning, Field Survey, Beneficiary Documents).
 -- The existing Audit Trail (pages/audit/*) only proxies to the remote civentral.tech

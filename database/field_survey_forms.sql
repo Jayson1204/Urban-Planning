@@ -1,4 +1,4 @@
--- Phase 11: Field Survey module, sub-module 1 — Survey Forms (survey type/template definitions).
+-- Field Survey module, sub-module 1 — Survey Forms (survey type/template definitions).
 -- Master table for the Field Survey module; assignments and results FK into this.
 CREATE TABLE IF NOT EXISTS `field_survey_forms` (
   `form_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,

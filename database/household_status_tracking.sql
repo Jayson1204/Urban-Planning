@@ -1,4 +1,4 @@
--- Phase 3 follow-up: promotes households to a fully managed record (list, edit, archive)
+-- Households follow-up: promotes households to a fully managed record (list, edit, archive)
 -- instead of only being creatable inline through the resident form's household picker.
 
 ALTER TABLE `households`

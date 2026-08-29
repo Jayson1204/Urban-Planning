@@ -1,4 +1,4 @@
--- Phase 18 seed: real, named NHA housing/resettlement projects in Caloocan
+-- Seed data: real, named NHA housing/resettlement projects in Caloocan
 -- City, found via web research (2026-08-19) since no bulk dataset exists for
 -- this layer (OSM has no reliable tagging for "housing project"). Each row
 -- cites its source; fields not confirmed by that source are left NULL so the

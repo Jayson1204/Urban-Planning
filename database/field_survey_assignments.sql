@@ -1,4 +1,4 @@
--- Phase 11: Field Survey module, sub-module 2 — Survey Assignments.
+-- Field Survey module, sub-module 2 — Survey Assignments.
 -- A form assigned to a surveyor for a subject: a resident, a household, or a free-text site.
 CREATE TABLE IF NOT EXISTS `field_survey_assignments` (
   `assignment_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,

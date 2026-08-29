@@ -1,4 +1,4 @@
--- Phase 4: Housing Management
+-- Housing Management
 -- Module 4.1 - Housing Units (master inventory record).
 -- New local tables. Later Phase 4 modules (Beneficiaries, Occupancy, Relocation,
 -- History) will add their own tables referencing `housing_units`.
