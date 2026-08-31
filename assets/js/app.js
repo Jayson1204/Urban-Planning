@@ -19,7 +19,7 @@ function escapeHtml(value) {
     // Cache-busting version for dynamically loaded scripts. Bump this whenever a
     // bridge-loaded JS file is changed so browsers fetch the new copy instead of a
     // stale cached one (XAMPP serves static .js with a long cache lifetime).
-    const ASSET_VERSION = '2026-08-29-4';
+    const ASSET_VERSION = '2026-08-31-1';
 
     // Global loader
     window.loadCiventralScript = function(src, callback = null) {

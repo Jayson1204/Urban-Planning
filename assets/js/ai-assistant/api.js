@@ -24,6 +24,11 @@ async function sendAiMessage(message) {
 
   appendChatMessage('user', message);
   aiChatHistory.push({ role: 'user', text: message });
+  // Keep client-side history in step with the server's cap so the browser isn't
+  // uploading an ever-growing payload every turn in a long session.
+  if (aiChatHistory.length > 12) {
+    aiChatHistory = aiChatHistory.slice(-12);
+  }
   setAiChatInputEnabled(false);
   showTypingIndicator(true);
 

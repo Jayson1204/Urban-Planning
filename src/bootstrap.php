@@ -39,6 +39,7 @@ require_once __DIR__ . '/Repositories/FieldSurveyResultRepository.php';
 require_once __DIR__ . '/Repositories/FieldSurveyPhotoRepository.php';
 require_once __DIR__ . '/Repositories/AnalyticsRepository.php';
 require_once __DIR__ . '/Repositories/ActivityLogRepository.php';
+require_once __DIR__ . '/Repositories/AiUsageLogRepository.php';
 require_once __DIR__ . '/Repositories/BarangayRepository.php';
 require_once __DIR__ . '/Repositories/SubdivisionRepository.php';
 require_once __DIR__ . '/Repositories/HousingProjectRepository.php';
@@ -113,6 +114,7 @@ $fieldSurveyResultRepo = new \App\Repositories\FieldSurveyResultRepository($db ?
 $fieldSurveyPhotoRepo = new \App\Repositories\FieldSurveyPhotoRepository($db ?? null);
 $analyticsRepo = new \App\Repositories\AnalyticsRepository($db ?? null);
 $activityLogRepo = new \App\Repositories\ActivityLogRepository($db ?? null);
+$aiUsageLogRepo = new \App\Repositories\AiUsageLogRepository($db ?? null);
 $barangayRepo = new \App\Repositories\BarangayRepository($db ?? null);
 $subdivisionRepo = new \App\Repositories\SubdivisionRepository($db ?? null);
 $housingProjectRepo = new \App\Repositories\HousingProjectRepository($db ?? null);
@@ -137,7 +139,7 @@ $infrastructureRecordService = new \App\Services\InfrastructureRecordService($in
 $fieldSurveyFormService = new \App\Services\FieldSurveyFormService($fieldSurveyFormRepo);
 $fieldSurveyAssignmentService = new \App\Services\FieldSurveyAssignmentService($fieldSurveyAssignmentRepo, $fieldSurveyFormRepo, $residentRepo, $householdRepo);
 $fieldSurveyResultService = new \App\Services\FieldSurveyResultService($fieldSurveyResultRepo, $fieldSurveyAssignmentRepo);
-$geminiService = new \App\Services\GeminiService($analyticsRepo);
+$geminiService = new \App\Services\GeminiService($analyticsRepo, $aiUsageLogRepo);
 $activityLogService = new \App\Services\ActivityLogService($activityLogRepo);
 $barangayService = new \App\Services\BarangayService($barangayRepo, $subdivisionRepo, $housingProjectRepo, $buildingRepo);
 $subdivisionService = new \App\Services\SubdivisionService($subdivisionRepo);

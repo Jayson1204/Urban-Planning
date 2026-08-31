@@ -39,6 +39,7 @@ $order = [
     'housing_projects_seed.sql',
     'citizen_accounts.sql',
     'citizen_account_login_lockout.sql',
+    'ai_usage_logs.sql',
 ];
 
 $applied = $pdo->query('SELECT filename FROM schema_migrations')->fetchAll(PDO::FETCH_COLUMN);

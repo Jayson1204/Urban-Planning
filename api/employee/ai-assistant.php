@@ -28,7 +28,7 @@ if ($method === 'POST') {
     }
 
     // Cap history length so the payload and prompt stay reasonable.
-    $history = array_slice($history, -20);
+    $history = array_slice($history, -12);
 
     $result = $geminiService->chat($message, $history);
 

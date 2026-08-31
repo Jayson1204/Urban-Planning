@@ -5,14 +5,38 @@ namespace App\Services;
 class GeminiService
 {
     private $apiKey;
-    private $model;
+    private $defaultModel;
+    private $complexModel;
     private $analyticsRepo;
+    private $usageLogRepo;
 
-    public function __construct($analyticsRepo = null, $model = 'gemini-flash-latest')
+    // USD per 1M tokens. Thinking tokens (thoughtsTokenCount) bill at the output rate.
+    // Only models this service actually routes to need an entry; an unlisted model just
+    // skips cost estimation rather than failing the request.
+    private const PRICING = [
+        'gemini-3.1-flash-lite' => ['input' => 0.25, 'output' => 1.50],
+        'gemini-3.5-flash-lite' => ['input' => 0.30, 'output' => 2.50],
+        'gemini-flash-latest' => ['input' => 0.30, 'output' => 2.50],
+    ];
+
+    // Cheap heuristic for routing to the pricier "complex" model tier: no extra API call,
+    // just message length or intent keywords implying multi-point analysis/recommendations.
+    private const COMPLEX_KEYWORDS = [
+        'recommend', 'analy', 'priorit', 'compare', 'trend', 'assess', 'strategy', 'forecast', 'evaluat',
+    ];
+    private const COMPLEX_LENGTH_THRESHOLD = 220;
+
+    private const DEFAULT_MAX_OUTPUT_TOKENS = 400;
+    private const COMPLEX_MAX_OUTPUT_TOKENS = 800;
+    private const TEMPERATURE = 0.3;
+
+    public function __construct($analyticsRepo = null, $usageLogRepo = null)
     {
         $this->apiKey = getenv('GEMINI_API_KEY') ?: null;
-        $this->model = $model;
+        $this->defaultModel = getenv('GEMINI_MODEL') ?: 'gemini-3.1-flash-lite';
+        $this->complexModel = getenv('GEMINI_MODEL_COMPLEX') ?: 'gemini-3.5-flash-lite';
         $this->analyticsRepo = $analyticsRepo;
+        $this->usageLogRepo = $usageLogRepo;
     }
 
     public function isConfigured()
@@ -20,9 +44,12 @@ class GeminiService
         return !empty($this->apiKey);
     }
 
-    public function generateContent($prompt)
+    public function generateContent($prompt, $complex = false)
     {
-        return $this->call(null, [['role' => 'user', 'parts' => [['text' => $prompt]]]]);
+        $model = $complex ? $this->complexModel : $this->defaultModel;
+        $maxOutputTokens = $complex ? self::COMPLEX_MAX_OUTPUT_TOKENS : self::DEFAULT_MAX_OUTPUT_TOKENS;
+
+        return $this->call($model, null, [['role' => 'user', 'parts' => [['text' => $prompt]]]], $maxOutputTokens);
     }
 
     /**
@@ -32,6 +59,10 @@ class GeminiService
      */
     public function chat($message, $history = [])
     {
+        $complex = $this->isComplexRequest($message);
+        $model = $complex ? $this->complexModel : $this->defaultModel;
+        $maxOutputTokens = $complex ? self::COMPLEX_MAX_OUTPUT_TOKENS : self::DEFAULT_MAX_OUTPUT_TOKENS;
+
         $contents = [];
         foreach ($history as $turn) {
             $role = ($turn['role'] ?? 'user') === 'model' ? 'model' : 'user';
@@ -39,7 +70,23 @@ class GeminiService
         }
         $contents[] = ['role' => 'user', 'parts' => [['text' => $message]]];
 
-        return $this->call($this->buildSystemInstruction(), $contents);
+        return $this->call($model, $this->buildSystemInstruction(), $contents, $maxOutputTokens);
+    }
+
+    private function isComplexRequest($message)
+    {
+        if (strlen($message) > self::COMPLEX_LENGTH_THRESHOLD) {
+            return true;
+        }
+
+        $lower = strtolower($message);
+        foreach (self::COMPLEX_KEYWORDS as $keyword) {
+            if (strpos($lower, $keyword) !== false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function buildSystemInstruction()
@@ -87,14 +134,20 @@ class GeminiService
         return implode("\n", $lines);
     }
 
-    private function call($systemInstructionText, $contents)
+    private function call($model, $systemInstructionText, $contents, $maxOutputTokens)
     {
         if (!$this->isConfigured()) {
             return ['success' => false, 'error' => 'GEMINI_API_KEY is not configured on the server.'];
         }
 
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key={$this->apiKey}";
-        $payload = ['contents' => $contents];
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$this->apiKey}";
+        $payload = [
+            'contents' => $contents,
+            'generationConfig' => [
+                'maxOutputTokens' => $maxOutputTokens,
+                'temperature' => self::TEMPERATURE,
+            ],
+        ];
         if ($systemInstructionText) {
             $payload['systemInstruction'] = ['parts' => [['text' => $systemInstructionText]]];
         }
@@ -121,15 +174,57 @@ class GeminiService
 
         if ($httpCode !== 200) {
             $message = $body['error']['message'] ?? ('Gemini API returned HTTP ' . $httpCode);
+            $this->logUsage($model, $body['usageMetadata'] ?? null, false);
             return ['success' => false, 'error' => $message, 'raw' => $body];
         }
 
         $text = $body['candidates'][0]['content']['parts'][0]['text'] ?? null;
+        $this->logUsage($model, $body['usageMetadata'] ?? null, $text !== null);
 
         if ($text === null) {
             return ['success' => false, 'error' => 'Gemini response did not contain any text.', 'raw' => $body];
         }
 
         return ['success' => true, 'text' => $text];
+    }
+
+    /**
+     * Never throws - a logging failure must not break the chat reply it was called from.
+     */
+    private function logUsage($model, $usageMetadata, $success)
+    {
+        if (!$this->usageLogRepo) {
+            return;
+        }
+
+        try {
+            $promptTokens = $usageMetadata['promptTokenCount'] ?? 0;
+            $thoughtsTokens = $usageMetadata['thoughtsTokenCount'] ?? 0;
+            $candidatesTokens = $usageMetadata['candidatesTokenCount'] ?? 0;
+            $totalTokens = $usageMetadata['totalTokenCount'] ?? ($promptTokens + $thoughtsTokens + $candidatesTokens);
+
+            $estimatedCost = null;
+            if (isset(self::PRICING[$model])) {
+                $pricing = self::PRICING[$model];
+                // Thinking tokens are billed as output tokens.
+                $outputTokens = $thoughtsTokens + $candidatesTokens;
+                $estimatedCost = ($promptTokens / 1000000 * $pricing['input']) + ($outputTokens / 1000000 * $pricing['output']);
+            }
+
+            $userId = $_SESSION['user_id'] ?? null;
+
+            $this->usageLogRepo->create([
+                'user_id' => $userId,
+                'model' => $model,
+                'prompt_tokens' => $promptTokens,
+                'thoughts_tokens' => $thoughtsTokens,
+                'candidates_tokens' => $candidatesTokens,
+                'total_tokens' => $totalTokens,
+                'estimated_cost_usd' => $estimatedCost,
+                'success' => $success ? 1 : 0,
+            ]);
+        } catch (\Throwable $e) {
+            error_log('GeminiService::logUsage failed: ' . $e->getMessage());
+        }
     }
 }

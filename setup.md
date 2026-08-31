@@ -56,6 +56,7 @@ cp .env.example .env
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_ENCRYPTION`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM_EMAIL`, `SMTP_FROM_NAME` | outgoing mail via PHPMailer |
 | `EXPO_PUBLIC_API_BASE_URL` | base URL the local proxy endpoints (`api/*` files using `config/proxy.php`) forward to; defaults to the production API at `https://civentral.tech/api/employee` |
 | `GEMINI_API_KEY` | server-side only, used by the AI Planning Assistant module — never expose to frontend JS |
+| `GEMINI_MODEL`, `GEMINI_MODEL_COMPLEX` | model IDs for the default (cheap/fast) and complex-request tiers; see `src/Services/GeminiService.php` |
 
 Ask a teammate (Scrum Master) for real reCAPTCHA/SMTP/Gemini credentials and remote API access — this project has no local auth backend of its own; login and RBAC proxy to the shared production system.
 
@@ -93,6 +94,7 @@ Repeat for each file below, substituting the filename, in this order:
 22. `housing_projects_seed.sql`
 23. `citizen_accounts.sql`
 24. `citizen_account_login_lockout.sql`
+25. `ai_usage_logs.sql`
 
 New migration files are appended to this list (in whatever order their own foreign keys require) as new modules are built — update this list when you add one.
 
