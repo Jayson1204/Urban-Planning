@@ -87,14 +87,20 @@
       };
     ?>
 
-    <aside id="sidebar" class="bg-brand-light text-slate-600 w-72 min-h-[calc(100vh-5rem)] flex flex-col justify-between transition-all duration-300 border-r border-brand-border/60 sticky top-20 h-[calc(100vh-5rem)] z-30 shrink-0 shadow-sm">
+    <div id="sidebarBackdrop" onclick="closeMobileSidebar()" class="hidden fixed inset-x-0 bottom-0 top-20 bg-slate-950/50 z-20 lg:hidden"></div>
+
+    <aside id="sidebar" class="fixed lg:sticky top-20 left-0 -translate-x-full lg:translate-x-0 bg-brand-light text-slate-600 w-72 h-[calc(100vh-5rem)] flex flex-col justify-between transition-all duration-300 border-r border-brand-border/60 z-40 lg:z-30 shrink-0 shadow-2xl lg:shadow-sm">
 
       <div class="flex flex-col h-full overflow-hidden">
         <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto custom-scrollbar">
 
           <div class="sidebar-divider px-1 pb-3 mb-2 border-b">
-            <button onclick="toggleSidebar()" class="sidebar-collapse-btn w-full py-2 rounded-xl border flex items-center justify-center focus:outline-none transition cursor-pointer shadow-xs" title="Collapse Menu Panel">
+            <button onclick="toggleSidebar()" class="sidebar-collapse-btn hidden lg:flex w-full py-2 rounded-xl border items-center justify-center focus:outline-none transition cursor-pointer shadow-xs" title="Collapse Menu Panel">
               <i id="toggleArrow" class="fa-solid fa-chevron-left text-xs"></i>
+            </button>
+            <button onclick="closeMobileSidebar()" class="sidebar-collapse-btn flex lg:hidden w-full py-2 rounded-xl border items-center justify-center gap-2 focus:outline-none transition cursor-pointer shadow-xs" title="Close Menu">
+              <i class="fa-solid fa-xmark text-xs"></i>
+              <span class="text-[10px] font-bold uppercase tracking-wider">Close Menu</span>
             </button>
           </div>
 

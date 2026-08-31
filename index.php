@@ -100,7 +100,7 @@
           Discover convenient digital public pathways, community updates, and localized transaction structures managed completely online.
         </p>
         <div class="pt-2 sm:pt-4 flex flex-wrap justify-center gap-3">
-          <a href="#features" class="px-4 sm:px-5 py-2.5 sm:py-3 bg-brand-medium text-white font-semibold rounded-lg text-xs sm:text-sm transition shadow-md hover:bg-opacity-90" id="heroBtnPrimary">Explore Services</a>
+          <a href="#features" class="px-4 sm:px-5 py-2.5 sm:py-3 bg-brand-medium text-white font-semibold rounded-lg text-xs sm:text-sm transition shadow-md hover:bg-brand-medium/90" id="heroBtnPrimary">Explore Services</a>
           <a href="#download-app" class="px-4 sm:px-5 py-2.5 sm:py-3 bg-white/10 hover:bg-white/20 text-white font-semibold border border-white/30 rounded-lg text-xs sm:text-sm transition" id="heroBtnSecondary">Get Mobile App</a>
         </div>
       </div>

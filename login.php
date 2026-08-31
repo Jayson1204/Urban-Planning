@@ -131,7 +131,7 @@ $recaptchaSiteKey = getenv('RECAPTCHA_SITE_KEY') ?: '';
 
         <button 
           type="submit" 
-          class="w-full py-3.5 px-4 bg-brand-medium hover:bg-opacity-90 text-white font-semibold rounded-lg text-sm transition shadow-sm focus:outline-none cursor-pointer"
+          class="w-full py-3.5 px-4 bg-brand-medium hover:bg-brand-dark hover:shadow-md hover:-translate-y-0.5 text-white font-semibold rounded-lg text-sm transition focus:outline-none cursor-pointer"
         >
           Sign in
         </button>
@@ -198,7 +198,7 @@ $recaptchaSiteKey = getenv('RECAPTCHA_SITE_KEY') ?: '';
         <button 
           type="submit" 
           id="btnVerifyOtp"
-          class="w-full py-3 px-4 bg-brand-medium hover:bg-opacity-90 text-white font-bold rounded-xl text-sm transition shadow-sm focus:outline-none cursor-pointer flex items-center justify-center gap-2"
+          class="w-full py-3 px-4 bg-brand-medium hover:bg-brand-dark hover:shadow-md hover:-translate-y-0.5 text-white font-bold rounded-xl text-sm transition focus:outline-none cursor-pointer flex items-center justify-center gap-2"
         >
           <span>Verify & Complete Sign In</span>
         </button>

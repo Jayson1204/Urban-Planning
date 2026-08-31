@@ -50,33 +50,36 @@ require_once __DIR__ . '/../src/bootstrap.php';
 </head>
 <body class="bg-slate-50 font-sans antialiased text-slate-800 min-h-screen flex flex-col">
 
-  <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 h-20 px-6 flex items-center justify-between sticky top-0 z-[90] shadow-xs shrink-0">
-    <div class="flex items-center space-x-4 text-brand-dark">
+  <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 h-20 px-3 sm:px-6 flex items-center justify-between sticky top-0 z-[90] shadow-xs shrink-0">
+    <div class="flex items-center space-x-2 sm:space-x-4 text-brand-dark min-w-0">
+        <button onclick="toggleMobileSidebar()" class="lg:hidden header-action-btn -ml-1 p-2 text-slate-500 dark:text-slate-400 hover:text-brand-dark dark:hover:text-brand-medium cursor-pointer shrink-0" title="Open Menu" aria-label="Open Menu">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
         <div class="shrink-0 flex items-center justify-center">
-          <img src="<?php echo $basePath ?? '../'; ?>assets/images/logo.png" alt="Logo" class="h-16 w-auto object-contain">
+          <img src="<?php echo $basePath ?? '../'; ?>assets/images/logo.png" alt="Logo" class="h-11 sm:h-16 w-auto object-contain">
         </div>
-    <div class="flex flex-col">
-      <span class="text-base font-black tracking-[0.15em] uppercase leading-none dark:text-white">CIVENTRAL</span>
-      <span class="text-[9px] font-bold text-brand-medium tracking-widest uppercase mt-1">Caloocan Portal</span>
+    <div class="hidden sm:flex flex-col min-w-0">
+      <span class="text-base font-black tracking-[0.15em] uppercase leading-none dark:text-white truncate">CIVENTRAL</span>
+      <span class="text-[9px] font-bold text-brand-medium tracking-widest uppercase mt-1 truncate">Caloocan Portal</span>
     </div>
   </div>
 
     <div class="flex items-center space-x-4">
       
-      <div class="hidden md:flex items-center space-x-2 text-slate-500 dark:text-slate-400 font-mono text-xs font-semibold">
+      <div class="hidden lg:flex items-center space-x-2 text-slate-500 dark:text-slate-400 font-mono text-xs font-semibold">
         <i class="fa-solid fa-calendar-day text-brand-medium"></i>
         <span id="headerClock">Loading System Time...</span>
       </div>
-      
-      <div class="hidden md:block h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
+
+      <div class="hidden lg:block h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
 
       <!-- Inactivity Countdown -->
-      <div class="hidden md:flex items-center space-x-2 text-slate-500 dark:text-slate-400 font-mono text-xs font-semibold" title="Session Timeout">
+      <div class="hidden lg:flex items-center space-x-2 text-slate-500 dark:text-slate-400 font-mono text-xs font-semibold" title="Session Timeout">
         <i class="fa-solid fa-hourglass-half text-brand-medium"></i>
         <span id="inactivityCountdown">05:00</span>
       </div>
-      
-      <div class="hidden md:block h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
+
+      <div class="hidden lg:block h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
 
       <button id="themeToggleBtn" onclick="toggleAppTheme()" class="header-action-btn p-2 text-slate-400 hover:text-brand-dark dark:hover:text-amber-400 cursor-pointer" title="Toggle Light / Dark Mode">
         <i id="themeToggleIcon" class="fa-solid fa-moon text-lg"></i>
@@ -90,7 +93,7 @@ require_once __DIR__ . '/../src/bootstrap.php';
         </button>
         
         <!-- Notifications Dropdown Menu Card -->
-        <div id="notifDropdownMenu" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-[100] transition-all transform scale-95 origin-top-right overflow-hidden flex flex-col">
+        <div id="notifDropdownMenu" class="hidden absolute right-0 mt-2 w-80 sm:w-96 max-w-[92vw] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-[100] transition-all transform scale-95 origin-top-right overflow-hidden flex flex-col">
           <!-- Card Header -->
           <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/40 shrink-0">
             <span class="font-black text-slate-800 dark:text-white uppercase tracking-wider text-xs">Notifications</span>

@@ -128,3 +128,34 @@ function toggleSidebar() {
 
     }
 }
+
+// MOBILE SIDEBAR (off-canvas drawer below the lg breakpoint)
+let isMobileSidebarOpen = false;
+
+function openMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (!sidebar) return;
+    isMobileSidebarOpen = true;
+    sidebar.classList.remove('-translate-x-full');
+    if (backdrop) backdrop.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+}
+
+function closeMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (!sidebar) return;
+    isMobileSidebarOpen = false;
+    sidebar.classList.add('-translate-x-full');
+    if (backdrop) backdrop.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+}
+
+function toggleMobileSidebar() {
+    if (isMobileSidebarOpen) {
+        closeMobileSidebar();
+    } else {
+        openMobileSidebar();
+    }
+}
