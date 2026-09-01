@@ -1,5 +1,9 @@
 <?php
 require_once __DIR__ . '/../src/bootstrap.php';
+
+// Every page that renders this header is a protected staff page; redirect to login
+// if there is no authenticated session instead of rendering the page shell for guests.
+\App\Middleware\AuthMiddleware::handle($basePath ?? '../');
 ?>
 <!DOCTYPE html>
 <html lang="en">
