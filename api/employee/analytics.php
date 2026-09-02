@@ -129,14 +129,29 @@ if (($_GET['export'] ?? '') === 'csv') {
     exit;
 }
 
+// The main Dashboard (assets/js/dashboard-analytics.js) is a second, separate consumer of
+// this same endpoint that predates Overall Analytics -- it still expects the original
+// summary() fields (total_households, total_survey_assignments, total_survey_results) plus
+// top-level kpis/charts. Those repository methods were kept intact specifically so this
+// still works; merge them back in rather than changing the dashboard's own JS.
+$legacySummary = $analyticsRepo->summary();
+$overallSummary = $analyticsRepo->overallSummary($dateFrom, $dateTo);
+$housingOccupancy = $analyticsRepo->housingOccupancyChart();
+
 respond(['status' => 'success', 'data' => [
-    'summary' => $analyticsRepo->overallSummary($dateFrom, $dateTo),
+    'summary' => array_merge($legacySummary, $overallSummary),
+    'kpis' => $analyticsRepo->kpis(),
+    'charts' => [
+        'housing_occupancy' => $housingOccupancy,
+        'urban_project_status' => $analyticsRepo->urbanProjectStatusChart(),
+        'survey_condition' => $analyticsRepo->surveyConditionChart(),
+    ],
     'housing' => [
         'by_status' => $analyticsRepo->housingApplicationsByStatus($dateFrom, $dateTo),
         'by_category' => $analyticsRepo->housingApplicationsByCategory($dateFrom, $dateTo),
         'applications_over_time' => $analyticsRepo->housingApplicationsOverTime($dateFrom, $dateTo),
         'applications_status_over_time' => $analyticsRepo->housingApplicationsStatusOverTime($dateFrom, $dateTo),
-        'occupancy' => $analyticsRepo->housingOccupancyChart(),
+        'occupancy' => $housingOccupancy,
         'by_barangay' => $analyticsRepo->housingUnitsByBarangay($dateFrom, $dateTo),
     ],
     'projects' => [
