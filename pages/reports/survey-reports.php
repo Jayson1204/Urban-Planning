@@ -42,6 +42,9 @@ include '../../includes/sidebar.php';
     <p class="text-xs text-slate-500">Generated <?php echo date('F j, Y g:i A'); ?></p>
   </div>
 
+  <!-- Report Meta: generated date/time, filtered vs total count, applied filters -->
+  <div id="reportMetaBar" class="text-[11px] font-semibold text-slate-500 bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-2.5"></div>
+
   <!-- Summary Cards -->
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
     <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between group relative overflow-hidden">

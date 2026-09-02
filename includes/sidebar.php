@@ -57,16 +57,23 @@
         'history.php'
       ];
       $reportsPages = [
+        'overall-reports.php',
         'resident-reports.php',
         'housing-reports.php',
+        'application-reports.php',
         'project-reports.php',
-        'survey-reports.php'
+        'survey-reports.php',
+        'user-reports.php',
+        'activity-reports.php'
       ];
       $aiAssistantPages = [
         'chat.php'
       ];
       $activityLogPages = [
         'activity.php'
+      ];
+      $analyticsPages = [
+        'overview.php'
       ];
 
       $isSuperAdmin = !empty($headerUser['is_superadmin']) || !empty($headerUser['is_global_access']);
@@ -108,6 +115,19 @@
             <i class="fa-solid fa-gauge-high text-sm <?php echo $currentPage == 'dashboard.php' ? 'text-brand-medium' : 'text-slate-400'; ?> group-hover:text-brand-medium transition"></i>
             <span class="sidebar-text truncate">Dashboard</span>
           </a>
+
+          <?php
+          // Gated by production's shared Role & Permission system, like every other module.
+          // Reuses the 'program analytics' resource the API already required (the page was
+          // previously unreachable -- it had no sidebar entry at all).
+          $canAccessAnalytics = $isSuperAdmin || $hasResourceAccess(['program analytics', 'overall analytics', 'analytics']);
+          if ($canAccessAnalytics):
+          ?>
+          <a href="<?php echo $basePath ?? '../'; ?>pages/analytics/overview.php" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs tracking-wide transition group cursor-pointer <?php echo in_array($currentPage, $analyticsPages) ? 'bg-white text-brand-dark border border-brand-border font-bold shadow-xs' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-dark dark:hover:text-[#86B6F6] border border-transparent font-semibold'; ?>">
+            <i class="fa-solid fa-chart-line text-sm <?php echo in_array($currentPage, $analyticsPages) ? 'text-brand-medium' : 'text-slate-400'; ?> group-hover:text-brand-medium transition"></i>
+            <span class="sidebar-text truncate">Overall Analytics</span>
+          </a>
+          <?php endif; ?>
 
           <span class="sidebar-text text-[9px] font-bold tracking-widest text-slate-400 uppercase block px-3 mb-2 mt-2">Urban Planning</span>
 
@@ -256,10 +276,14 @@
             </button>
 
             <div id="reportsDropdown" class="<?php echo in_array($currentPage, $reportsPages) ? '' : 'hidden'; ?> pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
+              <a href="<?php echo $basePath ?? '../'; ?>pages/reports/overall-reports.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'overall-reports.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-file-invoice text-[10px] <?php echo $currentPage == 'overall-reports.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Overall Reports</span></a>
               <a href="<?php echo $basePath ?? '../'; ?>pages/reports/resident-reports.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'resident-reports.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-people-roof text-[10px] <?php echo $currentPage == 'resident-reports.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Resident Reports</span></a>
               <a href="<?php echo $basePath ?? '../'; ?>pages/reports/housing-reports.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'housing-reports.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-house-chimney text-[10px] <?php echo $currentPage == 'housing-reports.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Housing Reports</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/reports/application-reports.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'application-reports.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-file-lines text-[10px] <?php echo $currentPage == 'application-reports.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Application Reports</span></a>
               <a href="<?php echo $basePath ?? '../'; ?>pages/reports/project-reports.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'project-reports.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-diagram-project text-[10px] <?php echo $currentPage == 'project-reports.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Project Reports</span></a>
               <a href="<?php echo $basePath ?? '../'; ?>pages/reports/survey-reports.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'survey-reports.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-clipboard-list text-[10px] <?php echo $currentPage == 'survey-reports.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Survey Reports</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/reports/user-reports.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'user-reports.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-users-gear text-[10px] <?php echo $currentPage == 'user-reports.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>User Reports</span></a>
+              <a href="<?php echo $basePath ?? '../'; ?>pages/reports/activity-reports.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] rounded-md transition <?php echo $currentPage == 'activity-reports.php' ? 'text-brand-medium font-black bg-white border border-brand-border/40 shadow-xs' : 'text-slate-500 hover:text-brand-dark'; ?>"><i class="fa-solid fa-clock-rotate-left text-[10px] <?php echo $currentPage == 'activity-reports.php' ? 'text-brand-medium' : 'opacity-50'; ?>"></i> <span>Activity Reports</span></a>
             </div>
           </div>
           <?php endif; ?>

@@ -59,12 +59,26 @@ class HousingBeneficiaryRepository
             $where[] = "b.unit_id = :unit_id";
             $params['unit_id'] = $filters['unit_id'];
         }
+        if (!empty($filters['barangay'])) {
+            // Single placeholder reused via COALESCE, not repeated (EMULATE_PREPARES=false).
+            $where[] = "COALESCE(res.barangay, h.barangay) = :barangay";
+            $params['barangay'] = $filters['barangay'];
+        }
+        if (!empty($filters['date_from'])) {
+            $where[] = "COALESCE(b.application_date, b.created_at) >= :date_from";
+            $params['date_from'] = $filters['date_from'] . ' 00:00:00';
+        }
+        if (!empty($filters['date_to'])) {
+            $where[] = "COALESCE(b.application_date, b.created_at) <= :date_to";
+            $params['date_to'] = $filters['date_to'] . ' 23:59:59';
+        }
 
         $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
 
         $countSql = "SELECT COUNT(*) AS total
                      FROM housing_beneficiaries b
                      LEFT JOIN residents res ON b.resident_id = res.resident_id
+                     LEFT JOIN households h ON b.household_id = h.household_id
                      LEFT JOIN housing_units hu ON b.unit_id = hu.unit_id
                      {$whereSql}";
         $countRows = $this->db->query($countSql, $params);
@@ -103,6 +117,72 @@ class HousingBeneficiaryRepository
              FROM housing_beneficiaries"
         );
         return $rows[0] ?? ['total' => 0, 'applicants' => 0, 'awarded' => 0, 'disqualified' => 0];
+    }
+
+    // Filter-aware summary for the Housing Application Report -- unlike stats() (used by
+    // the Beneficiaries management page for a fixed global count), this respects whatever
+    // filters the report currently has applied. Uses the same Pending/Approved/Rejected
+    // mapping approved for the Overall Analytics module (Applicant+Qualified/Awarded/
+    // Disqualified), with Cancelled broken out separately rather than folded into Rejected.
+    public function reportStats($filters)
+    {
+        $where = [];
+        $params = [];
+
+        if (!empty($filters['search'])) {
+            $where[] = "CONCAT_WS(' ', res.first_name, res.middle_name, res.last_name, hu.unit_code) LIKE :search";
+            $params['search'] = '%' . $filters['search'] . '%';
+        }
+        if (!empty($filters['beneficiary_status'])) {
+            $where[] = "b.beneficiary_status = :beneficiary_status";
+            $params['beneficiary_status'] = $filters['beneficiary_status'];
+        }
+        if (!empty($filters['category'])) {
+            $where[] = "b.category = :category";
+            $params['category'] = $filters['category'];
+        }
+        if (!empty($filters['status'])) {
+            $where[] = "b.status = :status";
+            $params['status'] = $filters['status'];
+        }
+        if (!empty($filters['barangay'])) {
+            $where[] = "COALESCE(res.barangay, h.barangay) = :barangay";
+            $params['barangay'] = $filters['barangay'];
+        }
+        if (!empty($filters['date_from'])) {
+            $where[] = "COALESCE(b.application_date, b.created_at) >= :date_from";
+            $params['date_from'] = $filters['date_from'] . ' 00:00:00';
+        }
+        if (!empty($filters['date_to'])) {
+            $where[] = "COALESCE(b.application_date, b.created_at) <= :date_to";
+            $params['date_to'] = $filters['date_to'] . ' 23:59:59';
+        }
+
+        $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
+
+        $rows = $this->db->query(
+            "SELECT
+                COUNT(*) AS total,
+                SUM(b.beneficiary_status IN ('Applicant','Qualified')) AS pending,
+                SUM(b.beneficiary_status = 'Awarded') AS approved,
+                SUM(b.beneficiary_status = 'Disqualified') AS rejected,
+                SUM(b.beneficiary_status = 'Cancelled') AS cancelled
+             FROM housing_beneficiaries b
+             LEFT JOIN residents res ON b.resident_id = res.resident_id
+             LEFT JOIN households h ON b.household_id = h.household_id
+             LEFT JOIN housing_units hu ON b.unit_id = hu.unit_id
+             {$whereSql}",
+            $params
+        );
+
+        $r = $rows[0] ?? [];
+        return [
+            'total' => (int)($r['total'] ?? 0),
+            'pending' => (int)($r['pending'] ?? 0),
+            'approved' => (int)($r['approved'] ?? 0),
+            'rejected' => (int)($r['rejected'] ?? 0),
+            'cancelled' => (int)($r['cancelled'] ?? 0),
+        ];
     }
 
     public function hasActiveAward($unitId, $excludeId = null)
